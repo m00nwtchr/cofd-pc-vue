@@ -1,0 +1,21 @@
+Headings : Fluoxetine
+Sub-Headings : Pterra-dactyl
+Body : Goudy
+
+Aurum : Copperplate
+Cuprum : Fandango by T26
+Ferrum : VitriolAlt
+Frankenstein : DuBellay
+Galateid : Stonecross
+Mercurius: Abaddon
+Osiran : Galahad or Mordred
+Stannum : FelinaGothic
+Tammuz : Distress
+Ulgan : InvacuoValid
+
+Additional Typefaces
+
+P22DaVinciBackwords
+P22DaVinciForwards
+IndustrialSchizophrenic
+TemaCantanteSans
