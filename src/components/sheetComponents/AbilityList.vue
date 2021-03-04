@@ -17,7 +17,7 @@ import { defineComponent } from "vue";
 export default defineComponent({
 	name: "AbilityList",
 	props: {
-		"abilityArr": {
+		"abilities": {
 			required: true,
 			type: Array
 		},
@@ -39,7 +39,7 @@ export default defineComponent({
 				delete (ability as any).false;
 				
 				// eslint-disable-next-line vue/no-mutating-props
-				this.abilityArr.push(ability);
+				this.abilities.push(ability);
 			}
 		},
 		doInput(ability: Ability) {
@@ -48,17 +48,17 @@ export default defineComponent({
 				delete (ability as any).false;
 				
 				// eslint-disable-next-line vue/no-mutating-props
-				this.abilityArr.push(ability);
+				this.abilities.push(ability);
 			}
 			if (this.optionsMutable &&  ability && ability.name === "") {
 				// eslint-disable-next-line vue/no-mutating-props
-				this.abilityArr.splice(this.abilityArr.indexOf(ability), 1);
+				this.abilities.splice(this.abilities.indexOf(ability), 1);
 			}
 		}
 	},
 	computed: {
 		visibleArr(): Ability[] {
-			const arr: any[] = [...this.abilityArr];
+			const arr: any[] = [...this.abilities];
 
 			if (this.optionsMutable) {
 				arr.push({name: "", dots: 0, false: true});
