@@ -1,0 +1,19 @@
+$color-vampire:    #5c1914;
+$vamp-silver: #414040;
+
+
+
+.charsheet-vampire {
+	background-color: white;
+	color: $color-vampire;
+
+	#attr-cats {
+		text-transform: lowercase;
+
+		color: $vamp-silver;
+	}
+
+	.sheet-dot-full {
+		background-color: $color-vampire !important;
+	}
+}
