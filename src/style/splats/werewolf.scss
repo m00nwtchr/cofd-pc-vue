@@ -1,0 +1,16 @@
+$color-werewolf:    #985f4c;
+
+.charsheet-werewolf {
+	background-color: white;
+	color: $color-werewolf;
+
+	#attr-cats {
+		text-transform: lowercase;
+
+		color: $vamp-silver;
+	}
+
+	.sheet-dot-full {
+		background-color: black !important;
+	}
+}

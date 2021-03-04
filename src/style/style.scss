@@ -1,0 +1,9 @@
+@import "./splats/vampire.scss";
+@import "./splats/mortal.scss";
+@import "./splats/mage.scss";
+@import "./splats/werewolf.scss";
+
+body {
+  color: $text;
+  background-color: $primary !important;
+}

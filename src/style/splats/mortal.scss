@@ -1,0 +1,39 @@
+$color-mortal:    #7c7f88;
+$mortal-bg: #f1f4fe;
+
+// @import "../../assets/splat/mortal-header-bg.png";
+
+.charsheet-mortal {
+	background-color: $mortal-bg;
+	
+	color: black;
+
+	// #attr-cats {
+	// 	text-transform: lowercase;
+
+	// 	// color: $vamp-silver;
+	// }
+
+	h2 {
+		// text-decoration: underline overline;
+
+		font-family: 'PlasticMan';
+
+		// background-image: url(../../assets/images/mortal-header.png);
+	}
+
+	h3, #minorTraits, #infoBar, #attr-cats {
+		font-family: 'Escalido';
+	}
+
+	.block i {
+		font-family: Goudy;
+		// font-weight: 300;
+		// font-weight: bold;
+		// font-
+	}
+
+	.sheet-dot-full {
+		background-color: black !important;
+	}
+}
