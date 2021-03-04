@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "precache-manifest.fd9c45fcb2b85288aaea04f3d6ed6abc.js"
+  "precache-manifest.3be1a183478ec184f86c49b67e7d2a97.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "cofd-pc"});
