@@ -243,7 +243,7 @@ const x = defineComponent({
 		abilities: function(): {[index: string]: number} {
 			const character: Character = this.character;
 			const obj: {[index: string]: number} = {};
-			(character.abilities || []).forEach(el => {
+			character.abilities.forEach(el => {
 				obj[el.name.toLowerCase()] = el.dots;
 			});
 			return obj;
@@ -316,6 +316,9 @@ const x = defineComponent({
 	beforeMount() {
 		(window as any).vue = this;
 		this.characters = JSON.parse(localStorage.characters) || {};
+
+		this.characters[this.id] = Object.assign({}, new Character({splat: this.characters[this.id].splat}), this.characters[this.id]);
+
 		this.character = this.characters[this.id];
 		console.log(this.character);
 	},
