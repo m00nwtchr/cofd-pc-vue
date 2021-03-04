@@ -243,7 +243,7 @@ const x = defineComponent({
 		abilities: function(): {[index: string]: number} {
 			const character: Character = this.character;
 			const obj: {[index: string]: number} = {};
-			character.abilities.forEach(el => {
+			(character.abilities || []).forEach(el => {
 				obj[el.name.toLowerCase()] = el.dots;
 			});
 			return obj;
