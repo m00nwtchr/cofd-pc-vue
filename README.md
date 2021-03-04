@@ -1,5 +1,7 @@
 # cofd-pc
 
+## [Demo](https://lmarianski.github.io/cofd-pc/#/)
+
 ## Project setup
 ```
 yarn install
