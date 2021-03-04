@@ -12,12 +12,60 @@ interface SplatTraits {
 
 interface MageTraits extends SplatTraits {
 	roteSkills: string[];
+	abilities: Ability[];
+}
+
+// class VampireTraits implements SplatTraits {
+// 	abilities: Ability[] = [
+// 		{name: "Animalism", dots: 0},
+// 		{name: "Auspex", dots: 0},
+// 		{name: "Celerity", dots: 0},
+// 		{name: "Dominate", dots: 0},
+// 		{name: "Majesty", dots: 0},
+// 		{name: "Nightmare", dots: 0},
+// 		{name: "Obfuscate", dots: 0},
+// 		{name: "Protean", dots: 0},
+// 		{name: "Resilience", dots: 0},
+// 		{name: "Vigor", dots: 0}
+// 	];
+// }
+
+// class WerewolfTraits implements SplatTraits {
+// 	abilities: Ability[] = [
+// 		{name: "Cunning", dots: 0},
+// 		{name: "Glory", dots: 0},
+// 		{name: "Honor", dots: 0},
+// 		{name: "Purity", dots: 0},
+// 		{name: "Wisdom", dots: 0}
+// 	];
+// }
+
+
+// const TRAIT_SPLAT_MAP: {[index: number]: any} = {
+// 	[EnumSplat.WEREWOLF]: WerewolfTraits,
+// 	[EnumSplat.VAMPIRE]: VampireTraits,
+// 	[EnumSplat.MAGE]: MageTraits,
+// };
+
+export interface Attributes {
+	[index: string]: number;
+	intelligence: number;
+	wits: number;
+	resolve: number;
+
+	strength: number;
+	dexterity: number;
+	stamina: number;
+
+	presence: number;
+	manipulation: number;
+	composure: number;
 }
 
 export default class Character {
 	name!: string;
 	age?: number;
-	
+
 	player?: string;
 	chronicle?: string;
 
@@ -35,24 +83,11 @@ export default class Character {
 
 	legacy?: string; // Legacy/Bloodline/Lodge
 
-	attributes!: {
-		[index: string]: number;
-		intelligence: number;
-		wits: number;
-		resolve: number;
+	attributes!: Attributes;
 
-		strength: number;
-		dexterity: number;
-		stamina: number;
+	skills: { [index: string]: number } = {};
 
-		presence: number;
-		manipulation: number;
-		composure: number;
-	};
-
-	skills: {[index: string]: number} = {};
-
-	abilities?: {[index: string]: number};
+	abilities: Ability[] = [];
 	merits: Ability[] = [];
 
 	healthTrack: number[] = [];
@@ -67,7 +102,7 @@ export default class Character {
 	fuel = 0;
 	// maxFuel = 10;
 
-	integrityTrait? = 7;
+	integrityTrait?= 7;
 
 	size = 5;
 	// speed?: number;
@@ -79,62 +114,79 @@ export default class Character {
 
 	// initative?: number;
 
-	beats? = 0;
-	experience? = 0;
+	beats?= 0;
+	experience?= 0;
 
-	alternateBeats? = 0;
-	alternateExperience? = 0;
+	alternateBeats?= 0;
+	alternateExperience?= 0;
 
-	// constructor(opts: any) {
+	roteSkills: string[] = [];
 
-	// }
+	constructor({ splat }: { splat?: EnumSplat }) {
+		switch (splat) {
+		case (EnumSplat.VAMPIRE):
+			this.abilities = [
+				{ name: "Animalism", dots: 0 },
+				{ name: "Auspex", dots: 0 },
+				{ name: "Celerity", dots: 0 },
+				{ name: "Dominate", dots: 0 },
+				{ name: "Majesty", dots: 0 },
+				{ name: "Nightmare", dots: 0 },
+				{ name: "Obfuscate", dots: 0 },
+				{ name: "Protean", dots: 0 },
+				{ name: "Resilience", dots: 0 },
+				{ name: "Vigor", dots: 0 }
+			];
+			break;
+		}
+	}
 
-	splatTraits: {
-		// [index: number]: SplatTraits;
-		[EnumSplat.MORTAL]: undefined;
-		[EnumSplat.WEREWOLF]: SplatTraits;
-		[EnumSplat.MAGE]: MageTraits;
-		[EnumSplat.VAMPIRE]: SplatTraits;
-	} = {
-		[EnumSplat.MORTAL]: undefined,
-		[EnumSplat.VAMPIRE]: {
-			abilities: [
-				{name: "Animalism", dots: 0},
-				{name: "Auspex", dots: 0},
-				{name: "Celerity", dots: 0},
-				{name: "Dominate", dots: 0},
-				{name: "Majesty", dots: 0},
-				{name: "Nightmare", dots: 0},
-				{name: "Obfuscate", dots: 0},
-				{name: "Protean", dots: 0},
-				{name: "Resilience", dots: 0},
-				{name: "Vigor", dots: 0}
-			],
-		},
-		[EnumSplat.MAGE]: {
-			abilities: [
-				{name: "Death", dots: 0},
-				{name: "Fate", dots: 0},
-				{name: "Forces", dots: 0},
-				{name: "Life", dots: 0},
-				{name: "Matter", dots: 0},
-				{name: "Mind", dots: 0},
-				{name: "Prime", dots: 0},
-				{name: "Spirit", dots: 0},				
-				{name: "Space", dots: 0},
-				{name: "Time", dots: 0}
-			],
-			roteSkills: []
+	// splatTraits: {
+	// 	// [index: number]: SplatTraits;
+	// 	[EnumSplat.MORTAL]: undefined;
+	// 	[EnumSplat.WEREWOLF]: SplatTraits;
+	// 	[EnumSplat.MAGE]: MageTraits;
+	// 	[EnumSplat.VAMPIRE]: SplatTraits;
+	// } = {
+	// 	[EnumSplat.MORTAL]: undefined,
+	// 	[EnumSplat.VAMPIRE]: {
+	// 		abilities: [
+	// 			{name: "Animalism", dots: 0},
+	// 			{name: "Auspex", dots: 0},
+	// 			{name: "Celerity", dots: 0},
+	// 			{name: "Dominate", dots: 0},
+	// 			{name: "Majesty", dots: 0},
+	// 			{name: "Nightmare", dots: 0},
+	// 			{name: "Obfuscate", dots: 0},
+	// 			{name: "Protean", dots: 0},
+	// 			{name: "Resilience", dots: 0},
+	// 			{name: "Vigor", dots: 0}
+	// 		],
+	// 	},
+	// 	[EnumSplat.MAGE]: {
+	// 		abilities: [
+	// 			{name: "Death", dots: 0},
+	// 			{name: "Fate", dots: 0},
+	// 			{name: "Forces", dots: 0},
+	// 			{name: "Life", dots: 0},
+	// 			{name: "Matter", dots: 0},
+	// 			{name: "Mind", dots: 0},
+	// 			{name: "Prime", dots: 0},
+	// 			{name: "Spirit", dots: 0},				
+	// 			{name: "Space", dots: 0},
+	// 			{name: "Time", dots: 0}
+	// 		],
+	// 		roteSkills: []
 
-		},
-		[EnumSplat.WEREWOLF]: {
-			abilities: [
-				{name: "Cunning", dots: 0},
-				{name: "Glory", dots: 0},
-				{name: "Honor", dots: 0},
-				{name: "Purity", dots: 0},
-				{name: "Wisdom", dots: 0}
-			],
-		},
-	};
+	// 	},
+	// 	[EnumSplat.WEREWOLF]: {
+	// 		abilities: [
+	// 			{name: "Cunning", dots: 0},
+	// 			{name: "Glory", dots: 0},
+	// 			{name: "Honor", dots: 0},
+	// 			{name: "Purity", dots: 0},
+	// 			{name: "Wisdom", dots: 0}
+	// 		],
+	// 	},
+	// };
 }

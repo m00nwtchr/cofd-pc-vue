@@ -4,13 +4,13 @@ import CharacterList from "../views/CharacterList.vue";
 import CharacterView from "../views/CharacterView.vue";
 
 const routes: Array<RouteRecordRaw> = [
+	// {
+	// 	path: "/",
+	// 	name: "Home",
+	// 	component: Home
+	// },
 	{
 		path: "/",
-		name: "Home",
-		component: Home
-	},
-	{
-		path: "/list",
 		name: "List",
 		component: CharacterList
 	},

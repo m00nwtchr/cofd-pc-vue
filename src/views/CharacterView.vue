@@ -51,11 +51,11 @@
 					Resistance<br />
 				</div>
 				<div class="row col-sm-10">
-					<div v-for="i in attributes.length" :key="i" class="block col-sm-4">
-						<span style="text-transform: capitalize" v-for="j in attributes[i-1].length" :key="j">
-							{{ attributes[i-1][j-1] }}
+					<div v-for="attrCat in attributeNames" :key="attrCat" class="block col-sm-4">
+						<span style="text-transform: capitalize" v-for="attr in attrCat" :key="attr">
+							{{ attr }}
 							<div class="sheet-dots">
-								<button @click="setAttr(attributes[i-1][j-1], n)" v-for="n in attrMax" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':character.attributes[attributes[i-1][j-1]]>=n,'sheet-dot-small':attrMax>5}"></button>
+								<button @click="setAttr(attr, n)" v-for="n in attrMax" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':character.attributes[attr]>=n,'sheet-dot-small':attrMax>5}"></button>
 							</div>
 							<br>
 						</span>
@@ -73,7 +73,7 @@
 							Rote<br/>Skill
 						</div>
 						<span style="text-transform: capitalize" v-for="skill in cat" :key="skill">
-							<button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.splatTraits[character.splat].roteSkills.includes(skill)}"></button>
+							<button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button>
 							{{ skill.replaceAll("_", " ") }}
 							<div class="sheet-dots">
 								<button @click="setSkill(skill, n)" v-for="n in attrMax" :key="n" class="sheet-dot" :class="{'sheet-dot-full': character.skills[skill] >= n,'sheet-dot-small':attrMax>5}"></button>
@@ -89,9 +89,9 @@
 					<div class="row col-12">
 						<div class="col col-sm-7">
 
-							<ability-list v-if="splat && splat.abilityName" :abilityArr="character.splatTraits[character.splat].abilities" :optionsMutable="!splat.finiteAbilities" :abilityName="splat.abilityName" id="ability" class="block" />
+							<ability-list v-if="splat && splat.abilityName" :abilities="character.abilities" :optionsMutable="!splat.finiteAbilities" :abilityName="splat.abilityName" id="ability" class="block" />
 
-							<ability-list :abilityArr="character.merits" abilityName="Merits" id="merits" class="block" />
+							<ability-list :abilities="character.merits" abilityName="Merits" id="merits" class="block" />
 
 							<div id="minorTraits" class="block col col-12">
 								Size: <input v-model.number="character.size" type="number" /><br>
@@ -124,15 +124,8 @@
 
 						</div>
 						<div class="col col-sm-5">
-							<div id="health" class="" style="margin-bottom: 15px">
-								<h3 class="separator col-sm-12">Health</h3>
-								<div class="sheet-dots" style="margin-top:-10px;">
-									<button v-for="n in maxHealth" :key="n" class="sheet-dot" :class="{'sheet-dot-full': true}"></button>
-								</div>
-								<div class="sheet-boxes" style="margin-top:-7px;">
-									<button v-for="n in maxHealth" :key="n" class="sheet-box" :class="{'sheet-dot-full': true}"></button>
-								</div>
-							</div>
+							<health-component id="health" style="margin-bottom: 15px" :maxHealth="maxHealth" :healthTrack="character.healthTrack" name="Health" />
+
 							<div id="willpower" style="margin-bottom: 15px">
 								<h3 class="separator col-sm-12">Willpower</h3>
 								<div class="sheet-dots" style="margin-top:-10px;">
@@ -175,9 +168,10 @@
 import { computed, defineComponent } from "vue";
 
 import { Splat, SPLATS, EnumSplat } from "../definitions/Splat";
-import Character from "../definitions/Character";
+import Character, { Attributes } from "../definitions/Character";
 
 import AbilityList from "@/components/sheetComponents/AbilityList.vue";
+import HealthComponent from "@/components/sheetComponents/HealthComponent.vue";
 
 // <div class="sheet-dots">
 // 	<button @click="setAttr('intelligence', n)" v-for="n in attrMax" :key="n" class="sheet-dot"></button>
@@ -186,15 +180,17 @@ import AbilityList from "@/components/sheetComponents/AbilityList.vue";
 interface CharacterViewData {
 	characters: { [index: string]: Character };
 	character: Character;
-	attributes: string[][];
+	attributeNames: string[][];
 	skills: string[][];
 	skillCats: {[index: string]: number};
+	attributes: Attributes;
 }
 
-export default defineComponent({
+const x = defineComponent({
 	name: "CharacterView",
 	components: {
-		"AbilityList": AbilityList
+		"AbilityList": AbilityList,
+		"HealthComponent": HealthComponent
 	},
 	computed: {
 		id: function (): string {
@@ -204,6 +200,21 @@ export default defineComponent({
 			console.log(EnumSplat[this.character.splat]);
 			return SPLATS[this.character.splat];
 		},
+		attributes: function(): Attributes {
+			return {
+				intelligence: this.character.attributes.intelligence,
+				wits: this.character.attributes.wits,
+				resolve: this.character.attributes.resolve,
+
+				strength: this.character.attributes.strength  + (this.abilities.vigor || 0),
+				dexterity: this.character.attributes.dexterity,
+				stamina: this.character.attributes.stamina + (this.abilities.resilience || 0),
+
+				presence: this.character.attributes.presence,
+				manipulation: this.character.attributes.manipulation,
+				composure: this.character.attributes.composure,
+			};
+		},		
 		attrMax: function() {
 			console.log(this.splat);
 			return (this as any).character.power > 5 ? ((this as any).character as Character).power : 5;
@@ -211,27 +222,31 @@ export default defineComponent({
 		maxHealth: function() {
 			const character: Character = this.character;
 			console.log(character);
-			return character && character.attributes.stamina + (character.size as number);
+			return (this as any).attributes.stamina + (character.size as number);
 		},
 		maxWillpower: function() {
-			const character: Character = this.character;
-			return character.attributes.resolve + character.attributes.composure;
+			return (this as any).attributes.resolve + (this as any).attributes.composure;
 		},		
 		speed: function() {
-			const character: Character = this.character;
-			return character.attributes.strength + character.attributes.dexterity + 5;
+			return (this as any).attributes.strength + (this as any).attributes.dexterity + 5 + ((this as any).abilities.celerity || 0);
 		},
 		defense: function() {
-			const character: Character = this.character;
-			return Math.min(character.attributes.dexterity, character.attributes.wits) + (character.skills.athletics || 0);
+			return Math.min((this as any).attributes.dexterity, (this as any).attributes.wits) + ((this as any).skills.athletics || 0);
 		},
 		initative: function() {
-			const character: Character = this.character;
-			return character.attributes.dexterity + character.attributes.composure;
+			return (this as any).attributes.dexterity + (this as any).attributes.composure;
 		},
 		maxFuel: function() {
 			const character: Character = this.character;
-			return character.power === 0 ? (this as any).character.splat === EnumSplat.VAMPIRE ? character.attributes.stamina : 0 : character.power >= 5 ? character.power >= 9 ? character.power === 10 ? 75 : (50) : (10 + (character.power-4)*5) : (10 + character.power - 1);
+			return character.power === 0 ? (this as any).character.splat === EnumSplat.VAMPIRE ? (this as any).attributes.stamina : 0 : character.power >= 5 ? character.power >= 9 ? character.power === 10 ? 75 : (50) : (10 + (character.power-4)*5) : (10 + character.power - 1);
+		},
+		abilities: function(): {[index: string]: number} {
+			const character: Character = this.character;
+			const obj: {[index: string]: number} = {};
+			character.abilities.forEach(el => {
+				obj[el.name.toLowerCase()] = el.dots;
+			});
+			return obj;
 		}
 	},
 	methods: {
@@ -270,7 +285,7 @@ export default defineComponent({
 			character[trait] = Math.max(min || 0, character[trait]);
 		},
 		toggleRoteSkill: function(skill: string) {
-			const roteSkills = this.character.splatTraits[EnumSplat.MAGE].roteSkills; 
+			const roteSkills = this.character.roteSkills; 
 			if (roteSkills.includes(skill)) {
 				roteSkills.splice(roteSkills.indexOf(skill), 1);
 			} else { 
@@ -285,7 +300,7 @@ export default defineComponent({
 
 			EnumSplat,
 
-			attributes: [
+			attributeNames: [
 				["intelligence", "wits"        , "resolve"],
 				["strength"    , "dexterity"   , "stamina"],
 				["presence"    , "manipulation", "composure"],
@@ -296,7 +311,7 @@ export default defineComponent({
 				["animal_ken", "empathy", "expression", "intimidation", "persuasion", "socialize", "streetwise", "subterfuge"],
 			],
 			skillCats: {"mental": -3, "physical": -1, "social": -1}
-		} as CharacterViewData;
+		};
 	},
 	beforeMount() {
 		(window as any).vue = this;
@@ -311,23 +326,6 @@ export default defineComponent({
 				localStorage.characters = JSON.stringify(newVal);
 			},
 			deep: true,
-		},
-		maxHealth: function() {
-			// const delIs: number[] = [];
-			// this.character.healthTrack.forEach((v,i) => {
-			// 	if (i > this.maxHealth) {
-			// 		delIs.push(i);
-			// 	}
-			// });
-			if (this.character.healthTrack.length < this.maxHealth) {
-				for (let iii = this.character.healthTrack.length; iii < this.maxHealth; iii++) {
-					this.character.healthTrack.push(0);
-				}
-			}
-			// delIs.forEach((v) => {
-			// 	delete this.character.healthTrack[v];
-			// });
-			console.log(this.character.healthTrack.length);
 		}
 		// attrMax: function(newVal, oldVal) {
 		// 	if (newVal > 5) {
@@ -338,6 +336,8 @@ export default defineComponent({
 		// }
 	},
 });
+
+export default x;
 </script>
 
 <style lang="scss">
