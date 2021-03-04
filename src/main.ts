@@ -30,7 +30,7 @@ Object.keys(characters).forEach(key => {
 });
 
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development" || !localStorage.characters) {
 	localStorage.characters = JSON.stringify(characters);
 }
 
