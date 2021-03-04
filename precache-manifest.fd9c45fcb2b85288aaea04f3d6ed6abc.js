@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "f6f68bc8288a5006f873",
+    "revision": "961eac4658f36437a601",
     "url": "css/app.9699af40.css"
   },
   {
@@ -128,12 +128,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "fonts/YouMurdererBB.e125151c.woff2"
   },
   {
-    "revision": "83828854d91827f4dabbb059b367858f",
+    "revision": "41bd7e4c9b7871a5bae5eda0e0e1bae4",
     "url": "index.html"
   },
   {
-    "revision": "f6f68bc8288a5006f873",
-    "url": "js/app.22945b73.js"
+    "revision": "961eac4658f36437a601",
+    "url": "js/app.cbc04438.js"
   },
   {
     "revision": "76918d45d54aedae61e2",
