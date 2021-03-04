@@ -1,6 +1,6 @@
 module.exports = {
 	// output: {
-	publicPath: "/cofd-pc/",
+	publicPath: "",
 	// },
 	css: {
 		loaderOptions: {
