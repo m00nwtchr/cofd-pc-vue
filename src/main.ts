@@ -14,6 +14,7 @@ import "@/style/style.scss";
 
 import Character from "./definitions/Character";
 import { EnumSplat } from "./definitions/Splat";
+
 const app = createApp(App);
 
 app.use(store)
@@ -130,7 +131,8 @@ const characters: { [index: string]: Character | any } = {
 			"manipulation": 2,
 			"composure": 3
 		},
-		"willpower": 1
+		"willpower": 1,
+		"touchstones": [null, null, null, null, null, null, {name: "Therapist"}]
 	},
 	"88f0cd49-41d6-42cb-9c66-07214cc910f1": {
 		"skills": {},
@@ -237,6 +239,20 @@ const characters: { [index: string]: Character | any } = {
 				"level": 3
 			}
 		],
+		rotes: [
+			{arcanum: "Mind", level: 1, spell: "Mental Scan", roteSkill: "occult"},
+			{arcanum: "Mind", level: 2, spell: "Psychic Domination", roteSkill: "subterfuge"},
+			{arcanum: "Time", level: 1, spell: "Postcognition", roteSkill: "investigation"},
+
+		],
+		yantras: [
+			"High Speech (+2)",
+			"Shadow Name (+3)"
+		],
+		praxes: [
+			"Know Nature",
+			"Choose the Threads"
+		],
 		"spentWillpowerDots": 0,
 		"power": 2,
 		"fuel": 11,
@@ -263,7 +279,7 @@ const characters: { [index: string]: Character | any } = {
 		"virtueAnchor": "Patient",
 		"viceAnchor": "Greedy",
 		"subType": "Mastigos",
-		"organization": "Ordo Dracul",
+		"organization": "Mysterium",
 		"legacy": "",
 		"baseAttributes": {
 			"intelligence": 3,
@@ -354,7 +370,7 @@ const characters: { [index: string]: Character | any } = {
 		"power": 3,
 		"fuel": 7,
 		"integrityTrait": 7,
-		"touchstones": [],
+		"touchstones": [{name: "The Old Gang"}, {name: "The Ambitious Totem"}],
 		// "size": 5,
 		"armor": {
 			"general": 0,

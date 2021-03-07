@@ -138,7 +138,21 @@ export default class Character {
 	alternateBeats?= 0;
 	alternateExperience?= 0;
 
-	roteSkills: string[] = [];
+	// roteSkills: string[] = [];
+
+	activeSpells!: string[];
+	yantras!: string[];
+	magicalTools!: string[];
+	praxes!: string[];
+	inuredSpells!: string[];
+
+	rotes!: {
+		arcanum: string;
+		level: number;
+		spell: string;
+		creator?: string;
+		roteSkill: string;
+	}[];
 
 	currentForm?: string = undefined;
 
@@ -158,6 +172,13 @@ export default class Character {
 			break;
 		case (EnumSplat.MAGE):
 			ablList = ["Death", "Fate", "Forces", "Life", "Matter", "Mind", "Prime", "Spirit", "Space", "Time"];
+			this.activeSpells = [];
+			this.yantras = [];
+			this.magicalTools = [];
+			this.praxes = [];
+			this.inuredSpells = [];
+			
+			this.rotes = [];
 			break;
 		case (EnumSplat.WEREWOLF):
 			ablList = ["Purity", "Glory", "Honor", "Wisdom", "Cunning"];
@@ -238,7 +259,8 @@ export default class Character {
 		});
 
 		this.maxHealth = computed(function() {
-			return self.attributes.value.stamina + self.size.value;
+			console.log("upd");
+			return self.attributes.value.stamina + self.size.value + (self.subType.toLowerCase() === "rahu" && self.abilities.value["purity"] && self.abilities.value["purity"].level >= 2 ? self.abilities.value["purity"].level : 0);
 		});
 		
 		this.speed = computed(function() {
