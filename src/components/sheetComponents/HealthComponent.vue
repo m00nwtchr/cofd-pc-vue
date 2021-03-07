@@ -1,6 +1,7 @@
 <template>
 	<div>
 		<h3 class="separator col-sm-12">{{ name }}</h3>
+		<slot></slot>
 		<!-- <div class="sheet-dots" style="margin-top:-10px;"> -->
 			<!-- <button v-for="n in maxHealth" :key="n" class="sheet-dot" :class="{'sheet-dot-full': true}"></button> -->
 		<!-- </div> -->
@@ -48,8 +49,8 @@ export default defineComponent({
 				healthTrack[n] = 0;
 			}
 
-			console.log(n, c);		
-			console.log(healthTrack);
+			// console.log(n, c);		
+			// console.log(healthTrack);
 		}
 	},
 	computed: {
@@ -77,7 +78,7 @@ export default defineComponent({
 					this.healthTrack.push(0);
 				}
 			}
-			console.log(this.healthTrack.length);
+			// console.log(this.healthTrack.length);
 		}
 	}
 });

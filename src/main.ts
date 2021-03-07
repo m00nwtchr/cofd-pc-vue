@@ -14,9 +14,9 @@ import "@/style/style.scss";
 
 import Character from "./definitions/Character";
 import { EnumSplat } from "./definitions/Splat";
+const app = createApp(App);
 
-createApp(App)
-	.use(store)
+app.use(store)
 	.use(router)
 	// .use(BootstrapVue)
 	.mount("#app");
@@ -35,103 +35,71 @@ const characters: { [index: string]: Character | any } = {
 			"streetwise": 2,
 			"subterfuge": 4
 		},
-		"abilities": [
-			{
+		"abilities": {
+			"animalism": {
 				"name": "Animalism",
-				"dots": 1
+				"level": 1
 			},
-			{
-				"name": "Auspex",
-				"dots": 0
-			},
-			{
-				"name": "Celerity",
-				"dots": 0
-			},
-			{
+			"dominate":{
 				"name": "Dominate",
-				"dots": 2
+				"level": 2
 			},
-			{
-				"name": "Majesty",
-				"dots": 0
-			},
-			{
-				"name": "Nightmare",
-				"dots": 0
-			},
-			{
-				"name": "Obfuscate",
-				"dots": 0
-			},
-			{
-				"name": "Protean",
-				"dots": 0
-			},
-			{
-				"name": "Resilience",
-				"dots": 0
-			},
-			{
-				"name": "Vigor",
-				"dots": 0
-			},
-			{
+			"coil of the voivode": {
 				"name": "Coil of the Voivode",
-				"dots": 1
+				"level": 1
 			}
-		],
+		},
 		"merits": [
 			{
 				"name": "Ordo Dracul Status",
-				"dots": 1
+				"level": 1
 			},
 			{
 				"name": "City Status",
-				"dots": 1
+				"level": 1
 			},
 			{
 				"name": "Cacophony Savvy",
-				"dots": 3
+				"level": 3
 			},
 			{
 				"name": "Fast-Talking",
-				"dots": 1
+				"level": 1
 			},
 			{
 				"name": "Professional Training",
-				"dots": 2
+				"level": 2
 			},
 			{
 				"name": "Feeding Grounds",
-				"dots": 0
+				"level": 0
 			},
 			{
 				"name": "Sleight of Hand",
-				"dots": 0
+				"level": 0
 			},
 			{
 				"name": "Striking Looks",
-				"dots": 0
+				"level": 0
 			},
 			{
 				"name": "Honey Trap",
-				"dots": 0
+				"level": 0
 			},
 			{
 				"name": "Safe Place",
-				"dots": 3
+				"level": 3
 			},
 			{
 				"name": "Contacts",
-				"dots": 2
+				"level": 2
 			}
 		],
 		"spentWillpowerDots": 0,
 		"power": 1,
 		"fuel": 8,
 		"integrityTrait": 7,
-		"size": 5,
+		// "size": 5,
 		"armor": {
 			"general": 0,
 			"ballistic": 0
@@ -151,7 +119,7 @@ const characters: { [index: string]: Character | any } = {
 		"subType": "Ventrue",
 		"organization": "Ordo Dracul",
 		"legacy": "",
-		"attributes": {
+		"baseAttributes": {
 			"intelligence": 3,
 			"wits": 3,
 			"resolve": 2,
@@ -172,7 +140,7 @@ const characters: { [index: string]: Character | any } = {
 		"power": 1,
 		"fuel": 0,
 		"integrityTrait": 7,
-		"size": 5,
+		// "size": 5,
 		"armor": {
 			"general": 0,
 			"ballistic": 0
@@ -192,7 +160,7 @@ const characters: { [index: string]: Character | any } = {
 		"viceAnchor": "whatever",
 		"faction": "The Trollers",
 		"organization": "The Mystery Troll Cult",
-		"attributes": {
+		"baseAttributes": {
 			"intelligence": 3,
 			"wits": 3,
 			"resolve": 2,
@@ -217,83 +185,63 @@ const characters: { [index: string]: Character | any } = {
 			"animal_ken": 1,
 			"subterfuge": 3
 		},
-		"abilities": [
-			{
-				"name": "Death",
-				"dots": 0
-			},
-			{
-				"name": "Fate",
-				"dots": 0
-			},
-			{
+		"abilities": {
+			"forces": {
 				"name": "Forces",
-				"dots": 1
+				"level": 1
 			},
-			{
-				"name": "Life",
-				"dots": 0
-			},
-			{
+			"matter":{
 				"name": "Matter",
-				"dots": 1
+				"level": 1
 			},
-			{
+			"mind":{
 				"name": "Mind",
-				"dots": 3
+				"level": 3
 			},
-			{
-				"name": "Prime",
-				"dots": 0
-			},
-			{
-				"name": "Spirit",
-				"dots": 0
-			},
-			{
+			"space":{
 				"name": "Space",
-				"dots": 1
+				"level": 1
 			},
-			{
+			"time":{
 				"name": "Time",
-				"dots": 2
+				"level": 2
 			}
-		],
+		},
 		"merits": [
 			{
 				"name": "Mysterium Order Status",
-				"dots": 1
+				"level": 1
 			},
 			{
 				"name": "High Speech",
-				"dots": 1
+				"level": 1
 			},
 			{
 				"name": "Shadow Name",
-				"dots": 3
+				"level": 3
 			},
 			{
 				"name": "Occultation",
-				"dots": 3
+				"level": 3
 			},
 			{
 				"name": "Resources",
-				"dots": 2
+				"level": 2
 			},
 			{
 				"name": "Safe Place",
-				"dots": 2
+				"level": 2
 			},
 			{
 				"name": "Trained Observer",
-				"dots": 3
+				"level": 3
 			}
 		],
 		"spentWillpowerDots": 0,
 		"power": 2,
 		"fuel": 11,
 		"integrityTrait": 7,
-		"size": 5,
+		// "size": 5,
 		"armor": {
 			"general": 0,
 			"ballistic": 0
@@ -317,7 +265,7 @@ const characters: { [index: string]: Character | any } = {
 		"subType": "Mastigos",
 		"organization": "Ordo Dracul",
 		"legacy": "",
-		"attributes": {
+		"baseAttributes": {
 			"intelligence": 3,
 			"wits": 3,
 			"resolve": 2,
@@ -331,35 +279,83 @@ const characters: { [index: string]: Character | any } = {
 		"willpower": 5
 	},
 	"b153b71d-57b0-488e-8a14-165f0ebc5b20": {
-		"skills": {},
-		"abilities": [
+		"skills": {
+			"investigation": 2,
+			"medicine": 2,
+			"athletics": 2,
+			"brawl": 3,
+			"stealth": 2,
+			"survival": 3,
+			"intimidation": 3,
+			"persuasion": 4
+		},
+		"abilities": {
+			"purity":{
+				"level": 3,
+				"name": "Purity"
+			},
+			"glory": {
+				"level": 1,
+				"name": "Glory"
+			}
+		},
+		"merits": [
 			{
-				"name": "Cunning",
-				"dots": 0
+				"name": "Giant",
+				"dots": 0,
+				"level": 3
 			},
 			{
-				"name": "Glory",
-				"dots": 0
+				"name": "Trained Observer",
+				"dots": 0,
+				"level": 1
 			},
 			{
-				"name": "Honor",
-				"dots": 0
+				"name": "Defensive Combat (Brawl)",
+				"dots": 0,
+				"level": 1
 			},
 			{
-				"name": "Purity",
-				"dots": 0
+				"name": "Favored Form (Gauru)",
+				"dots": 0,
+				"level": 2
 			},
 			{
-				"name": "Wisdom",
-				"dots": 0
+				"name": "Efficient Killer",
+				"dots": 0,
+				"level": 2
+			},
+			{
+				"name": "Relentless Assault",
+				"dots": 0,
+				"level": 2
+			},
+			{
+				"name": "Language",
+				"dots": 0,
+				"level": 1
+			},
+			{
+				"name": "Totem",
+				"dots": 0,
+				"level": 1
 			}
 		],
-		"merits": [],
+		"healthTrack": [
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0
+		],
 		"spentWillpowerDots": 0,
-		"power": 1,
-		"fuel": 0,
+		"power": 3,
+		"fuel": 7,
 		"integrityTrait": 7,
-		"size": 5,
+		"touchstones": [],
+		// "size": 5,
 		"armor": {
 			"general": 0,
 			"ballistic": 0
@@ -369,6 +365,7 @@ const characters: { [index: string]: Character | any } = {
 		"alternateBeats": 0,
 		"alternateExperience": 0,
 		"roteSkills": [],
+		"currentForm": "hishu",
 		"name": "Amos Gray",
 		"splat": 3,
 		"player": "m00n",
@@ -379,23 +376,28 @@ const characters: { [index: string]: Character | any } = {
 		"subType": "Rahu",
 		"organization": "Blood Talons",
 		"legacy": "",
-		"attributes": {
-			"intelligence": 3,
+		"baseAttributes": {
+			"intelligence": 1,
 			"wits": 3,
 			"resolve": 2,
-			"strength": 1,
-			"dexterity": 3,
-			"stamina": 2,
+			"strength": 3,
+			"dexterity": 2,
+			"stamina": 3,
 			"presence": 3,
-			"manipulation": 2,
+			"manipulation": 1,
 			"composure": 3
+		},
+		"kuruthTriggers": {
+			"passive": "Your auspice moon is in the sky.",
+			"common": "You witness your auspice moon in the sky.",
+			"specific": "Hear a wolf or werewolf howl when your auspice moon is in the sky."
 		}
 	}
 };
 
-Object.keys(characters).forEach(key => {
-	characters[key] = Object.assign({}, new Character({splat: characters[key].splat}), characters[key]);
-});
+// Object.keys(characters).forEach(key => {
+// 	characters[key] = Object.assign({}, new Character({splat: characters[key].splat}), characters[key]);
+// });
 
 
 if (process.env.NODE_ENV === "development" || !localStorage.characters) {
@@ -403,6 +405,6 @@ if (process.env.NODE_ENV === "development" || !localStorage.characters) {
 }
 
 (window as any).export = (): void => {
-	const url = `data:text/plain;base64,${btoa(localStorage.characters)}`;
+	const url = `data:application/json;base64,${btoa(JSON.stringify(JSON.parse(localStorage.characters),null,"\t"))}`;
 	console.log(url);
 };

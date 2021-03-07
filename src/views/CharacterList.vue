@@ -35,9 +35,9 @@ export default defineComponent({
 	},
 	watch: {
 		characters: function(newVal, oldVal) {
-			console.log(JSON.stringify(newVal));
+			// console.log(JSON.stringify(newVal));
 			localStorage.characters = JSON.stringify(newVal);
-			console.log(localStorage.characters);
+			// console.log(localStorage.characters);
 		}
 	}
 });
