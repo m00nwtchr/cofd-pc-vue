@@ -2,7 +2,15 @@ $color-werewolf:    #985f4c;
 
 .charsheet-werewolf {
 	background-color: white;
-	color: $color-werewolf;
+	// color: $color-werewolf;
+
+	.separator {
+		color: $color-werewolf;
+	}
+
+	#infoBar {
+		color: $color-werewolf;
+	}
 
 	input {
 		color: black;
@@ -11,15 +19,15 @@ $color-werewolf:    #985f4c;
 	#attr-cats {
 		// text-transform: lowercase;
 
-		// color: $vamp-silver;
+		color: $color-werewolf;
 	}
 
 	.attr-proper {
-		color: black;
+		// color: black;
 	}
 
 	.sheet-dot-full {
-		background-color: black !important;
+		// background-color: black !important;
 	}
 
 	.separator {
@@ -27,11 +35,11 @@ $color-werewolf:    #985f4c;
 	}
 
 	#skills span {
-		color: black;
+		// color: black;
 	}
 
 	#werewolf-forms {
-		color: black;
+		// color: black;
 
 		> div {
 			// border-right: 1px solid $color-werewolf;

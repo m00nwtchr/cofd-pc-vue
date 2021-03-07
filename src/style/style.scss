@@ -8,9 +8,13 @@ body {
   background-color: $primary !important;
 }
 
-input.line {
-	border-bottom: 1px solid;
+.line {
+	border-bottom: 1px solid black;
 	// margin-top: -15px !important;
 	padding: 0px;
 	height: 20px;
+}
+
+.selected {
+  text-shadow: $selected-shadow;
 }

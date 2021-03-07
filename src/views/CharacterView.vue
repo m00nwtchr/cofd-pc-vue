@@ -11,7 +11,16 @@
 		}">
 			<!-- <fab /> -->
 
+			<div class="fab">
+				<button>Action BTN</button>
+			</div>
+
+			{{selectedTraits}}
+
 			<div id="infoBar" class="bar row col-12">
+
+				<!-- <datalist> </datalist> -->
+
 				<div class="block col-sm-4">
 					{{ splat && splat.nameName }}: <input v-model="character.name" /><br />
 					<span v-if="character.splat === EnumSplat.MORTAL">
@@ -25,9 +34,9 @@
 				</div>
 				<div class="block col-sm-4">
 					{{ splat && splat.virtueAnchorName }}:
-					<input v-model="character.virtueAnchor" /><br />
+					<input v-model="character.virtueAnchor" list="virtueAnchors" /><br />
 					{{ splat && splat.viceAnchorName }}:
-					<input v-model="character.viceAnchor" /><br />
+					<input v-model="character.viceAnchor" list="viceAnchors" /><br />
 					Concept: <input v-model="character.concept" /><br />
 				</div>
 				<div class="block col-sm-4">
@@ -39,13 +48,30 @@
 					</span>
 					<span v-else>
 						{{ splat && splat.subTypeName }}:
-						<input v-model="character.subType" /><br />
+						<input v-model="character.subType" list="subTypes" /><br />
 						{{ splat && splat.legacyName }}:
 						<input v-model="character.legacy" /><br />
 					</span>
 
 					{{ splat && splat.orgName }}:
-					<input v-model="character.organization" /><br />
+					<input v-model="character.organization" list="organizations"/><br />
+
+					<datalist id="organizations">
+						<option v-for="org in splat.organizations" :key="org.name">{{ org.name }}</option>
+					</datalist>
+
+					<datalist id="subTypes">
+						<option v-for="el in splat.subTypes" :key="el.name">{{ el.name }}</option>
+					</datalist>
+
+					<datalist id="virtueAnchors">
+						<option v-for="el in splat.virtueAnchors" :key="el">{{ el }}</option>
+					</datalist>
+
+
+					<datalist id="viceAnchors">
+						<option v-for="el in splat.viceAnchors" :key="el">{{ el }}</option>
+					</datalist>
 				</div>
 			</div>
 			<div class="separator col-12"><h2>Attributes</h2></div>
@@ -58,7 +84,7 @@
 				<div class="attr-proper row col-sm-10">
 					<div v-for="attrCat in attributeNames" :key="attrCat" class="block col-sm-4">
 						<span style="text-transform: capitalize" v-for="attr in attrCat" :key="attr">
-							{{ attr }}
+							<span :class="{'selected': selectedTraits[attr]}" @click="selectTrait(attr,{attr:true})">{{ attr }}</span>
 							<div class="sheet-dots">
 								<button @click="setAttr(attr, n)" v-for="n in attrMax" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':character.baseAttributes[attr]>=n,'sheet-dot-small':attrMax>5}"></button>
 							</div>
@@ -78,8 +104,10 @@
 							Rote<br/>Skill
 						</div>
 						<span style="text-transform: capitalize" v-for="skill in cat" :key="skill">
-							<button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button>
-							{{ skill.replaceAll("_", " ") }}
+							<!-- <button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button> -->
+							<button v-if="character.splat === EnumSplat.MAGE" class="sheet-box" :class="{'sheet-dot-full': organization.skills.includes(skill)}"></button>
+							<span :class="{'selected': selectedTraits[skill]}" @click="selectTrait(skill,{skill:true,skillCat: i})">{{ skill.replaceAll("_", " ") }}</span>
+							
 							<div class="sheet-dots">
 								<button @click="setSkill(skill, n)" v-for="n in attrMax" :key="n" class="sheet-dot" :class="{'sheet-dot-full': character.skills[skill] >= n,'sheet-dot-small':attrMax>5}"></button>
 							</div>
@@ -117,7 +145,7 @@
 								</div>
 								<span style="clear:both;"></span>
 										<br>
-								Experience: <input v-model="character.experience" /><br>
+								Experience: <input v-model.number="character.experience" type="number" /><br>
 								<div v-if="(splat && splat.alternateBeatName) && !splat.alternateBeatOptional">
 									<span style="float:left;">{{ splat.alternateBeatName }} Beats:</span> 
 									<div style="float:left;">
@@ -127,14 +155,14 @@
 										</div>
 										<span style="clear:both;"></span>
 										<br>
-									{{ splat.alternateBeatName }} Experience: <input v-model="character.alternateExperience" /><br>
+									{{ splat.alternateBeatName }} Experience: <input v-model.number="character.alternateExperience" type="number" /><br>
 								</div>
 							</div>
 
 						</div>
 						<div class="col col-sm-5">
 							<health-component id="health" class="col-12" style="margin-bottom: 15px" :maxHealth="character.maxHealth" :healthTrack="character.healthTrack" name="Health">
-								<i class="subtitle" style="margin-bottom: 5px" v-if="character.splat === EnumSplat.WEREWOLF">(EEE)</i>
+								<!-- <i class="subtitle" style="margin-bottom: 5px" v-if="character.splat === EnumSplat.WEREWOLF">(EEE)</i> -->
 							</health-component>
 
 							<div id="willpower" class="col-12" style="margin-bottom: 15px">
@@ -147,7 +175,7 @@
 								</div>							
 							</div>
 							<div v-if="splat && splat.powerTraitName" class="col-12" id="powerTrait" style="margin-bottom: 15px">
-								<h3 class="separator col-sm-12">{{ splat.powerTraitName }}</h3>
+								<h3 :class="{'selected': selectedTraits['power']}" @click="selectTrait('power', {})" class="separator col-sm-12">{{ splat.powerTraitName }}</h3>
 								<div class="sheet-dots" style="margin-top:-10px;">
 									<button v-for="n in 10" :key="n" class="sheet-dot" @click="setTrait('power', n, {min: 1})" :class="{'sheet-dot-full': character.power >= n}"></button>
 								</div>
@@ -179,6 +207,57 @@
 							
 							<item-list class="col-12" name="Conditions" :items="character.conditions" :mutable="true"  />
 						</div>
+					</div>
+				</div>
+
+				<div v-if="character.splat === EnumSplat.MAGE" id="mage-traits" class="row col-12">
+					<div class="col-sm-4">
+							<div class="col-12" id="activeSpells" style="margin-bottom: 15px">
+								<h4 class="separator col-sm-12">Active Spells</h4>
+								<input class="line" v-for="n in character.power" :key="n" v-model="character.activeSpells[n-1]">
+							</div>
+							<item-list id="yantras" class="col-12" name="yantras" :items="character.yantras" :mutable="true" style="margin-bottom: 15px"  />
+							<item-list id="tools" class="col-12" name="magical tools" :items="character.magicalTools" :mutable="true"  style="margin-bottom: 15px"/>
+							<item-list id="praxes" class="col-12" name="praxes" :items="character.praxes" :mutable="true"  style="margin-bottom: 15px"/>
+							<item-list id="inuredSpells" class="col-12" name="inured spells" :items="character.inuredSpells" :mutable="true"  style="margin-bottom: 15px"/>
+					</div>
+
+					<div class="col-sm-8">
+							<div id="rotes" class="row col-sm-12">
+								<h4 class="separator col-sm-12" style="margin-bottom: 15px">Rotes</h4>
+									<div class="col-2" >
+										<i class="subtitle">Arcanum</i>
+									</div>
+									<div id="rote-level" class="col-1">
+										<i class="subtitle">Level</i>
+									</div>
+									<div class="col-5">
+										<i class="subtitle">Spell</i>
+									</div>
+									<div class="col-2">
+										<i class="subtitle">Creator</i>
+									</div>
+									<div class="col-2">
+										<i class="subtitle">Rote Skill</i>
+									</div>
+								<div @input="doInputRote(rote,i)" class="row" v-for="(rote,i) in rotes" :key="i">
+									<div class="col-2" >
+										<input class="line"  v-model="rote.arcanum">
+									</div>
+									<div id="rote-level" class="col-1">
+										<input class="line" v-model.number="rote.level" type="number">
+									</div>
+									<div class="col-5">
+										<input class="line" v-model="rote.spell">
+									</div>
+									<div class="col-2">
+										<input class="line" v-model="rote.creator">
+									</div>
+									<div class="col-2">
+										<input style="text-transform: capitalize;" class="line" v-model="rote.roteSkill">
+									</div>
+								</div>
+							</div>						
 					</div>
 				</div>
 
@@ -223,7 +302,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, toRefs } from "vue";
+import { computed, defineComponent, ref, Ref, toRefs } from "vue";
 
 import { Splat, SPLATS, EnumSplat, Form } from "../definitions/Splat";
 import Character, { Ability, Attributes } from "../definitions/Character";
@@ -236,6 +315,8 @@ import ItemList from "@/components/sheetComponents/ItemList.vue";
 // import fab from "vue-fab";
 
 import deepmerge from "deepmerge";
+
+import RandomUtil from "../RandomUtil";
 
 // <div class="sheet-dots">
 // 	<button @click="setAttr('intelligence', n)" v-for="n in attrMax" :key="n" class="sheet-dot"></button>
@@ -266,6 +347,12 @@ const x = defineComponent({
 		splat (): Splat {
 			// console.log(EnumSplat[this.character.splat]);
 			return SPLATS[this.character.splat];
+		},
+		subType() {
+			return (this as any).splat.subTypes.filter((el: any)=>el.name.toLowerCase() === this.character.subType.toLowerCase())[0] || {};
+		},
+		organization() {
+			return (this as any).splat.organizations.filter((el: any)=>el.name.toLowerCase() === this.character.organization.toLowerCase())[0] || {skills:[]};
 		},
 		// attributes(): Attributes {
 		// 	return {
@@ -323,9 +410,110 @@ const x = defineComponent({
 				speedMod: 0,
 				traits: []
 			};
+		},
+		rotes() {
+			const rotes = [...(this as any).character.rotes];
+			rotes.push({});
+			return rotes;
 		}
 	},
 	methods: {
+		async rollTest() {
+			const results = [] as string[][];
+
+			const maxTarget = 12;
+			const maxDice = 15;
+
+			const rollIterations = 5;
+
+			for (let dice = 1; dice <= maxDice; dice++) {
+				for (let target = 1; target <= maxTarget; target++) {
+
+					// const succArr = [];
+					// for (let i = 0; i < 10; i++) {
+					let succs = 0;
+					for (let j = 0; j < rollIterations; j++) {
+						const suc = await this.roll(dice, {} as any);
+						
+						if (suc >= target) {
+							succs++;
+						}
+					}
+					// succArr.push(succs/target);
+					// }
+					if (!results[dice-1]) results[dice-1] = [];
+					// results[dice-1][target-1] = succArr.reduce((prev, val) => prev+val) / 10;
+					results[dice-1][target-1] = ((succs/rollIterations/target)*100).toFixed(2);
+				}
+			}
+			return results;
+		},
+		// getRandom(num: number, min: number, max: number): number[] {
+
+		// 	if (window.crypto && window.crypto.getRandomValues) {
+		// 		const randomIntArray = function (length, min, max) {
+		// 			return new Array(length).fill(0).map(() => randomInt(min, max))
+		// 		}
+
+		// 		return Array.from();
+		// 	} else {
+		// 		return Array.from({length: num}, () => Math.round(Math.random() * max-1)+min);
+		// 	}
+		// },
+		roll(dice: number, opts: {
+			again: number;
+			bonus: number;
+			treshold: number;
+			values: boolean;
+		}): number[] | number {
+			opts = opts || {} as any;
+			opts.again    = opts.again || 10;
+			opts.bonus    = opts.bonus || 0;
+			opts.treshold = opts.treshold || 8;
+			opts.values   = opts.values || false;
+
+			// const self = this;
+
+			let result = RandomUtil.randomIntArray(dice, 1, 10);
+			// let result = await RandomUtil.generateIntegerSequence(dice, 1, 10);
+
+			const again = result.filter(num => num >= opts.again).length;
+
+			if (again > 0 && again !== 1) {
+				result = result.concat(this.roll(again, Object.assign({}, opts, {values: true})));
+			}
+
+			// .flatMap(num => num >= opts.again ? [num, ...this.roll(1, Object.assign({}, opts, {values: true})) as number[]] : [num]) as number[];
+
+
+			const succs = result.filter(el => el >= opts.treshold).length;
+
+			return opts.values ? result : succs+opts.bonus;
+		},
+		selectTrait(name: string, opts: {attr?: boolean; skill?: boolean; skillCat: string; ability?: boolean}) {
+			if (this.selectedTraits[name] !== undefined) {
+				delete this.selectedTraits[name];
+			} else {
+				if (Object.keys(this.selectedTraits).length === 3) {
+					this.selectedTraits = {};
+				}
+
+				// eslint-disable-next-line @typescript-eslint/no-this-alias
+				const self = this;
+				console.log(name);
+
+				this.selectedTraits[name] = computed(function() {
+					const attributes = self.character.attributes;
+					const skills = self.character.skills;
+					const abilities = self.character.abilities;
+					const obj = (opts.attr ? attributes : opts.skill ? skills : opts.ability ? abilities : self.character);
+
+					const res = (opts.ability ? obj[name].level : obj[name]) || 0;
+					return res+(res === 0 && opts.skill ? Object.values(self.skillCats)[opts.skillCat as any] : 0);
+				});
+				console.log(this.selectedTraits);
+			}
+		},
 		setAttr(attr: string, val: number) {
 			const character: Character = (this as any).character;
 
@@ -359,6 +547,14 @@ const x = defineComponent({
 			
 			// console.log(character[trait], min);
 			character[trait] = Math.max(min || 0, character[trait]);
+
+			if (trait === "beats" || trait === "alternateBeats") {
+				if (character[trait] === 5) {
+					character[trait] = 0;
+
+					trait === "beats" ? character["experience"]++ : character["alternateExperience"]++;
+				}
+			}
 		},
 		toggleRoteSkill(skill: string) {
 			const roteSkills = this.character.roteSkills; 
@@ -366,6 +562,21 @@ const x = defineComponent({
 				roteSkills.splice(roteSkills.indexOf(skill), 1);
 			} else { 
 				roteSkills.push(skill);
+			}
+		},
+		doInputRote(ability: any, i: number) {
+			if (!this.character.rotes[i]) {
+				this.character.rotes[i] = ability;
+			}
+			// console.log(ability);
+			if (!ability.arcanum &&
+				!ability.spell  &&
+				!ability.creator &&
+				!ability.roteSkill
+			) {
+				// console.log(ability);
+				// eslint-disable-next-line vue/no-mutating-props
+				this.character.rotes.splice(i, 1);
 			}
 		},
 		getNum(val: string): number {
@@ -385,7 +596,10 @@ const x = defineComponent({
 			characters: null as any,
 			character: null as any,
 			sizeMinusForm: null as any,
-			EnumSplat,
+
+			selectedTraits: {} as {[index: string]: Ref<number>},
+
+			EnumSplat, ref, RandomUtil,
 
 			attributeNames: [
 				["intelligence", "wits"        , "resolve"],
@@ -397,7 +611,7 @@ const x = defineComponent({
 				["athletics", "brawl", "drive", "firearms", "larceny", "stealth", "survival", "weaponry"],
 				["animal_ken", "empathy", "expression", "intimidation", "persuasion", "socialize", "streetwise", "subterfuge"],
 			],
-			skillCats: {"mental": -3, "physical": -1, "social": -1}
+			skillCats: {"mental": -3, "physical": -1, "social": -1} as {[index: string]: number}
 		};
 	},
 	beforeMount() {
@@ -534,7 +748,7 @@ button.sheet-dot {
 }
 
 button.sheet-dot-full {
-	background: $accent;
+	background: $accent !important;
 }
 
 .sheet-dot,
@@ -632,6 +846,25 @@ button.sheet-dot-small {
 	font-size: 8pt;
 
 	color: black;
+}
+
+.fab {
+	position: fixed;
+
+	right: 10px;
+	bottom: 10px;
+}
+
+#rotes {
+	text-align: center;
+	#rote-level input {
+		width: 220%;
+	}
+	input {
+		width: 100%;
+		margin-left: 10px;
+	}
+
 }
 
 </style>
