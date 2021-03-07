@@ -5,13 +5,15 @@
 		<div style="margin:0" v-for="(ability, i) in visibleArr" :key="i" class="block row col-sm-12">
 			<input @input="doInput(ability)" v-model="ability.name" class="line col-7">
 			<div class="sheet-dots col-5">
-				<button @click="setDots(ability, n)" v-for="n in 5" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':ability.dots>=n}"></button>
+				<button @click="setDots(ability, n)" v-for="n in 5" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':ability.level>=n}"></button>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
+/* eslint-disable vue/no-mutating-props */
+
 import { Ability } from "@/definitions/Character";
 import { defineComponent } from "vue";
 export default defineComponent({
@@ -19,7 +21,7 @@ export default defineComponent({
 	props: {
 		"abilities": {
 			required: true,
-			type: Array
+			type: Object
 		},
 		"abilityName": {
 			required: true,
@@ -31,43 +33,68 @@ export default defineComponent({
 			type: Boolean
 		}		
 	},
+	data() {return {
+		abilityArr: []
+	} as {abilityArr: Ability[]};},
+	beforeMount() {
+		console.log(this.abilities);
+		this.abilityArr = Object.values(this.abilities);
+	},
 	methods: {
 		setDots(ability: Ability, n: number) {
-			ability.dots = (ability.dots === n ? n-1 : n);
+			ability.level = (ability.level === n ? n-1 : n);
 
-			if (this.optionsMutable && (ability as any).false && ability.name !== "" && ability.dots > 0) {
+			if (this.optionsMutable && (ability as any).false && ability.name !== "" && ability.level > 0) {
 				delete (ability as any).false;
 				
 				// eslint-disable-next-line vue/no-mutating-props
-				this.abilities.push(ability);
+				this.abilityArr.push(ability);
 			}
 		},
 		doInput(ability: Ability) {
 			console.log("E");
-			if (this.optionsMutable &&  ability && (ability as any).false && ability.name !== "" && ability.dots > 0) {
+			if (this.optionsMutable &&  ability && (ability as any).false && ability.name !== "" && ability.level > 0) {
 				delete (ability as any).false;
 				
 				// eslint-disable-next-line vue/no-mutating-props
-				this.abilities.push(ability);
+				this.abilityArr.push(ability);
 			}
 			if (this.optionsMutable &&  ability && ability.name === "") {
 				// eslint-disable-next-line vue/no-mutating-props
-				this.abilities.splice(this.abilities.indexOf(ability), 1);
+				this.abilityArr.splice(this.abilityArr.indexOf(ability), 1);
 			}
 		}
 	},
 	computed: {
 		visibleArr(): Ability[] {
-			const arr: any[] = [...this.abilities];
+			const arr: any[] = [].concat(this.abilityArr as any);
 
 			if (this.optionsMutable) {
-				arr.push({name: "", dots: 0, false: true});
+				arr.push({name: "", level: 0, false: true});
 			}
 
 			return arr as Ability[];
 		}
 	},
 	watch: {
+		abilityArr: {handler(newVal, oldVal) {
+			// (this as any).abilities = {};
+
+			newVal.forEach((el: Ability) => {
+				this.abilities[el.name.toLowerCase()] = el;
+			});
+		}, deep:true}
+		// abilities: {handler(newVal, oldVal) {
+
+		// 	// console.log(newVal, oldVal);
+
+		// 	const newW = Object.keys(newVal).filter(el => Object.keys(oldVal).includes(el))[0];
+		// 	const old  = Object.keys(oldVal).filter(el => Object.keys(newVal).includes(el))[0];
+
+
+		// 	this.abilities[newW] = this.abilities[old];
+		// 	delete this.abilities[old];
+		// }, deep: true}
 		// abilityArr: {
 		// 	handler(newArr, oldArr) {
 		// 		newArr.forEach(el => {
@@ -99,13 +126,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-input.line {
-	border-bottom: 1px solid;
-	// margin-top: -15px !important;
-	padding: 0px;
-	height: 20px;
-}
-
 .sheet-dots {
 	padding: 0px;
 }

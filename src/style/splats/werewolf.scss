@@ -4,13 +4,58 @@ $color-werewolf:    #985f4c;
 	background-color: white;
 	color: $color-werewolf;
 
-	#attr-cats {
-		text-transform: lowercase;
+	input {
+		color: black;
+	}
 
-		color: $vamp-silver;
+	#attr-cats {
+		// text-transform: lowercase;
+
+		// color: $vamp-silver;
+	}
+
+	.attr-proper {
+		color: black;
 	}
 
 	.sheet-dot-full {
 		background-color: black !important;
+	}
+
+	.separator {
+		text-transform: capitalize;
+	}
+
+	#skills span {
+		color: black;
+	}
+
+	#werewolf-forms {
+		color: black;
+
+		> div {
+			// border-right: 1px solid $color-werewolf;
+			// border-top: 1px solid $color-werewolf;
+			> i {
+				// padding-bottom: 2px;
+				// border-bottom: 1px solid $color-werewolf;
+			}
+			> div {
+				// height: 100%;
+				// border-right: 1px solid $color-werewolf;
+				// padding: 2px;
+			}
+			input {
+				width: 45px;
+			}
+		}
+
+		.form-active {
+			text-shadow: $selected-shadow;
+		}
+
+		h4 {
+			color: $color-werewolf;
+		}
 	}
 }
