@@ -6,7 +6,13 @@
 		<ul class="col-12" id="list">
 			<router-link :key="key" v-for="(el, key) in characters"  :to="'/character/'+key"><li class="list-item">
 			
-				<div>{{el.name}}</div>
+				<div>
+					<span class="name">{{el.name}}</span><br>
+					<span style="text-transform: capitalize;" class="desc">
+						<span v-if="el.concept">{{ el.concept }}<br></span>
+						{{ `${EnumSplat[el.splat].toLowerCase()}, ${el.organization ||""} ${el.legacy ||""} ${el.subType ||""}` }}
+					</span>
+				</div>
 			
 			</li></router-link>
 
@@ -16,6 +22,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { EnumSplat } from "@/definitions/Splat";
+
+console.log(EnumSplat);
 
 export default defineComponent({
 	name: "CharacterList",
@@ -23,7 +32,8 @@ export default defineComponent({
 	},
 	data() {
 		return {
-			characters: {}
+			characters: {},
+			EnumSplat
 		};
 	},
 	mounted() {
@@ -72,6 +82,8 @@ header {
 
 	list-style-type: none;
 
+	line-height: 16px;
+
 	li {
 		display: block;
 
@@ -82,9 +94,10 @@ header {
 		text-align: left;
 
 
-		height: 50px;
+		height: 60px;
 		background-color: $accent;
 
+		border: 2px solid gray;
 
 		div {
 			margin-left: 10px;
@@ -92,6 +105,14 @@ header {
 			color: $text-light;
 		}
 	}
+}
+
+.name {
+	font-weight: bold;
+}
+
+.desc {
+	font-size: 10pt;
 }
 
 a {
