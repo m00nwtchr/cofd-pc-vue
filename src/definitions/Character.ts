@@ -1,5 +1,5 @@
 import deepmerge from "deepmerge";
-import { computed, ComputedRef, Ref, ref, toRefs } from "vue";
+import { computed, ComputedRef, isRef, reactive, Ref, ref, toRefs } from "vue";
 import { Computed } from "vuex";
 import { EnumSplat, Form } from "./Splat";
 
@@ -50,6 +50,52 @@ interface MageTraits extends SplatTraits {
 // 	[EnumSplat.MAGE]: MageTraits,
 // };
 
+// function get(baseObj: any, traitName: string): Ref<any> {
+// 	return computed(() => {
+// 		return (baseObj as any)[traitName] || {};
+// 	});
+// }
+
+// (window as any).get = get;
+
+export function getNum(val: string): number {
+	// return computed(() => {
+	// const ret = (() => {
+	try {
+		return eval(val) || 0;
+	} catch(e) {
+		return 0;
+	}
+	// })();
+
+	// return isRef(ret) ? ret : ref(ret);
+	// });
+}
+
+function def<T>(func: () => T, def?: T): ComputedRef<T> {
+	return computed(() => {
+		try {
+			const val = func();
+			// console.log(def);
+			if (def === undefined) {
+				if (typeof val === "number") {
+					def = 0 as any;
+				}
+			}
+			// console.log(val, typeof val);
+
+			return val || def;
+		} catch (e) {
+			return def || 0;
+		}
+	}) as any;
+	// try {
+	// 	return func() || def;
+	// } catch (e) {
+	// 	return def;
+	// }
+}
+
 export interface Attributes {
 	[index: string]: number;
 	intelligence: number;
@@ -86,13 +132,14 @@ export default class Character {
 
 	legacy?: string; // Legacy/Bloodline/Lodge
 
-	baseAttributes!: Ref<Attributes>;
+	baseAttributes!: Attributes;
 	attributes: ComputedRef<Attributes>;
 
 	skills: { [index: string]: number } = {};
+	specialties: { [index: string]: string[] } = {};
 
 	// abilityArr: Ability[] | Ref<Ability[]>;
-	abilities: Ref<{ [index: string]: Ability }>;
+	abilities: { [index: string]: Ability };
 
 	merits: Ability[] = [];
 
@@ -138,8 +185,6 @@ export default class Character {
 	alternateBeats?= 0;
 	alternateExperience?= 0;
 
-	// roteSkills: string[] = [];
-
 	activeSpells!: string[];
 	yantras!: string[];
 	magicalTools!: string[];
@@ -154,13 +199,19 @@ export default class Character {
 		roteSkill: string;
 	}[];
 
-	currentForm?: string = undefined;
+	currentForm?: Ref<string> = undefined;
+	currentFormObj!: ComputedRef<Form>;
 
 	kuruthTriggers?: {passive: string; common: string; specific: string};
+
+	getNum(arg: string) {
+		return getNum.call(this, arg);
+	}
 
 	constructor(opts: Character) {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const self = this;
+		const vue = (window as any).vue;
 
 		// const giantBonus = 
 
@@ -182,7 +233,22 @@ export default class Character {
 			break;
 		case (EnumSplat.WEREWOLF):
 			ablList = ["Purity", "Glory", "Honor", "Wisdom", "Cunning"];
-			this.currentForm = "hishu";
+			this.currentForm = ref("hishu");
+
+			this.currentFormObj = computed(function() {
+				return vue.splat.forms && self.currentForm ? vue.splat.forms[self.currentForm.value] : {
+					name: "",
+					desc: "",
+					dexterityMod: 0,
+					manipulationMod: 0,
+					perceptionMod: 0,
+					sizeMod: 0,
+					staminaMod:0,
+					strengthMod:0,
+					speedMod: 0,
+					traits: []
+				};
+			});
 			this.kuruthTriggers = {passive: "", common: "", specific: ""};
 			break;
 		}
@@ -195,8 +261,12 @@ export default class Character {
 
 		Object.assign(this, opts);
 
-		this.abilities = ref(Object.assign({}, defaultAbl, (this as any).abilities));
-		this.baseAttributes = ref(this.baseAttributes);
+		this.abilities = reactive(Object.assign({}, defaultAbl, (this as any).abilities));
+		this.baseAttributes = reactive(this.baseAttributes);
+		
+		if (this.currentForm && !isRef(this.currentForm)) {
+			this.currentForm = ref(this.currentForm);
+		}
 
 		// console.log(toRefs(this));
 
@@ -216,21 +286,20 @@ export default class Character {
 
 		console.log(this.abilities);
 
-		const vue = (window as any).vue;
 
 		this.attributes = computed(function() {
 			return {
-				intelligence: self.baseAttributes.value.intelligence,
-				wits: self.baseAttributes.value.wits,
-				resolve: self.baseAttributes.value.resolve,
+				intelligence: self.baseAttributes.intelligence,
+				wits: self.baseAttributes.wits,
+				resolve: self.baseAttributes.resolve,
 
-				strength : self.baseAttributes.value.strength  + vue.getNum("this.currentForm.strengthMod") + vue.getNum("this.character.abilities.value.vigor.level"),
-				dexterity: self.baseAttributes.value.dexterity + vue.getNum("this.currentForm.dexterityMod"),
-				stamina  : self.baseAttributes.value.stamina   + vue.getNum("this.currentForm.staminaMod")  + vue.getNum("this.character.abilities.value.resilience.level"),
+				strength : self.baseAttributes.strength  + def(() => self.currentFormObj.value.strengthMod).value + def(() => self.abilities.vigor.level).value,
+				dexterity: self.baseAttributes.dexterity + def(() => self.currentFormObj.value.dexterityMod).value,
+				stamina  : self.baseAttributes.stamina   + def(() => self.currentFormObj.value.staminaMod).value  + def(() => self.abilities.resilience.level).value,//((self.abilities.value.resilience || {}).level || 0),//vue.getNum("this.character.abilities.value.resilience.level"),
 
-				presence: self.baseAttributes.value.presence,
-				manipulation: self.baseAttributes.value.manipulation + vue.getNum("this.currentForm.manipulationMod"),
-				composure: self.baseAttributes.value.composure,
+				presence: self.baseAttributes.presence,
+				manipulation: self.baseAttributes.manipulation + def(() => self.currentFormObj.value.manipulationMod).value,
+				composure: self.baseAttributes.composure,
 			};
 		}/*,set(val) {
 			console.log(val);
@@ -249,27 +318,37 @@ export default class Character {
 			};
 		}}*/);
 
+		const giantMod = computed(() => self.merits.find(el => el.name === "Giant" && el.level == 3) ? 1 : 0);
+		const sizeMod = def(() => self.currentFormObj.value.sizeMod);
 		this.size = computed({
 			get() {
-				return self.baseSize.value + vue.getNum("this.currentForm.sizeMod") + (self.merits.find(el => el.name === "Giant" && el.level == 3) ? 1 : 0);
+				return self.baseSize.value + sizeMod.value + giantMod.value;
 			},
 			set(val) {
-				self.baseSize.value = val - vue.getNum("this.currentForm.sizeMod") - (self.merits.find(el => el.name === "Giant" && el.level == 3) ? 1 : 0);
+				self.baseSize.value = val - sizeMod.value - giantMod.value;
 			}
 		});
 
 		this.maxHealth = computed(function() {
-			console.log("upd");
-			return self.attributes.value.stamina + self.size.value + (self.subType.toLowerCase() === "rahu" && self.abilities.value["purity"] && self.abilities.value["purity"].level >= 2 ? self.abilities.value["purity"].level : 0);
+			let val = self.attributes.value.stamina + self.size.value;
+			
+			if (self.splat === EnumSplat.WEREWOLF) {
+				if (self.subType.toLowerCase() === "rahu") {
+					const purity = def(() => self.abilities.purity.level, 0).value;
+					val += purity >= 2 ? purity : 0;
+				}
+			}
+
+			return val;
 		});
 		
 		this.speed = computed(function() {
 			// this.getNum;
-			return self.attributes.value.strength + self.attributes.value.dexterity + 5 + vue.getNum("this.character.abilities.celerity.level") + vue.getNum("this.currentForm.speedMod");
+			return self.attributes.value.strength + self.attributes.value.dexterity + 5 + def(() => self.abilities.celerity.level).value + def(() => self.currentFormObj.value.speedMod).value;
 		});
 
 		this.defense = computed(function() {
-			return Math.min(self.attributes.value.dexterity, self.attributes.value.wits) + (self.skills.athletics || 0);
+			return Math.min(self.attributes.value.dexterity, self.attributes.value.wits) + def(() => self.skills.athletics).value;
 		});
 	}
 

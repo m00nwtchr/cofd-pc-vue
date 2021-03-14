@@ -12,7 +12,7 @@
 			<!-- <fab /> -->
 
 			<div class="fab">
-				<button>Action BTN</button>
+				<button @click="rollSelected()">Roll Selected</button>
 			</div>
 
 			{{selectedTraits}}
@@ -85,8 +85,9 @@
 					<div v-for="attrCat in attributeNames" :key="attrCat" class="block col-sm-4">
 						<span style="text-transform: capitalize" v-for="attr in attrCat" :key="attr">
 							<span :class="{'selected': selectedTraits[attr]}" @click="selectTrait(attr,{attr:true})">{{ attr }}</span>
+							<input v-if="!dotsOverFive && attrMax > 5" v-model.number="character.baseAttributes[attr]" type="number" style="width: 35px;" class="attr-input">
 							<div class="sheet-dots">
-								<button @click="setAttr(attr, n)" v-for="n in attrMax" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':character.baseAttributes[attr]>=n,'sheet-dot-small':attrMax>5}"></button>
+								<button @click="setAttr(attr, n)" v-for="n in dotAttrMax" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':character.baseAttributes[attr]>=n,'sheet-dot-small':dotAttrMax>5}"></button>
 							</div>
 							<br>
 						</span>
@@ -106,12 +107,22 @@
 						<span style="text-transform: capitalize" v-for="skill in cat" :key="skill">
 							<!-- <button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button> -->
 							<button v-if="character.splat === EnumSplat.MAGE" class="sheet-box" :class="{'sheet-dot-full': organization.skills.includes(skill)}"></button>
-							<span :class="{'selected': selectedTraits[skill]}" @click="selectTrait(skill,{skill:true,skillCat: i})">{{ skill.replaceAll("_", " ") }}</span>
+							<span :class="{'selected': selectedTraits[skill],'specialties': character.specialties[skill] && character.specialties[skill].length > 0}" @click="selectTrait(skill,{skill:true,skillCat: i})">
+								{{ skill.replaceAll("_", " ") }}
+							</span>
 							
+							<button class="dropdown-toggle material-icons" @click="specialtyDropDown(skill)">
+								<span v-if="specialtyDropSelect === skill">arrow_drop_down</span>
+								<span v-else>arrow_right</span>
+							</button>
+
 							<div class="sheet-dots">
-								<button @click="setSkill(skill, n)" v-for="n in attrMax" :key="n" class="sheet-dot" :class="{'sheet-dot-full': character.skills[skill] >= n,'sheet-dot-small':attrMax>5}"></button>
+								<button @click="setSkill(skill, n)" v-for="n in dotAttrMax" :key="n" class="sheet-dot" :class="{'sheet-dot-full': character.skills[skill] >= n,'sheet-dot-small':dotAttrMax>5}"></button>
 							</div>
 							<br>
+
+							<item-list v-if="specialtyDropSelect === skill" class="col-12" :items="character.specialties[skill]" :mutable="true"  />
+
 						</span>
 					</div>
 					<br>		
@@ -126,7 +137,9 @@
 
 							<ability-list :abilities="character.merits" abilityName="Merits" id="merits" class="block" />
 
-							<div id="werewolf-conditions"> </div>
+							<!-- <div id="werewolf-conditions"> </div> -->
+							<item-list v-if="character.splat === EnumSplat.WEREWOLF" class="col-12" name="Conditions" :items="character.conditions" :mutable="true"  />
+
 
 							<div id="minorTraits" class="block col col-12">
 								<span v-if="character.splat !== EnumSplat.WEREWOLF">
@@ -137,14 +150,14 @@
 									Armor: {{ character.armor ? character.armor.general+"/"+character.armor.ballistic : "" }}<br>
 									Initative Mod: {{ initative }}<br>
 								</span>
-								<span style="float:left;">Beats:</span>
-								<div style="float:left;">
+								<span style="float:left; margin-right: 5px;">Beats:</span>
+								<div style="float:left; margin-right: 10px;">
 									<span v-for="n in 5" :key="n">
 										<button class="sheet-box" @click="setTrait('beats', n)" :class="{'sheet-dot-full': character.beats >= n}"></button>
 									</span>
 								</div>
 								<span style="clear:both;"></span>
-										<br>
+								<br v-if="character.splat !== EnumSplat.WEREWOLF">
 								Experience: <input v-model.number="character.experience" type="number" /><br>
 								<div v-if="(splat && splat.alternateBeatName) && !splat.alternateBeatOptional">
 									<span style="float:left;">{{ splat.alternateBeatName }} Beats:</span> 
@@ -205,7 +218,7 @@
 								<!-- </div> -->
 							</div>
 							
-							<item-list class="col-12" name="Conditions" :items="character.conditions" :mutable="true"  />
+							<item-list v-if="character.splat !== EnumSplat.WEREWOLF" class="col-12" name="Conditions" :items="character.conditions" :mutable="true"  />
 						</div>
 					</div>
 				</div>
@@ -264,7 +277,7 @@
 				<div id="werewolf-forms" class="row col w-100" v-if="character.splat===EnumSplat.WEREWOLF">
 					<div v-for="(form) in splat.forms"
 						:key="form" style="text-align:left;width:100%" class="col-sm">
-						<h4 @click="character.currentForm = form.name.toLowerCase()" :class="{'form-active': currentForm.name.toLowerCase() === form.name.toLowerCase()}" class="separator col-sm-12">{{ form.name }}</h4>
+						<h4 @click="character.currentForm = form.name.toLowerCase()" :class="{'form-active': character.currentForm.toLowerCase() === form.name.toLowerCase()}" class="separator col-sm-12">{{ form.name }}</h4>
 						<i class="subtitle">({{ form.desc }})</i>
 						
 						<div>
@@ -373,6 +386,9 @@ const x = defineComponent({
 			// console.log(this.splat);
 			return (this as any).character.power > 5 ? ((this as any).character as Character).power : 5;
 		},
+		dotAttrMax() {
+			return Math.min((this as any).attrMax, (this as any).dotsOverFive ? 10 : 5);
+		},
 		maxWillpower() {
 			return (this as any).character.attributes.resolve + (this as any).character.attributes.composure;
 		},
@@ -398,18 +414,7 @@ const x = defineComponent({
 		// 	return obj;
 		// },
 		currentForm(): Form {
-			return (this as any).splat.forms && (this as any).character.currentForm ? (this as any).splat.forms[(this as any).character.currentForm] : {
-				name: "",
-				desc: "",
-				dexterityMod: 0,
-				manipulationMod: 0,
-				perceptionMod: 0,
-				sizeMod: 0,
-				staminaMod:0,
-				strengthMod:0,
-				speedMod: 0,
-				traits: []
-			};
+			return this.character.currentFormObj;
 		},
 		rotes() {
 			const rotes = [...(this as any).character.rotes];
@@ -460,6 +465,16 @@ const x = defineComponent({
 		// 		return Array.from({length: num}, () => Math.round(Math.random() * max-1)+min);
 		// 	}
 		// },
+		rollSelected(opts: any) {
+			const vals = Object.values(this.selectedTraits) as any[];
+			if (vals.length === 0) return 0;
+
+			const dice = vals.reduce((prev,val) => prev+val);
+
+			const result = this.roll(dice, opts);
+
+			alert(`Rolled ${dice} dice, got ${result} successes`);
+		},
 		roll(dice: number, opts: {
 			again: number;
 			bonus: number;
@@ -473,6 +488,11 @@ const x = defineComponent({
 			opts.values   = opts.values || false;
 
 			// const self = this;
+
+			if (dice <= 0) {
+				dice = 1;
+				opts.again = 11;
+			}
 
 			let result = RandomUtil.randomIntArray(dice, 1, 10);
 			// let result = await RandomUtil.generateIntegerSequence(dice, 1, 10);
@@ -556,14 +576,6 @@ const x = defineComponent({
 				}
 			}
 		},
-		toggleRoteSkill(skill: string) {
-			const roteSkills = this.character.roteSkills; 
-			if (roteSkills.includes(skill)) {
-				roteSkills.splice(roteSkills.indexOf(skill), 1);
-			} else { 
-				roteSkills.push(skill);
-			}
-		},
 		doInputRote(ability: any, i: number) {
 			if (!this.character.rotes[i]) {
 				this.character.rotes[i] = ability;
@@ -579,23 +591,34 @@ const x = defineComponent({
 				this.character.rotes.splice(i, 1);
 			}
 		},
-		getNum(val: string): number {
-			try {
-				return eval(val) || 0;
-			} catch(e) {
-				return 0;
-			}
-		},
 		formDefense(form: Form) {
 			return Math.min((this as any).character.attributes.dexterity - (this as any).currentForm.dexterityMod + form.dexterityMod, (this as any).character.attributes.wits) + ((this as any).character.skills.athletics || 0);
 			// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
 		},
+		specialtyDropDown(skill: string) {
+			if (this.specialtyDropSelect === skill) {
+				if (this.character.specialties[skill] && this.character.specialties[skill].length === 0) {
+					this.character.specialties[skill] = undefined;
+				}
+
+				this.specialtyDropSelect = null;
+			} else {
+				if (!this.character.specialties[skill]) {
+					this.character.specialties[skill] = [];
+				}
+
+				this.specialtyDropSelect = skill;
+			}
+		}
 	},
 	data() {
 		return {
 			characters: null as any,
 			character: null as any,
 			sizeMinusForm: null as any,
+
+			dotsOverFive: false,
+			specialtyDropSelect: null as string | null,
 
 			selectedTraits: {} as {[index: string]: Ref<number>},
 
@@ -865,6 +888,46 @@ button.sheet-dot-small {
 		margin-left: 10px;
 	}
 
+}
+
+.attr-input {
+	border: 1px solid black;
+	border-radius: 10px;
+	background-color: #484747;
+	color: white;
+}
+
+#werewolf-forms {
+	// background-image: url('../assets/images/werewolf-forms.webp')
+}
+.dropdown-toggle {
+	border: none;
+
+	height: 100%;
+	// padding-bottom: -10px;
+
+	vertical-align: center;
+	text-align: center;
+
+	span {
+		// : 10px;
+		font-size: 14pt;
+	}
+}
+
+.dropdown-toggle::after {
+	display: none !important;
+	// padding-top: 10px;
+}
+
+.specialties {
+	$color: green;
+
+	color: green;
+	// fill: black;
+    // stroke: red;
+    // stroke-width: 3;
+// text-shadow: 2px 0 0 $color, -2px 0 0 $color, 0 2px 0 $color, 0 -2px 0 $color, 1px 1px $color, -1px -1px 0 $color, 1px -1px 0 $color, -1px 1px 0 $color;
 }
 
 </style>
