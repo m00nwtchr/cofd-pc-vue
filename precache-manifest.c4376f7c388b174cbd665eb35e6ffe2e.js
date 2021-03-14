@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "ab09e65f133946e2ac5e",
-    "url": "css/app.41f740aa.css"
+    "revision": "4a49c59d6f2deb2b7e05",
+    "url": "css/app.0e98cf18.css"
   },
   {
-    "revision": "a81e390e7590941a80dd",
+    "revision": "ac04500a5e00d73a1fd3",
     "url": "css/chunk-vendors.55204a1e.css"
   },
   {
@@ -96,6 +96,22 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "fonts/KidsFirstPrintFont.9164c019.woff2"
   },
   {
+    "revision": "2a61b00fcc9b1afbf99be145777b1b72",
+    "url": "fonts/MaterialIcons-Regular.2a61b00f.eot"
+  },
+  {
+    "revision": "51cf1d641ae503ece727e7d84b182524",
+    "url": "fonts/MaterialIcons-Regular.51cf1d64.ttf"
+  },
+  {
+    "revision": "703cf8f274fbb265d49c6262825780e1",
+    "url": "fonts/MaterialIcons-Regular.703cf8f2.woff2"
+  },
+  {
+    "revision": "84a37de85c17f186652a179b1145392f",
+    "url": "fonts/MaterialIcons-Regular.84a37de8.woff"
+  },
+  {
     "revision": "290b354e263ec9c8adf87833190f0581",
     "url": "fonts/OrdnerNormal.290b354e.woff"
   },
@@ -128,16 +144,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "fonts/YouMurdererBB.e125151c.woff2"
   },
   {
-    "revision": "f8ff3d43deec0d9ec5dc15f6c502446b",
+    "revision": "9ce26fc5fe4cfc689b22460a70e29371",
     "url": "index.html"
   },
   {
-    "revision": "ab09e65f133946e2ac5e",
-    "url": "js/app.eec1cff5.js"
+    "revision": "4a49c59d6f2deb2b7e05",
+    "url": "js/app.df86e9c0.js"
   },
   {
-    "revision": "a81e390e7590941a80dd",
-    "url": "js/chunk-vendors.891e329a.js"
+    "revision": "ac04500a5e00d73a1fd3",
+    "url": "js/chunk-vendors.3ff4d111.js"
   },
   {
     "revision": "0fd40443d1cb24700c0ba9017f9f5a21",
