@@ -46,7 +46,8 @@ export default defineComponent({
 	},	
 	methods: {
 		doInput(item: any, attr: string, i: number) {
-			if (this.mutable && !item || item[attr]  === "") {
+			if (this.mutable && Object.values(item).filter(el => el).length === 0) {
+				console.log(item, this.items);
 				// eslint-disable-next-line vue/no-mutating-props
 				this.items.splice(i, 1);
 			}
@@ -58,7 +59,7 @@ export default defineComponent({
 			.replace(/([a-z\d])([A-Z])/g, "$1 $2")
 			// Look for lower-case letters followed by numbers
 			.replace(/([a-zA-Z])(\d)/g, "$1 $2")
-			.replace(/^./, function(str){ return str.toUpperCase(); })
+			.replace(/^./, s=>s.toUpperCase())
 			// Remove any white space left around the word
 			.trim();
 		}
@@ -69,13 +70,14 @@ export default defineComponent({
 			const arr: any[] = [].concat(this.items as any);
 
 			if (this.mutable) {
-				//arr.push({});
+				arr.push({});
 			}
 
 			return arr as Ability[];
 		},
 		attrs() {
-			return Object.keys((this as any).items.reduce((prev: any, val: any) => Object.assign({}, prev, val)));
+			// [].reduce();
+			return Object.keys((this as any).items.reduce((prev: any, val: any) => Object.assign({}, prev, val), {}));
 		}
 	},
 	watch: {

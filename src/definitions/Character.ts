@@ -73,15 +73,16 @@ export function getNum(val: string): number {
 }
 
 function def<T>(func: () => T, def?: T): ComputedRef<T> {
+	if (!def) def = 0 as any;
 	return computed(() => {
 		try {
 			const val = func();
 			// console.log(def);
-			if (def === undefined) {
-				if (typeof val === "number") {
-					def = 0 as any;
-				}
-			}
+			// if (def === undefined) {
+			// 	if (typeof val === "number") {
+			// 		def = 0 as any;
+			// 	}
+			// }
 			// console.log(val, typeof val);
 
 			return val || def;
@@ -141,7 +142,7 @@ export default class Character {
 	// abilityArr: Ability[] | Ref<Ability[]>;
 	abilities: { [index: string]: Ability };
 
-	merits: Ability[] = [];
+	merits: {[index in number | string]: Ability} = [] as unknown as {[index in number | string]: Ability};
 
 	// abilities: {[index: string]: Ability} = {};;
 	// merits: {[index: string]: Ability} = {};
@@ -176,6 +177,26 @@ export default class Character {
 		general: 0,
 		ballistic: 0
 	};
+
+	weapons: {
+		name: string;
+		damage: string;
+		range: string;
+		clip: string;
+		initative: number;
+		strength: number;
+		size: number;
+	}[] = [
+		{
+			name: "",
+			damage: "",
+			range: "",
+			clip: "",
+			initative: 0,
+			strength: 0,
+			size: 0,
+		}
+	];
 
 	// initative?: number;
 
@@ -318,7 +339,7 @@ export default class Character {
 			};
 		}}*/);
 
-		const giantMod = computed(() => self.merits.find(el => el.name === "Giant" && el.level == 3) ? 1 : 0);
+		const giantMod = def(() => self.merits.giant.level >= 3 ? 1 : 0);
 		const sizeMod = def(() => self.currentFormObj.value.sizeMod);
 		this.size = computed({
 			get() {
@@ -348,6 +369,7 @@ export default class Character {
 		});
 
 		this.defense = computed(function() {
+			console.log(def(() => self.skills.athletics));
 			return Math.min(self.attributes.value.dexterity, self.attributes.value.wits) + def(() => self.skills.athletics).value;
 		});
 	}
