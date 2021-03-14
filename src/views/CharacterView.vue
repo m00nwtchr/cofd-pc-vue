@@ -236,7 +236,8 @@
 					</div>
 
 					<div class="col-sm-8">
-							<div id="rotes" class="row col-sm-12">
+							<object-list :items="rotes" name="Rotes"></object-list>
+							<!-- <div id="rotes" class="row col-sm-12">
 								<h4 class="separator col-sm-12" style="margin-bottom: 15px">Rotes</h4>
 									<div class="col-2" >
 										<i class="subtitle">Arcanum</i>
@@ -270,7 +271,7 @@
 										<input style="text-transform: capitalize;" class="line" v-model="rote.roteSkill">
 									</div>
 								</div>
-							</div>						
+							</div> -->
 					</div>
 				</div>
 
@@ -307,6 +308,12 @@
 						</div>
 					</div>
 				</div>
+
+				<!-- <object-list :items="[
+				{key:'1',value:'a'}, 
+				{key:'2',value:'b'},
+				{key:'3',value:'c'}
+				]"></object-list> -->
 			</div>
 		</div>
 
@@ -324,6 +331,7 @@ import AbilityList from "@/components/sheetComponents/AbilityList.vue";
 import HealthComponent from "@/components/sheetComponents/HealthComponent.vue";
 import IntegrityComponent from "@/components/sheetComponents/IntegrityComponent.vue";
 import ItemList from "@/components/sheetComponents/ItemList.vue";
+import ObjectList from "@/components/sheetComponents/ObjectList.vue";
 
 // import fab from "vue-fab";
 
@@ -351,6 +359,7 @@ const x = defineComponent({
 		"HealthComponent": HealthComponent,
 		"IntegrityComponent": IntegrityComponent,
 		"ItemList": ItemList,
+		"ObjectList": ObjectList
 		// "fab": fab
 	},
 	computed: {
