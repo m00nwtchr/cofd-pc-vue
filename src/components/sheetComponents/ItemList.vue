@@ -24,7 +24,7 @@ export default defineComponent({
 			type: Array
 		},
 		"name": {
-			required: true,
+			required: false,
 			type: String
 		},
 		"mutable": {

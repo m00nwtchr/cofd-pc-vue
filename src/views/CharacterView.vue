@@ -272,6 +272,9 @@
 									</div>
 								</div>
 							</div> -->
+							<br>
+							<object-list :items="character.weapons"></object-list>
+
 					</div>
 				</div>
 
@@ -308,12 +311,6 @@
 						</div>
 					</div>
 				</div>
-
-				<!-- <object-list :items="[
-				{key:'1',value:'a'}, 
-				{key:'2',value:'b'},
-				{key:'3',value:'c'}
-				]"></object-list> -->
 			</div>
 		</div>
 
@@ -522,7 +519,7 @@ const x = defineComponent({
 		selectTrait(name: string, opts: {attr?: boolean; skill?: boolean; skillCat: string; ability?: boolean}) {
 			if (this.selectedTraits[name] !== undefined) {
 				delete this.selectedTraits[name];
-			} else {
+			} else if (name) {
 				if (Object.keys(this.selectedTraits).length === 3) {
 					this.selectedTraits = {};
 				}
@@ -535,7 +532,8 @@ const x = defineComponent({
 					const attributes = self.character.attributes;
 					const skills = self.character.skills;
 					const abilities = self.character.abilities;
-					const obj = (opts.attr ? attributes : opts.skill ? skills : opts.ability ? abilities : self.character);
+					const merits = self.character.merits;
+					const obj = (opts.attr ? attributes : opts.skill ? skills : opts.ability ? abilities[name] ? abilities : merits : self.character);
 
 					const res = (opts.ability ? obj[name].level : obj[name]) || 0;
 					return res+(res === 0 && opts.skill ? Object.values(self.skillCats)[opts.skillCat as any] : 0);

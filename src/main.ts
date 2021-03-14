@@ -324,42 +324,34 @@ const characters: { [index: string]: Character | any } = {
 		"merits": [
 			{
 				"name": "Giant",
-				"dots": 0,
 				"level": 3
 			},
 			{
 				"name": "Trained Observer",
-				"dots": 0,
 				"level": 1
 			},
 			{
 				"name": "Defensive Combat (Brawl)",
-				"dots": 0,
 				"level": 1
 			},
 			{
 				"name": "Favored Form (Gauru)",
-				"dots": 0,
 				"level": 2
 			},
 			{
 				"name": "Efficient Killer",
-				"dots": 0,
 				"level": 2
 			},
 			{
 				"name": "Relentless Assault",
-				"dots": 0,
 				"level": 2
 			},
 			{
 				"name": "Language",
-				"dots": 0,
 				"level": 1
 			},
 			{
 				"name": "Totem",
-				"dots": 0,
 				"level": 1
 			}
 		],
