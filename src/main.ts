@@ -12,6 +12,8 @@ import "@/assets/fonts/NWoD/stylesheet.css";
 
 import "@/style/style.scss";
 
+
+
 import Character from "./definitions/Character";
 import { EnumSplat } from "./definitions/Splat";
 
@@ -35,6 +37,11 @@ const characters: { [index: string]: Character | any } = {
 			"intimidation": 1,
 			"streetwise": 2,
 			"subterfuge": 4
+		},
+		"specialties": {
+			"larceny": ["Sleight of Hand"],
+			"streetwise": ["Rumors"],
+			"subterfuge": ["Detecting Lies"]
 		},
 		"abilities": {
 			"animalism": {
@@ -100,7 +107,6 @@ const characters: { [index: string]: Character | any } = {
 		"power": 1,
 		"fuel": 8,
 		"integrityTrait": 7,
-		// "size": 5,
 		"armor": {
 			"general": 0,
 			"ballistic": 0
@@ -109,7 +115,6 @@ const characters: { [index: string]: Character | any } = {
 		"experience": 1,
 		"alternateBeats": 0,
 		"alternateExperience": 0,
-		"roteSkills": [],
 		"name": "Darren Webb",
 		"splat": 2,
 		"player": "m00n",
@@ -142,7 +147,6 @@ const characters: { [index: string]: Character | any } = {
 		"power": 1,
 		"fuel": 0,
 		"integrityTrait": 7,
-		// "size": 5,
 		"armor": {
 			"general": 0,
 			"ballistic": 0
@@ -151,7 +155,6 @@ const characters: { [index: string]: Character | any } = {
 		"experience": 0,
 		"alternateBeats": 0,
 		"alternateExperience": 0,
-		"roteSkills": [],
 		"name": "Troll Mc. Trollface",
 		"splat": 0,
 		"age": 1000,
@@ -186,6 +189,11 @@ const characters: { [index: string]: Character | any } = {
 			"larceny": 4,
 			"animal_ken": 1,
 			"subterfuge": 3
+		},
+		"specialties": {
+			"computer": ["Hacking"],
+			"investigation": ["Cryptography"],
+			"occult": ["Goetia"]
 		},
 		"abilities": {
 			"forces": {
@@ -243,7 +251,6 @@ const characters: { [index: string]: Character | any } = {
 			{arcanum: "Mind", level: 1, spell: "Mental Scan", roteSkill: "occult"},
 			{arcanum: "Mind", level: 2, spell: "Psychic Domination", roteSkill: "subterfuge"},
 			{arcanum: "Time", level: 1, spell: "Postcognition", roteSkill: "investigation"},
-
 		],
 		yantras: [
 			"High Speech (+2)",
@@ -257,20 +264,14 @@ const characters: { [index: string]: Character | any } = {
 		"power": 2,
 		"fuel": 11,
 		"integrityTrait": 7,
-		// "size": 5,
 		"armor": {
 			"general": 0,
 			"ballistic": 0
 		},
 		"beats": 1,
-		"experience": "2",
+		"experience": 2,
 		"alternateBeats": 0,
-		"alternateExperience": "1",
-		"roteSkills": [
-			"investigation",
-			"occult",
-			"survival"
-		],
+		"alternateExperience": 1,
 		"name": "Moonwatcher",
 		"splat": 1,
 		"player": "m00n",
@@ -304,6 +305,11 @@ const characters: { [index: string]: Character | any } = {
 			"survival": 3,
 			"intimidation": 3,
 			"persuasion": 4
+		},
+		"specialties": {
+			"brawl": ["Claws"],
+			"stealth": ["Stalking"],
+			"intimidation": ["Direct Threats"]
 		},
 		"abilities": {
 			"purity":{
