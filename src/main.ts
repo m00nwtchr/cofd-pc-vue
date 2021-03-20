@@ -16,6 +16,7 @@ import "@/style/style.scss";
 
 import Character from "./definitions/Character";
 import { EnumSplat } from "./definitions/Splat";
+import { WebGLDiceRoller } from "./components/sheetComponents/diceRoller/3DDiceRoller";
 
 const app = createApp(App);
 
@@ -422,3 +423,5 @@ if (process.env.NODE_ENV === "development" || !localStorage.characters) {
 	const url = `data:application/json;base64,${btoa(JSON.stringify(JSON.parse(localStorage.characters),null,"\t"))}`;
 	console.log(url);
 };
+
+// new WebGLDiceRoller();

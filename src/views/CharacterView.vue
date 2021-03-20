@@ -4,6 +4,8 @@
 			<div>{{ character.name }}</div>
 		</header>
 		
+		<!-- <dice-roller></dice-roller> -->
+
 		<!-- <teleport v-if="character.splat !== EnumSplat.VAMPIRE" :to="`#${EnumSplat[character.splat].toLowerCase()}-conditions`"> -->
 		<!-- </teleport> -->
 		<div class="charsheet" :class="{
@@ -329,12 +331,14 @@ import HealthComponent from "@/components/sheetComponents/HealthComponent.vue";
 import IntegrityComponent from "@/components/sheetComponents/IntegrityComponent.vue";
 import ItemList from "@/components/sheetComponents/ItemList.vue";
 import ObjectList from "@/components/sheetComponents/ObjectList.vue";
+// import DiceRoller from "@/components/sheetComponents/diceRoller/DiceRoller.vue";
 
 // import fab from "vue-fab";
 
 import deepmerge from "deepmerge";
 
-import RandomUtil from "../RandomUtil";
+import {Random} from "../RandomUtil";
+import {DiceRoller} from "@/DiceRoller";
 
 // <div class="sheet-dots">
 // 	<button @click="setAttr('intelligence', n)" v-for="n in attrMax" :key="n" class="sheet-dot"></button>
@@ -356,7 +360,8 @@ const x = defineComponent({
 		"HealthComponent": HealthComponent,
 		"IntegrityComponent": IntegrityComponent,
 		"ItemList": ItemList,
-		"ObjectList": ObjectList
+		"ObjectList": ObjectList,
+		// "DiceRoller": DiceRoller
 		// "fab": fab
 	},
 	computed: {
@@ -444,7 +449,7 @@ const x = defineComponent({
 					// for (let i = 0; i < 10; i++) {
 					let succs = 0;
 					for (let j = 0; j < rollIterations; j++) {
-						const suc = await this.roll(dice, {} as any);
+						const suc = await this.roller.roll(dice, {} as any);
 						
 						if (suc >= target) {
 							succs++;
@@ -471,50 +476,15 @@ const x = defineComponent({
 		// 		return Array.from({length: num}, () => Math.round(Math.random() * max-1)+min);
 		// 	}
 		// },
-		rollSelected(opts: any) {
+		async rollSelected(opts: any) {
 			const vals = Object.values(this.selectedTraits) as any[];
 			if (vals.length === 0) return 0;
 
 			const dice = vals.reduce((prev,val) => prev+val);
 
-			const result = this.roll(dice, opts);
+			const result = await this.roller.roll(dice, opts);
 
 			alert(`Rolled ${dice} dice, got ${result} successes`);
-		},
-		roll(dice: number, opts: {
-			again: number;
-			bonus: number;
-			treshold: number;
-			values: boolean;
-		}): number[] | number {
-			opts = opts || {} as any;
-			opts.again    = opts.again || 10;
-			opts.bonus    = opts.bonus || 0;
-			opts.treshold = opts.treshold || 8;
-			opts.values   = opts.values || false;
-
-			// const self = this;
-
-			if (dice <= 0) {
-				dice = 1;
-				opts.again = 11;
-			}
-
-			let result = RandomUtil.randomIntArray(dice, 1, 10);
-			// let result = await RandomUtil.generateIntegerSequence(dice, 1, 10);
-
-			const again = result.filter(num => num >= opts.again).length;
-
-			if (again > 0 && again !== 1) {
-				result = result.concat(this.roll(again, Object.assign({}, opts, {values: true})));
-			}
-
-			// .flatMap(num => num >= opts.again ? [num, ...this.roll(1, Object.assign({}, opts, {values: true})) as number[]] : [num]) as number[];
-
-
-			const succs = result.filter(el => el >= opts.treshold).length;
-
-			return opts.values ? result : succs+opts.bonus;
 		},
 		selectTrait(name: string, opts: {attr?: boolean; skill?: boolean; skillCat: string; ability?: boolean}) {
 			if (this.selectedTraits[name] !== undefined) {
@@ -629,7 +599,10 @@ const x = defineComponent({
 
 			selectedTraits: {} as {[index: string]: Ref<number>},
 
-			EnumSplat, ref, RandomUtil,
+			EnumSplat, ref,
+
+			// random: new Random(),
+			roller: new DiceRoller(),
 
 			attributeNames: [
 				["intelligence", "wits"        , "resolve"],
