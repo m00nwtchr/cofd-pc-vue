@@ -417,8 +417,11 @@ const characters: { [index: string]: Character | any } = {
 // 	characters[key] = Object.assign({}, new Character({splat: characters[key].splat}), characters[key]);
 // });
 
+// interface ImportMeta {
+// 	env: any;
+// }
 
-if (process.env.NODE_ENV === "development" || !localStorage.characters) {
+if (import.meta.env.MODE === "development" || !localStorage.characters) {
 	localStorage.characters = JSON.stringify(characters);
 }
 
