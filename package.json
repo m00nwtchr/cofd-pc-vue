@@ -5,14 +5,17 @@
   "description": "Chronicles of Darkness Player Companion",
   "license": "GPL-3.0",
   "scripts": {
+    "dev": "vite",
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "@types/cannon": "^0.1.5",
     "@types/deepmerge": "^2.2.0",
     "@types/three": "^0.126.1",
+    "@vitejs/plugin-vue": "^1.1.5",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "cannon": "^0.6.2",
@@ -22,8 +25,10 @@
     "register-service-worker": "^1.7.1",
     "three": "^0.126.1",
     "three-dom-elements": "^1.0.0",
+    "vite": "^2.1.2",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
+    "vuetify": "^3.0.0-alpha.2",
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
