@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { DiceRoller } from "@/DiceRoller";
+import { DiceRoller } from "../../../DiceRoller";
 import { defineComponent } from "vue";
 import { WebGLDiceRoller } from "./3DDiceRoller";
 // import { DiceRoller } from "./DiceRoller";

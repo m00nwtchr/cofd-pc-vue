@@ -326,19 +326,19 @@ import { computed, defineComponent, ref, Ref, toRefs } from "vue";
 import { Splat, SPLATS, EnumSplat, Form } from "../definitions/Splat";
 import Character, { Ability, Attributes } from "../definitions/Character";
 
-import AbilityList from "@/components/sheetComponents/AbilityList.vue";
-import HealthComponent from "@/components/sheetComponents/HealthComponent.vue";
-import IntegrityComponent from "@/components/sheetComponents/IntegrityComponent.vue";
-import ItemList from "@/components/sheetComponents/ItemList.vue";
-import ObjectList from "@/components/sheetComponents/ObjectList.vue";
-import DiceRollerComponent from "@/components/sheetComponents/diceRoller/DiceRoller.vue";
+import AbilityList from "../components/sheetComponents/AbilityList.vue";
+import HealthComponent from "../components/sheetComponents/HealthComponent.vue";
+import IntegrityComponent from "../components/sheetComponents/IntegrityComponent.vue";
+import ItemList from "../components/sheetComponents/ItemList.vue";
+import ObjectList from "../components/sheetComponents/ObjectList.vue";
+import DiceRollerComponent from "../components/sheetComponents/diceRoller/DiceRoller.vue";
 
 // import fab from "vue-fab";
 
 import deepmerge from "deepmerge";
 
 import {Random} from "../RandomUtil";
-import {DiceRoller} from "@/DiceRoller";
+import {DiceRoller} from "../DiceRoller";
 
 // <div class="sheet-dots">
 // 	<button @click="setAttr('intelligence', n)" v-for="n in attrMax" :key="n" class="sheet-dot"></button>
@@ -666,6 +666,7 @@ export default x;
 </script>
 
 <style lang="scss">
+@import "../style/vars.scss";
 
 $xs-max: 575.98px;
 $sm-min: 576px;

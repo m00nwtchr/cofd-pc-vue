@@ -1,4 +1,4 @@
-import { Random } from "@/RandomUtil";
+import { Random } from "./RandomUtil";
 
 export class DiceRoller {
 	

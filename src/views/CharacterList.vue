@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { EnumSplat } from "@/definitions/Splat";
+import { EnumSplat } from "../definitions/Splat";
 
 console.log(EnumSplat);
 
@@ -54,6 +54,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import "../style/vars.scss";
 
 header {
 	margin-top: 0px;
