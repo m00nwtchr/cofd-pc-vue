@@ -6,7 +6,7 @@ import "./registerServiceWorker";
 
 // import BootstrapVue from "bootstrap-vue";
 import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-vue/dist/bootstrap-vue.css";
+// import "bootstrap-vue/dist/bootstrap-vue.css";
 
 import "@/assets/fonts/NWoD/stylesheet.css";
 
@@ -424,4 +424,4 @@ if (process.env.NODE_ENV === "development" || !localStorage.characters) {
 	console.log(url);
 };
 
-// new WebGLDiceRoller();
+// new WebGLDiceRoller(document.body, {dimensions:{x:500,y:500}});
