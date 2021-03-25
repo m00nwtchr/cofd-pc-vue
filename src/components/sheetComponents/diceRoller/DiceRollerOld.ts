@@ -150,6 +150,9 @@ const DIE_FACTORIES: {
 	}
 };
 
+/**
+ * Based on http://a.teall.info/dice/
+ */
 export class DiceRoller {
 	config: {
 		w?: number;

@@ -4,11 +4,11 @@
 			<div>{{ character.name }}</div>
 		</header>
 		
-		<!-- <dice-roller></dice-roller> -->
+		<dice-roller></dice-roller>
 
 		<!-- <teleport v-if="character.splat !== EnumSplat.VAMPIRE" :to="`#${EnumSplat[character.splat].toLowerCase()}-conditions`"> -->
 		<!-- </teleport> -->
-		<div class="charsheet" :class="{
+		<div id="charsheet" :class="{
 			['charsheet-'+(EnumSplat && EnumSplat[character.splat]).toLowerCase()]: true
 		}">
 			<!-- <fab /> -->
@@ -331,7 +331,7 @@ import HealthComponent from "@/components/sheetComponents/HealthComponent.vue";
 import IntegrityComponent from "@/components/sheetComponents/IntegrityComponent.vue";
 import ItemList from "@/components/sheetComponents/ItemList.vue";
 import ObjectList from "@/components/sheetComponents/ObjectList.vue";
-// import DiceRoller from "@/components/sheetComponents/diceRoller/DiceRoller.vue";
+import DiceRollerComponent from "@/components/sheetComponents/diceRoller/DiceRoller.vue";
 
 // import fab from "vue-fab";
 
@@ -361,7 +361,7 @@ const x = defineComponent({
 		"IntegrityComponent": IntegrityComponent,
 		"ItemList": ItemList,
 		"ObjectList": ObjectList,
-		// "DiceRoller": DiceRoller
+		"DiceRoller": DiceRollerComponent
 		// "fab": fab
 	},
 	computed: {
