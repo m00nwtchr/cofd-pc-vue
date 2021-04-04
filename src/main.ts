@@ -122,7 +122,7 @@ const characters: { [index: string]: Character | any } = {
 		"alternateBeats": 0,
 		"alternateExperience": 0,
 		"name": "Darren Webb",
-		"splat": 2,
+		"splat": EnumSplat.VAMPIRE,
 		"player": "m00n",
 		"chronicle": "Chicago: Night Trains",
 		"concept": "Occult Journalist Mastermind",
@@ -162,7 +162,7 @@ const characters: { [index: string]: Character | any } = {
 		"alternateBeats": 0,
 		"alternateExperience": 0,
 		"name": "Troll Mc. Trollface",
-		"splat": 0,
+		"splat": EnumSplat.MORTAL,
 		"age": 1000,
 		"player": "That Guy",
 		"chronicle": "The Troll Chronicle",
@@ -274,7 +274,7 @@ const characters: { [index: string]: Character | any } = {
 		"alternateBeats": 0,
 		"alternateExperience": 1,
 		"name": "Moonwatcher",
-		"splat": 1,
+		"splat": EnumSplat.MAGE,
 		"player": "m00n",
 		"chronicle": "What Lurks Below",
 		"concept": "Technomancer/Computer Programmer",
@@ -382,7 +382,7 @@ const characters: { [index: string]: Character | any } = {
 		"roteSkills": [],
 		"currentForm": "hishu",
 		"name": "Amos Gray",
-		"splat": 3,
+		"splat": EnumSplat.WEREWOLF,
 		"player": "m00n",
 		"chronicle": "",
 		"concept": "",
@@ -407,6 +407,20 @@ const characters: { [index: string]: Character | any } = {
 			"common": "You witness your auspice moon in the sky.",
 			"specific": "Hear a wolf or werewolf howl when your auspice moon is in the sky."
 		}
+	},
+	"db32e1fe-f3c3-4b80-b5b1-b86ad99124de": {
+		"splat": EnumSplat.CHANGELING,
+		"baseAttributes": {
+			"intelligence": 1,
+			"wits": 3,
+			"resolve": 2,
+			"strength": 3,
+			"dexterity": 2,
+			"stamina": 3,
+			"presence": 3,
+			"manipulation": 1,
+			"composure": 3
+		},
 	}
 };
 

@@ -1,28 +1,31 @@
 <template>
 	<div>
-		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-			<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[0] }} Touchstone</h3>
-			<!-- eslint-disable-next-line vue/no-mutating-props -->
-			<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name">
-		</div>
-		<h3 class="separator col-sm-12">{{ splat.integrityTraitName }}</h3>
-		<div class="sheet-dots" style="margin-top:-10px;">
-		<span v-for="n in items" :key="n" >
-				<button class="sheet-dot" @click="$parent.setTrait('integrityTrait', n)" :class="{'sheet-dot-full': character.integrityTrait >= n}"></button>
-				<span v-if="integrityTrackType === 'verticalTouchstoneTrack'">
-					<!-- <input class="line" @input="doInput(n)" v-if="character.touchstones[n-1]" v-model="character.touchstones[n-1].name"> -->
-					<!-- <input class="line" @input="doInput(n)" v-else> -->
-					<!-- eslint-disable-next-line vue/no-mutating-props -->
-					<input class="line" @input="doInput(n)" v-model="touchstonesTemp[n-1].name">
-					<br>
+		<health-component v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.maxClarity" :healthTrack="character.clarityTrack" :name="splat.integrityTraitName" />
+		<span v-else>
+			<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
+				<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[0] }} Touchstone</h3>
+				<!-- eslint-disable-next-line vue/no-mutating-props -->
+				<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name">
+			</div>
+			<h3 class="separator col-sm-12">{{ splat.integrityTraitName }}</h3>
+			<div class="sheet-dots" style="margin-top:-10px;">
+			<span v-for="n in items" :key="n" >
+					<button class="sheet-dot" @click="$parent.setTrait('integrityTrait', n)" :class="{'sheet-dot-full': character.integrityTrait >= n}"></button>
+					<span v-if="integrityTrackType === 'verticalTouchstoneTrack'">
+						<!-- <input class="line" @input="doInput(n)" v-if="character.touchstones[n-1]" v-model="character.touchstones[n-1].name"> -->
+						<!-- <input class="line" @input="doInput(n)" v-else> -->
+						<!-- eslint-disable-next-line vue/no-mutating-props -->
+						<input class="line" @input="doInput(n)" v-model="touchstonesTemp[n-1].name">
+						<br>
+					</span>
 				</span>
-			</span>
-		</div>
-		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-			<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[1] }} Touchstone</h3>
-			<!-- eslint-disable-next-line vue/no-mutating-props -->
-			<input class="line" @input="doInput(2)" v-model="touchstonesTemp[1].name">
-		</div>		
+			</div>
+			<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
+				<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[1] }} Touchstone</h3>
+				<!-- eslint-disable-next-line vue/no-mutating-props -->
+				<input class="line" @input="doInput(2)" v-model="touchstonesTemp[1].name">
+			</div>
+		</span>
 	</div>
 </template>
 
@@ -31,9 +34,15 @@
 
 import { Ability } from "@/definitions/Character";
 import { EnumSplat } from "@/definitions/Splat";
+
+import HealthComponent from "./HealthComponent.vue";
+
 import { defineComponent } from "vue";
 export default defineComponent({
 	name: "IntegrityComponent",
+	components: {
+		"HealthComponent": HealthComponent
+	},
 	props: {
 		"character": {
 			required: true,

@@ -6,13 +6,10 @@ const i18n = g.global;
 const t = i18n.t.bind(i18n);
 const te = i18n.te.bind(i18n);
 
-
-
-
 //  IntegrityTrackType = string | {type: string; names?: string[]};
 
 export enum EnumSplat {
-	MORTAL, MAGE, VAMPIRE, WEREWOLF
+	MORTAL, MAGE, VAMPIRE, WEREWOLF, CHANGELING
 }
 
 export const SPLATS: { [index: number]: Splat } = {};
@@ -175,7 +172,6 @@ export class Splat {
 	}
 
 }
-
 
 const VAMP_ANCHORS = [
 	"Authoritarian",
