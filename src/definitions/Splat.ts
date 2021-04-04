@@ -36,24 +36,26 @@ export class Splat {
 
 	fuelTraitName: string;
 
-	alternateBeatName: string;
+	alternateBeatName: ((str: string) => string) | undefined;
 	alternateBeatOptional: boolean;
 
 	virtueAnchors: string[];
 	viceAnchors: string[];
 
-	subTypes: {[index: string]: {
-		name: string;
-		abilities: string[];
+	subTypes: {
+		[index: string]: {
+			name: string;
+			abilities: string[];
 
-		skills?: string[];
-		attributes?: string[];
+			skills?: string[];
+			attributes?: string[];
 
-		inferiorArcanum?: string;
+			inferiorArcanum?: string;
 
-		moonGifts?: string[];
-		gifts?: string[];
-	};};
+			moonGifts?: string[];
+			gifts?: string[];
+		};
+	};
 	legacies: string[];
 	organizations: {
 		name: string;
@@ -80,18 +82,20 @@ export class Splat {
 		virtueAnchors?: string[];
 		viceAnchors?: string[];
 
-		subTypes?: {[index: string]: {
-			name: string;
-			abilities: string[];
-	
-			skills?: string[];
-			attributes?: string[];
-	
-			inferiorArcanum?: string;
-	
-			moonGifts?: string[];
-			gifts?: string[];
-		};};
+		subTypes?: {
+			[index: string]: {
+				name: string;
+				abilities: string[];
+
+				skills?: string[];
+				attributes?: string[];
+
+				inferiorArcanum?: string;
+
+				moonGifts?: string[];
+				gifts?: string[];
+			};
+		};
 		legacies?: string[];
 		organizations?: {
 			name: string;
@@ -123,7 +127,7 @@ export class Splat {
 		this.virtueAnchorName = t(`splat.${name}.virtueAnchor`, t("splat.virtueAnchor"));
 		this.viceAnchorName = t(`splat.${name}.viceAnchor`, t("splat.viceAnchor"));
 
-		this.subTypeName = t(`splat.${name}.subTypeName`, t("character.chronicle"));
+		this.subTypeName = t(`splat.${name}.subType.name`, t("character.chronicle"));
 		this.legacyName = t(`splat.${name}.legacy`);
 		this.orgName = t(`splat.${name}.organization`);
 
@@ -160,12 +164,12 @@ export class Splat {
 		this.integrityTraitName = t(`splat.${name}.integrityTrait`, t("splat.integrityTrait"));
 		this.integrityTrackType = integrityTrackType || "normal";
 
-		this.abilityName = t(`splat.${name}.abilityName`, "");
+		this.abilityName = t(`splat.${name}.ability.name`, "");
 		this.abilities = abilities;
 
 		this.fuelTraitName = hasFuelTrait ? t(`splat.${name}.fuelTrait`, "") : "";
 
-		this.alternateBeatName = t(`splat.${name}.alternateBeat`, "");
+		this.alternateBeatName = te(`splat.${name}.alternateBeat`) ? (str) => t(`splat.${name}.alternateBeat`, { x: str }, { default: "" }) : undefined;
 		this.alternateBeatOptional = alternateBeatOptional === undefined ? true : alternateBeatOptional;
 
 		this.finiteAbilities = finiteAbilities === undefined ? false : finiteAbilities;
@@ -256,12 +260,12 @@ new Splat({
 	},
 	organizations: [
 		{
-			name: t("splat.mage.organization.adamantinearrow"),
+			name: t("splat.mage.organization.adamantine_arrow"),
 
 			skills: ["athletics", "intimidation", "medicine"]
 		},
 		{
-			name: t("splat.mage.organization.guardiansoftheveil"),
+			name: t("splat.mage.organization.guardians_of_the_veil"),
 
 			skills: ["investigation", "stealth", "subterfuge"]
 		},
@@ -271,17 +275,17 @@ new Splat({
 			skills: ["investigation", "occult", "survival"]
 		},
 		{
-			name: t("splat.mage.organization.silverladder"),
+			name: t("splat.mage.organization.silver_ladder"),
 
 			skills: ["expression", "persuasion", "subterfuge"]
 		},
 		{
-			name: t("splat.mage.organization.freecouncil"),
+			name: t("splat.mage.organization.free_council"),
 
 			skills: ["crafts", "persuasion", "science"]
 		},
 		{
-			name: t("splat.mage.organization.seersofthethrone"),
+			name: t("splat.mage.organization.seers_of_the_throne"),
 
 			skills: ["investigation", "occult", "persuasion"]
 		},
@@ -347,11 +351,27 @@ new Splat({
 	en: EnumSplat.WEREWOLF,
 	// virtueAnchorName: "Blood",
 	// viceAnchorName: "Bone",
-	virtueAnchors: ["Alpha", "Challenger", "Destroyer", "Fox", "The Monster", "Soldier"],
-	viceAnchors: ["Community Organizer", "Cub", "Guru", "Hedonist", "Lone Wolf", "Wallflower"],
+	virtueAnchors: [
+		"alpha",
+		"challenger",
+		"destroyer",
+		"fox",
+		"monster",
+		"soldier"
+	].map(el => t(`splat.werewolf.blood.${el}`)),
+	viceAnchors: [
+		"community_organizer", "cub", "guru", "hedonist", "lone_wolf", "wallflower"
+	].map(el => t(`splat.werewolf.bone.${el}`)),
 	// subTypeName: "Auspice",
 	// legacyName: "Lodge",
 	// orgName: "Tribe",
+	abilities: {
+		cunning: t("splat.werewolf.ability.cunning"),
+		glory: t("splat.werewolf.ability.glory"),
+		honor: t("splat.werewolf.ability.honor"),
+		purity: t("splat.werewolf.ability.purity"),
+		wisdom: t("splat.werewolf.ability.wisdom"),
+	},
 	subTypes: {
 		cahalith: {
 			name: "Cahalith",
@@ -660,7 +680,7 @@ export interface Form {
 wolf.forms = {
 	hishu: {
 		name: "Hishu",
-		desc: "Human",
+		desc: t("splat.werewolf.form.human"),
 		traits: [
 			"Sheep's Clothing"
 		],
@@ -676,7 +696,7 @@ wolf.forms = {
 	},
 	dalu: {
 		name: "Dalu",
-		desc: "Near-Human",
+		desc: t("splat.werewolf.form.near_human"),
 		traits: [
 			"Teeth/Claws +0L",
 			"Defense vs. Firearms",
@@ -695,7 +715,7 @@ wolf.forms = {
 	},
 	gauru: {
 		name: "Gauru",
-		desc: "Wolf-Man",
+		desc: t("splat.werewolf.form.wolf_man"),
 		traits: [
 			"Teeth/Claws +2L (Initative +3)",
 			"Defense vs. Firearms",
@@ -716,7 +736,7 @@ wolf.forms = {
 	},
 	urshul: {
 		name: "Urshul",
-		desc: "Near-Wolf",
+		desc: t("splat.werewolf.form.near_wolf"),
 		traits: [
 			"Teeth +2L/Claws +1L",
 			"Defense vs. Firearms",
@@ -735,7 +755,7 @@ wolf.forms = {
 	},
 	urhan: {
 		name: "Urhan",
-		desc: "Wolf",
+		desc: t("splat.werewolf.form.wolf"),
 		traits: [
 			"Teeth +1L",
 			"Chase Down"
