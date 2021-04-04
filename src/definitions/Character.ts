@@ -1,7 +1,7 @@
 import deepmerge from "deepmerge";
 import { computed, ComputedRef, isRef, reactive, Ref, ref, toRefs } from "vue";
 import { Computed } from "vuex";
-import { EnumSplat, Form } from "./Splat";
+import { EnumSplat, Form, SPLATS } from "./Splat";
 
 export interface Ability {
 	name: string;
@@ -57,6 +57,12 @@ interface MageTraits extends SplatTraits {
 // }
 
 // (window as any).get = get;
+function sortObj(obj: any) {
+	return Object.keys(obj).sort().reduce((result, key) => {
+		(result as any)[key] = obj[key];
+		return result;
+	}, {});
+}
 
 export function getNum(val: string): number {
 	// return computed(() => {
@@ -243,7 +249,7 @@ export default class Character {
 			ablList = ["Animalism", "Auspex", "Celerity", "Dominate", "Majesty", "Nightmare", "Obfuscate", "Protean", "Resilience", "Vigor"];
 			break;
 		case (EnumSplat.MAGE):
-			ablList = ["Death", "Fate", "Forces", "Life", "Matter", "Mind", "Prime", "Spirit", "Space", "Time"];
+			// ablList = ["Death", "Fate", "Forces", "Life", "Matter", "Mind", "Prime", "Spirit", "Space", "Time"];
 			this.activeSpells = [];
 			this.yantras = [];
 			this.magicalTools = [];
@@ -276,13 +282,32 @@ export default class Character {
 
 		const defaultAbl: { [index: string]: Ability } = {};
 
-		ablList.forEach(el => {
-			defaultAbl[el.toLowerCase()] = { name: el, level: 0 };
+		Object.entries(SPLATS[opts.splat].abilities || {}).forEach((el) => {
+			defaultAbl[el[0]] = {name: el[1], level: 0};
 		});
+
+		// ablList.forEach(el => {
+		// 	defaultAbl[el.toLowerCase()] = { name: el, level: 0 };
+		// });
 
 		Object.assign(this, opts);
 
 		this.abilities = reactive(Object.assign({}, defaultAbl, (this as any).abilities));
+		
+		console.log(defaultAbl);
+		Object.keys(this.abilities).forEach(key => {
+			const value = this.abilities[key];
+			const def = defaultAbl[key];
+
+			console.log(value.name, def);
+			if (def && value.name != def.name) {
+				value.name = def.name;
+			}
+		});
+		
+		this.abilities = sortObj(this.abilities);
+		console.log(Object.entries(this.abilities));
+
 		this.baseAttributes = reactive(this.baseAttributes);
 		
 		if (this.currentForm && !isRef(this.currentForm)) {

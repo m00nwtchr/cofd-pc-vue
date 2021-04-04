@@ -26,12 +26,12 @@
 				<div class="block col-sm-4">
 					{{ splat && splat.nameName }}: <input v-model="character.name" /><br />
 					<span v-if="character.splat === EnumSplat.MORTAL">
-						Age: <input v-model.number="character.age" type="number" /><br />
-						Player: <input v-model="character.player" /><br />
+						{{ $t("character.age") }}: <input v-model.number="character.age" type="number" /><br />
+						{{ $t("character.player") }}: <input v-model="character.player" /><br />
 					</span>
 					<span v-else>
-						Player: <input v-model="character.player" /><br />
-						Chronicle: <input v-model="character.chronicle" /><br />
+						{{ $t("character.player") }}: <input v-model="character.player" /><br />
+						{{ $t("character.chronicle") }}: <input v-model="character.chronicle" /><br />
 					</span>
 				</div>
 				<div class="block col-sm-4">
@@ -39,7 +39,7 @@
 					<input v-model="character.virtueAnchor" list="virtueAnchors" /><br />
 					{{ splat && splat.viceAnchorName }}:
 					<input v-model="character.viceAnchor" list="viceAnchors" /><br />
-					Concept: <input v-model="character.concept" /><br />
+					{{ $t("character.concept") }}: <input v-model="character.concept" /><br />
 				</div>
 				<div class="block col-sm-4">
 					<span v-if="character.splat === EnumSplat.MORTAL">
@@ -76,17 +76,17 @@
 					</datalist>
 				</div>
 			</div>
-			<div class="separator col-12"><h2>Attributes</h2></div>
+			<div class="separator col-12"><h2>{{ $t("character.attributes") }}</h2></div>
 			<div id="attrBar" class="bar row col-12">
 				<div id="attr-cats" style="text-align:right;" class="block col-sm-2">
-					Power<br />
-					Finesse<br />
-					Resistance<br />
+					{{ $t("character.attribute.power") }}<br />
+					{{ $t("character.attribute.finesse") }}<br />
+					{{ $t("character.attribute.resistance") }}<br />
 				</div>
 				<div class="attr-proper row col-sm-10">
 					<div v-for="attrCat in attributeNames" :key="attrCat" class="block col-sm-4">
 						<span style="text-transform: capitalize" v-for="attr in attrCat" :key="attr">
-							<span :class="{'selected': selectedTraits[attr]}" @click="selectTrait(attr,{attr:true})">{{ attr }}</span>
+							<span :class="{'selected': selectedTraits[attr]}" @click="selectTrait(attr,{attr:true})">{{ $t(`character.attribute.${attr}`) }}</span>
 							<input v-if="!dotsOverFive && attrMax > 5" v-model.number="character.baseAttributes[attr]" type="number" style="width: 35px;" class="attr-input">
 							<div class="sheet-dots">
 								<button @click="setAttr(attr, n)" v-for="n in dotAttrMax" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':character.baseAttributes[attr]>=n,'sheet-dot-small':dotAttrMax>5}"></button>
@@ -98,9 +98,9 @@
 			</div>
 			<div class="row col-12">
 				<div id="skills" class="bar col col-sm-4">
-					<h2 class="separator col-sm-12" style="margin-bottom: 20px">Skills</h2>
+					<h2 class="separator col-sm-12" style="margin-bottom: 20px">{{ $t("character.skills") }}</h2>
 					<div v-for="(cat,i) in skills" :key="cat" class="block col col-12">
-						<h3 class="separator">{{Object.keys(skillCats)[i]}}</h3>
+						<h3 class="separator">{{ $t(`character.cat.${Object.keys(skillCats)[i]}`) }}</h3>
 						<i class="col-12 subtitle">({{ Object.values(skillCats)[i] }} unskilled)</i><br>
 
 						<div style="font-style: italic;font-size: 10px;line-height: 10px;" v-if="character.splat === EnumSplat.MAGE">
@@ -110,7 +110,7 @@
 							<!-- <button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button> -->
 							<button v-if="character.splat === EnumSplat.MAGE" class="sheet-box" :class="{'sheet-dot-full': organization.skills.includes(skill)}"></button>
 							<span :class="{'selected': selectedTraits[skill],'specialties': character.specialties[skill] && character.specialties[skill].length > 0}" @click="selectTrait(skill,{skill:true,skillCat: i})">
-								{{ skill.replaceAll("_", " ") }}
+								{{ $t(`character.skill.${skill}`) }}
 							</span>
 							
 							<button class="dropdown-toggle material-icons" @click="specialtyDropDown(skill)">
@@ -131,7 +131,7 @@
 				</div>
 
 				<div id="traits" class="bar col-sm-8">
-					<h2 class="separator col-sm-12" style="margin-bottom: 20px">Other Traits</h2>
+					<h2 class="separator col-sm-12" style="margin-bottom: 20px">{{ $t("character.other_traits") }}</h2>
 					<div class="row col-12">
 						<div class="col col-sm-7">
 
@@ -145,14 +145,14 @@
 
 							<div id="minorTraits" class="block col col-12">
 								<span v-if="character.splat !== EnumSplat.WEREWOLF">
-									Size: <input v-model.number="character.size" type="number" /><br>
-									Speed: {{ character.speed }}<br>
-									Defense: {{ character.defense }}<br>
-									<!-- Armor: <input v-model="character.armor" /><br> -->
-									Armor: {{ character.armor ? character.armor.general+"/"+character.armor.ballistic : "" }}<br>
-									Initative Mod: {{ initative }}<br>
+									{{ $t("character.trait.size") }}: <input v-model.number="character.size" type="number" /><br>
+									{{ $t("character.trait.speed") }}: {{ character.speed }}<br>
+									{{ $t("character.trait.defense") }}: {{ character.defense }}<br>
+									<!-- {{ $t("character.trait.armor") }}: <input v-model="character.armor" /><br> -->
+									{{ $t("character.trait.armor") }}: {{ character.armor ? character.armor.general+"/"+character.armor.ballistic : "" }}<br>
+									{{ $t("character.trait.initative") }}: {{ initative }}<br>
 								</span>
-								<span style="float:left; margin-right: 5px;">Beats:</span>
+								<span style="float:left; margin-right: 5px;">{{ $t("character.trait.beats") }}:</span>
 								<div style="float:left; margin-right: 10px;">
 									<span v-for="n in 5" :key="n">
 										<button class="sheet-box" @click="setTrait('beats', n)" :class="{'sheet-dot-full': character.beats >= n}"></button>
@@ -160,9 +160,9 @@
 								</div>
 								<span style="clear:both;"></span>
 								<br v-if="character.splat !== EnumSplat.WEREWOLF">
-								Experience: <input v-model.number="character.experience" type="number" /><br>
+								{{ $t("character.trait.experience") }}: <input v-model.number="character.experience" type="number" /><br>
 								<div v-if="(splat && splat.alternateBeatName) && !splat.alternateBeatOptional">
-									<span style="float:left;">{{ splat.alternateBeatName }} Beats:</span> 
+									<span style="float:left;">{{ splat.alternateBeatName }} {{ $t("character.trait.beats") }}:</span> 
 									<div style="float:left;">
 										<span v-for="n in 5" :key="n">
 											<button class="sheet-box" @click="setTrait('alternateBeats', n)" :class="{'sheet-dot-full': character.alternateBeats >= n}"></button>
@@ -170,18 +170,18 @@
 										</div>
 										<span style="clear:both;"></span>
 										<br>
-									{{ splat.alternateBeatName }} Experience: <input v-model.number="character.alternateExperience" type="number" /><br>
+									{{ splat.alternateBeatName }} {{ $t("character.trait.experience") }}: <input v-model.number="character.alternateExperience" type="number" /><br>
 								</div>
 							</div>
 
 						</div>
 						<div class="col col-sm-5">
-							<health-component id="health" class="col-12" style="margin-bottom: 15px" :maxHealth="character.maxHealth" :healthTrack="character.healthTrack" name="Health">
+							<health-component id="health" class="col-12" style="margin-bottom: 15px" :maxHealth="character.maxHealth" :healthTrack="character.healthTrack" :name="$t('character.trait.health')">
 								<!-- <i class="subtitle" style="margin-bottom: 5px" v-if="character.splat === EnumSplat.WEREWOLF">(EEE)</i> -->
 							</health-component>
 
 							<div id="willpower" class="col-12" style="margin-bottom: 15px">
-								<h3 class="separator col-sm-12">Willpower</h3>
+								<h3 class="separator col-sm-12">{{ $t("character.trait.willpower") }}</h3>
 								<div class="sheet-dots" style="margin-top:-10px;">
 									<button v-for="n in maxWillpower" :key="n" @click="setTrait('spentWillpowerDots', maxWillpower-n, {off:-1})" class="sheet-dot" :class="{'sheet-dot-full': maxWillpower-character.spentWillpowerDots >= n}"></button>
 								</div>
@@ -287,21 +287,21 @@
 						<i class="subtitle">({{ form.desc }})</i>
 						
 						<div>
-							Strength: {{ character.attributes.strength         - currentForm.strengthMod     + form.strengthMod }}<br>
-							Dexterity: {{ character.attributes.dexterity       - currentForm.dexterityMod    + form.dexterityMod }}<br>
-							Stamina: {{ character.attributes.stamina           - currentForm.staminaMod      + form.staminaMod }}<br>
-							Manipulation: {{ character.attributes.manipulation - currentForm.manipulationMod + form.manipulationMod }}<br>
+							{{ $t("character.attribute.strength") }}: {{ character.attributes.strength         - currentForm.strengthMod     + form.strengthMod }}<br>
+							{{ $t("character.attribute.dexterity") }}: {{ character.attributes.dexterity       - currentForm.dexterityMod    + form.dexterityMod }}<br>
+							{{ $t("character.attribute.stamina") }}: {{ character.attributes.stamina           - currentForm.staminaMod      + form.staminaMod }}<br>
+							{{ $t("character.attribute.manipulation") }}: {{ character.attributes.manipulation - currentForm.manipulationMod + form.manipulationMod }}<br>
 
 							<br>
 
-							Size: <input v-if="form.name==='Hishu'" v-model.number="sizeMinusForm" type="number" />
+							{{ $t("character.trait.size") }}: <input v-if="form.name==='Hishu'" v-model.number="sizeMinusForm" type="number" />
 							<span v-else>{{ character.size - currentForm.sizeMod + form.sizeMod }}</span><br>
-							Defense: {{ formDefense(form) }}<br>
-							Initative: {{ initative - currentForm.dexterityMod + form.dexterityMod }}<br>
+							{{ $t("character.trait.defense") }}: {{ formDefense(form) }}<br>
+							{{ $t("character.trait.initative") }}: {{ initative - currentForm.dexterityMod + form.dexterityMod }}<br>
 							<!-- Armor: <input v-model="character.armor" /><br> -->
-							Speed: {{ character.speed - currentForm.strengthMod - currentForm.dexterityMod - currentForm.speedMod + form.strengthMod + form.dexterityMod + form.speedMod }}<br>
-							Armor: {{ character.armor ? character.armor.general+"/"+character.armor.ballistic : "" }}<br>
-							Perception: {{ perception - currentForm.perceptionMod + form.perceptionMod }} <br>
+							{{ $t("character.trait.speed") }}: {{ character.speed - currentForm.strengthMod - currentForm.dexterityMod - currentForm.speedMod + form.strengthMod + form.dexterityMod + form.speedMod }}<br>
+							{{ $t("character.trait.armor") }}: {{ character.armor ? character.armor.general+"/"+character.armor.ballistic : "" }}<br>
+							{{ $t("character.trait.perception") }}: {{ perception - currentForm.perceptionMod + form.perceptionMod }} <br>
 							<span v-if="form.name==='Gauru'">Kuruth Limit: {{ character.attributes.stamina - currentForm.staminaMod + character.power }}</span><br>
 
 							<div style="line-height: 15px;" class="form-traits">
@@ -373,7 +373,7 @@ const x = defineComponent({
 			return SPLATS[this.character.splat];
 		},
 		subType() {
-			return (this as any).splat.subTypes.filter((el: any)=>el.name.toLowerCase() === this.character.subType.toLowerCase())[0] || {};
+			return (this as any).splat.subTypes[(this as any).character.subType.toLowerCase()];
 		},
 		organization() {
 			return (this as any).splat.organizations.filter((el: any)=>el.name.toLowerCase() === this.character.organization.toLowerCase())[0] || {skills:[]};
