@@ -1,0 +1,128 @@
+{
+  "character": {
+    "player": "Gracz",
+    "chronicle": "Saga",
+    "name": "Imie",
+    "age": "Wiek",
+    "concept": "Koncept",
+    "cat": {
+      "mental": "Umysłowe",
+      "physical": "Fizyczne",
+      "social": "Społeczne"
+    },
+    "attributes": "Atrybuty",
+    "attribute": {
+      "composure": "Opanowanie",
+      "dexterity": "Zręczność",
+      "finesse": "Finezja",
+      "intelligence": "Inteligencja",
+      "manipulation": "Manipulacja",
+      "power": "Moc",
+      "presence": "Prezencja",
+      "resistance": "Odporność",
+      "resolve": "Przekonanie",
+      "stamina": "Wytrzymałość",
+      "strength": "Siła",
+      "wits": "Rozum"
+    },
+    "skills": "Zdolności",
+    "skill": {
+      "survival": "Przetrwanie",
+      "weaponry": "Broń",
+      "academics": "",
+      "animal_ken": "",
+      "athletics": "lekkoatletyka",
+      "brawl": "Bijatyka",
+      "computer": "Komputer",
+      "crafts": "Rzemieślnictwo",
+      "drive": "",
+      "empathy": "Empatia",
+      "expression": "Wyrażenie",
+      "firearms": "Broń palna",
+      "intimidation": "Zastraszenie",
+      "investigation": "",
+      "larceny": "Kradzież",
+      "medicine": "Medycyna",
+      "occult": "",
+      "persuasion": "Perswazja",
+      "politics": "Polityka",
+      "science": "Nauka",
+      "socialize": "",
+      "stealth": "Skradanie",
+      "streetwise": "",
+      "subterfuge": ""
+    },
+    "other_traits": "Inne Cechy",
+    "trait": {
+      "armor": "Zbroja",
+      "beats": "Bity",
+      "experience": "Doświadczenie",
+      "health": "Zdrowie",
+      "initative": "Inicjatywa",
+      "perception": "Postrzeganie",
+      "size": "Rozmiar",
+      "willpower": "Siła woli",
+      "speed": "Prędkość",
+      "defense": "Obrona"
+    }
+  },
+  "splat": {
+    "integrityTrait": "Integralność",
+    "virtueAnchor": "Cnota",
+    "viceAnchor": "Wada",
+    "mortal": {
+      "name": "Śmiertelnik",
+      "legacy": "Frakcja",
+      "organization": "Nazwa Grupy"
+    },
+    "mage": {
+      "name": "Mag",
+      "nameName": "",
+      "abilityName": "Arkana",
+      "subTypeName": "Ścieżka",
+      "alternateBeat": "Tajemne",
+      "fuelTrait": "Mana",
+      "integrityTrait": "Mądrość",
+      "legacy": "Dziedzictwo",
+      "powerTrait": "Gnoza",
+      "organization": "Zakon",
+      "ability": {
+        "death": "Śmierć",
+        "fate": "Los",
+        "forces": "Śiły",
+        "life": "Życie",
+        "matter": "Materia",
+        "mind": "Umysł",
+        "prime": "Pierwsza",
+        "spirit": "Duch",
+        "space": "Przestrzeń",
+        "time": "Czas"
+      }
+    },
+    "vampire": {
+      "name": "Vampir",
+      "abilityName": "Dyscypliny",
+      "integrityTrait": "Człowieczeństwo",
+      "fuelTrait": "Krew",
+      "legacy": "",
+      "powerTrait": "Moc Krwi",
+      "organization": "Przymierze",
+      "subTypeName": "Klan",
+      "ability": {
+        "animalism": "Animalizm",
+        "auspex": "Auspex",
+        "celerity": "Celerity",
+        "dominate": "Dominacja",
+        "majesty": "Majesty",
+        "nightmare": "Nightmare",
+        "obfuscate": "Niewidoczność",
+        "protean": "Transformacja",
+        "resilience": "Odporność",
+        "vigor": "Vigor"
+      }
+    },
+    "werewolf": {
+      "name": "Wilkołak"
+    }
+  }
+}
