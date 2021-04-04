@@ -29,28 +29,28 @@
     "skill": {
       "survival": "Przetrwanie",
       "weaponry": "Broń",
-      "academics": "",
-      "animal_ken": "",
-      "athletics": "lekkoatletyka",
+      "academics": "Wykształcenie",
+      "animal_ken": "Oswajanie",
+      "athletics": "Lekkoatletyka",
       "brawl": "Bijatyka",
       "computer": "Komputer",
       "crafts": "Rzemieślnictwo",
-      "drive": "",
+      "drive": "Prowadzenie",
       "empathy": "Empatia",
-      "expression": "Wyrażenie",
+      "expression": "Ekspresja",
       "firearms": "Broń palna",
-      "intimidation": "Zastraszenie",
-      "investigation": "",
+      "intimidation": "Zastraszanie",
+      "investigation": "Dochodzenie",
       "larceny": "Kradzież",
       "medicine": "Medycyna",
-      "occult": "",
+      "occult": "Okultyzm",
       "persuasion": "Perswazja",
       "politics": "Polityka",
       "science": "Nauka",
-      "socialize": "",
+      "socialize": "Etykieta",
       "stealth": "Skradanie",
-      "streetwise": "",
-      "subterfuge": ""
+      "streetwise": "Znajomość Półświatka",
+      "subterfuge": "Podstęp"
     },
     "other_traits": "Inne Cechy",
     "trait": {
@@ -78,15 +78,14 @@
     "mage": {
       "name": "Mag",
       "nameName": "",
-      "abilityName": "Arkana",
-      "subTypeName": "Ścieżka",
-      "alternateBeat": "Tajemne",
+      "alternateBeat": "Tajemne {x}",
       "fuelTrait": "Mana",
       "integrityTrait": "Mądrość",
       "legacy": "Dziedzictwo",
       "powerTrait": "Gnoza",
       "organization": "Zakon",
       "ability": {
+        "name": "Arkana",
         "death": "Śmierć",
         "fate": "Los",
         "forces": "Śiły",
@@ -97,32 +96,79 @@
         "spirit": "Duch",
         "space": "Przestrzeń",
         "time": "Czas"
+      },
+      "subType": {
+        "name": "Ścieżka"
       }
     },
     "vampire": {
       "name": "Vampir",
-      "abilityName": "Dyscypliny",
       "integrityTrait": "Człowieczeństwo",
       "fuelTrait": "Krew",
       "legacy": "",
       "powerTrait": "Moc Krwi",
       "organization": "Przymierze",
-      "subTypeName": "Klan",
+      "alternateBeat": "{x} Krwi",
       "ability": {
+        "name": "Dyscypliny",
         "animalism": "Animalizm",
-        "auspex": "Auspex",
-        "celerity": "Celerity",
+        "auspex": "Nadwrażliwość",
+        "celerity": "Przyspieszenie",
         "dominate": "Dominacja",
-        "majesty": "Majesty",
-        "nightmare": "Nightmare",
+        "majesty": "Majestat",
+        "nightmare": "Koszmar",
         "obfuscate": "Niewidoczność",
         "protean": "Transformacja",
-        "resilience": "Odporność",
-        "vigor": "Vigor"
+        "resilience": "Żywotność",
+        "vigor": "Wigor"
+      },
+      "subType": {
+        "name": "Klan"
       }
     },
     "werewolf": {
-      "name": "Wilkołak"
+      "name": "Wilkołak",
+      "virtueAnchor": "Krew",
+      "viceAnchor": "Kość",
+      "legacy": "Loża",
+      "organization": "Plemię",
+      "powerTrait": "Pierwotny Instynkt",
+      "integrityTrait": "Harmonia",
+      "fuelTrait": "Esencja",
+      "ability": {
+        "name": "Renoma",
+        "cunning": "Przebiegłość",
+        "wisdom": "Mądrość",
+        "purity": "Czystość",
+        "honor": "Honor",
+        "glory": "Chwała"
+      },
+      "subType": {
+        "name": "Łaska"
+      },
+      "form": {
+        "human": "Człowiek",
+        "near_human": "Niemal-Człowiek",
+        "wolf_man": "Człowiek-Wilk",
+        "near_wolf": "Niemal-Wilk",
+        "wolf": "Wilk"
+      },
+      "blood": {
+        "alpha": "Alfa",
+        "challenger": "Challenger",
+        "destroyer": "Niszczyciel",
+        "fox": "Lis",
+        "soldier": "Żołnierz",
+        "monster": "Potwór"
+      },
+      "bone": {
+        "lone_wolf": "Samotny Wilk",
+        "wallflower": "Lak",
+        "hedonist": "Hedonista",
+        "guru": "Guru",
+        "cub": "Młode",
+        "community_organizer": "Organizator Społeczności"
+      }
     }
   }
 }

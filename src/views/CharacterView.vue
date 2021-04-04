@@ -71,12 +71,11 @@
 					</datalist>
 
 					<datalist id="virtueAnchors">
-						<option v-for="el in splat.virtueAnchors" :key="el">{{ el }}</option>
+						<option v-for="el in splat.virtueAnchors" :key="el" :value="el" />
 					</datalist>
 
-
 					<datalist id="viceAnchors">
-						<option v-for="el in splat.viceAnchors" :key="el">{{ el }}</option>
+						<option v-for="el in splat.viceAnchors" :key="el" :value="el" />
 					</datalist>
 				</div>
 			</div>
@@ -166,7 +165,7 @@
 								<br v-if="character.splat !== EnumSplat.WEREWOLF">
 								{{ $t("character.trait.experience") }}: <input v-model.number="character.experience" type="number" /><br>
 								<div v-if="(splat && splat.alternateBeatName) && !splat.alternateBeatOptional">
-									<span style="float:left;">{{ splat.alternateBeatName }} {{ $t("character.trait.beats") }}:</span> 
+									<span style="float:left;">{{ splat.alternateBeatName($t("character.trait.beats")) }}:</span> 
 									<div style="float:left;">
 										<span v-for="n in 5" :key="n">
 											<button class="sheet-box" @click="setTrait('alternateBeats', n)" :class="{'sheet-dot-full': character.alternateBeats >= n}"></button>
@@ -174,7 +173,7 @@
 										</div>
 										<span style="clear:both;"></span>
 										<br>
-									{{ splat.alternateBeatName }} {{ $t("character.trait.experience") }}: <input v-model.number="character.alternateExperience" type="number" /><br>
+									{{ splat.alternateBeatName($t("character.trait.experience")) }}: <input v-model.number="character.alternateExperience" type="number" /><br>
 								</div>
 							</div>
 

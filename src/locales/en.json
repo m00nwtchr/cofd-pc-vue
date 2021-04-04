@@ -81,15 +81,14 @@
     "mage": {
       "name": "Mage",
       "nameName": "Shadow Name",
-      "abilityName": "Arcana",
-      "subTypeName": "Path",
       "legacy": "Legacy",
       "organization": "Order",
       "powerTrait": "Gnosis",
       "integrityTrait": "Wisdom",
       "fuelTrait": "Mana",
-      "alternateBeat": "Arcane",
+      "alternateBeat": "Arcane {x}",
       "ability": {
+        "name": "Arcana",
         "death": "Death",
         "fate": "Fate",
         "forces": "Forces",
@@ -102,6 +101,7 @@
         "time": "Time"
       },
       "subType": {
+        "name": "Path",
         "acanthus": "Acanthus",
         "mastigos": "Mastigos",
         "moros": "Moros",
@@ -113,15 +113,14 @@
       "name": "Vampire",
       "virtueAnchor": "Mask",
       "viceAnchor": "Dirge",
-      "abilityName": "Disciplines",
-      "subTypeName": "Clan",
       "legacy": "Bloodline",
       "organization": "Covenant",
       "powerTrait": "Blood Potency",
       "integrityTrait": "Humanity",
       "fuelTrait": "Vitae",
-      "alternateBeat": "Blood",
+      "alternateBeat": "Blood {x}",
       "ability": {
+        "name": "Disciplines",
         "animalism": "Animalism",
         "auspex": "Auspex",
         "celerity": "Celerity",
@@ -132,19 +131,54 @@
         "protean": "Protean",
         "resilience": "Resilience",
         "vigor": "Vigor"
+      },
+      "subType": {
+        "name": "Clan"
       }
     },
     "werewolf": {
       "name": "Werewolf",
       "virtueAnchor": "Blood",
       "viceAnchor": "Bone",
-      "subType": "Auspice",
       "legacy": "Lodge",
       "organization": "Tribe",
       "powerTrait": "Primal Urge",
       "integrityTrait": "Harmony",
-      "ability": "Renown",
-      "fuelTrait": "Essence"
+      "fuelTrait": "Essence",
+      "ability": {
+        "name": "Renown",
+        "cunning": "Cunning",
+        "glory": "Glory",
+        "honor": "Honor",
+        "purity": "Purity",
+        "wisdom": "Wisdom"
+      },
+      "subType": {
+        "name": "Auspice"
+      },
+      "form": {
+        "human": "Human",
+        "near_human": "Near-Human",
+        "wolf_man": "Wolf-Man",
+        "near_wolf": "Near-Wolf",
+        "wolf": "Wolf"
+      },
+      "blood": {
+        "alpha": "Alpha",
+        "challenger": "Challenger",
+        "destroyer": "Destroyer",
+        "fox": "Fox",
+        "monster": "The Monster",
+        "soldier": "Soldier"
+      },
+      "bone": {
+        "community_organizer": "Community Organizer",
+        "cub": "Cub",
+        "guru": "Guru",
+        "hedonist": "Hedonist",
+        "lone_wolf": "Lone Wolf",
+        "wallflower": "Wallflower"
+      }
     }
   }
 
