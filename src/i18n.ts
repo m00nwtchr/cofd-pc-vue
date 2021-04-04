@@ -1,7 +1,9 @@
 import { createI18n, LocaleMessages, VueMessageType } from "vue-i18n";
 import messages from "@intlify/vite-plugin-vue-i18n/messages";
 
-const env = window["process.env" as any] as any || {};
+const env = (window as any).process.env;
+
+console.log(window);
 
 function getLang() {
 	if (navigator.languages != undefined)
