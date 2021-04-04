@@ -5,7 +5,7 @@ const env = window["process.env" as any] as any || {};
 
 export default createI18n({
 	legacy: false,
-	locale: env.VUE_APP_I18N_LOCALE || "pl",
+	locale: env.VUE_APP_I18N_LOCALE || "en",
 	fallbackLocale: "en",
 	globalInjection: true,
 	messages
