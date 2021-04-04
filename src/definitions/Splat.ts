@@ -309,7 +309,19 @@ new Splat({
 	// subTypeName: "Clan",
 	// legacyName: "Bloodline",
 	// orgName: "Covenant",
-	abilities: {},
+	abilities: {
+		animalism: t("splat.vampire.ability.animalism"),
+		auspex: t("splat.vampire.ability.auspex"),
+		celerity: t("splat.vampire.ability.celerity"),
+		dominate: t("splat.vampire.ability.dominate"),
+		majesty: t("splat.vampire.ability.majesty"),
+		nightmare: t("splat.vampire.ability.nightmare"),
+		obfuscate: t("splat.vampire.ability.obfuscate"),
+		protean: t("splat.vampire.ability.protean"),
+		resilience: t("splat.vampire.ability.resilience"),
+		vigor: t("splat.vampire.ability.vigor")
+
+	},
 	subTypes: {
 		davea: { name: "Davea", abilities: ["celerity", "majesty", "vigor"] },
 		gangrel: { name: "Gangrel", abilities: ["animalism", "protean", "resilience"] },

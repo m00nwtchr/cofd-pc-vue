@@ -299,7 +299,7 @@ export default class Character {
 			const value = this.abilities[key];
 			const def = defaultAbl[key];
 
-			console.log(value.name, def);
+			console.log(key, value.name, def);
 			if (def && value.name != def.name) {
 				value.name = def.name;
 			}
