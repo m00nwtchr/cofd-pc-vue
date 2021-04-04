@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import "./registerServiceWorker";
+// import "./registerServiceWorker.ts";
 
 // import Vuetify from "./plugins/vuetify";
 
@@ -19,11 +19,13 @@ import "./style/style.scss";
 import Character from "./definitions/Character";
 import { EnumSplat } from "./definitions/Splat";
 import { WebGLDiceRoller } from "./components/sheetComponents/diceRoller/3DDiceRoller";
+import i18n from "./i18n";
 
-const app = createApp(App);
+const app = createApp(App).use(i18n);
 
 app.use(store)
 	.use(router)
+	.use(i18n)
 	// .use(Vuetify)
 	// .use(BootstrapVue)
 	.mount("#app");
@@ -201,23 +203,18 @@ const characters: { [index: string]: Character | any } = {
 		},
 		"abilities": {
 			"forces": {
-				"name": "Forces",
 				"level": 1
 			},
 			"matter":{
-				"name": "Matter",
 				"level": 1
 			},
 			"mind":{
-				"name": "Mind",
 				"level": 3
 			},
 			"space":{
-				"name": "Space",
 				"level": 1
 			},
 			"time":{
-				"name": "Time",
 				"level": 2
 			}
 		},

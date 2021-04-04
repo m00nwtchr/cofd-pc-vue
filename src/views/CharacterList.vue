@@ -10,7 +10,7 @@
 					<span class="name">{{el.name}}</span><br>
 					<span style="text-transform: capitalize;" class="desc">
 						<span v-if="el.concept">{{ el.concept }}<br></span>
-						{{ `${EnumSplat[el.splat].toLowerCase()}, ${el.organization ||""} ${el.legacy ||""} ${el.subType ||""}` }}
+						{{ `${$t(`splat.${EnumSplat[el.splat].toLowerCase()}.name`,EnumSplat[el.splat].toLowerCase())}, ${el.organization ||""} ${el.legacy ||""} ${el.subType ||""}` }}
 					</span>
 				</div>
 			

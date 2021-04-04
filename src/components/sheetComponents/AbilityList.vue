@@ -3,7 +3,7 @@
 		<h3 class="separator col-sm-12">{{ abilityName }}</h3>
 		<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
 		<div style="margin:0" v-for="(ability, i) in visibleArr" :key="i" class="block row col-sm-12">
-			<span class="line col-7" :class="{'selected': $parent.selectedTraits[ability.name.toLowerCase()]}" @click="$parent.selectTrait(ability.name.toLowerCase(),{ability:true})">
+			<span class="line col-7" :class="{'selected': $parent.selectedTraits[nameOf(i)]}" @click="$parent.selectTrait(nameOf(i),{ability:true})">
 				<input v-if="optionsMutable" @input="doInput(ability)" v-model="ability.name">
 				<span v-else>{{ ability.name }}</span>
 			</span>
@@ -11,12 +11,12 @@
 				<button class="sheet-dot" :class="{'sheet-dot-full':ability.level>=n,
 					'dot-limit': !optionsMutable && $parent.character.splat===$parent.EnumSplat.MAGE &&
 						(
-							(!$parent.subType.abilities.includes(ability.name.toLowerCase()) && n == 5) 
-							|| ($parent.subType.inferiorArcanum === ability.name.toLowerCase() && n >= 3)
+							(!$parent.subType.abilities.includes(nameOf(i)) && n == 5) 
+							|| ($parent.subType.inferiorArcanum === nameOf(i) && n >= 3)
 						),
 					'missing-dot': $parent.character.splat===$parent.EnumSplat.MAGE &&
 						(
-							($parent.subType.abilities.includes(ability.name.toLowerCase()) && n == 1) 
+							($parent.subType.abilities.includes(nameOf(i)) && n == 1) 
 						)	
 					}" @click="setDots(ability, n)" v-for="n in 5" :key="n"></button>
 			</div>
@@ -58,7 +58,7 @@ export default defineComponent({
 			ability.level = (ability.level === n ? n-1 : n);
 
 			if ((this as any).$parent.character.splat===(this as any).$parent.EnumSplat.MAGE) {
-				if ((this as any).$parent.subType.abilities.includes(ability.name.toLowerCase())) {
+				if ((this as any).$parent.subType.abilities.includes(this.nameOf(ability.name))) {
 					if (ability.level === 0) ability.level = 1;
 				}
 			}
@@ -78,9 +78,22 @@ export default defineComponent({
 				// eslint-disable-next-line vue/no-mutating-props
 				this.abilityArr.push(ability);
 			}
-			if (this.optionsMutable &&  ability && ability.name === "") {
+			if (!(ability as any).false && this.optionsMutable && ability && ability.name === "") {
 				// eslint-disable-next-line vue/no-mutating-props
 				this.abilityArr.splice(this.abilityArr.indexOf(ability), 1);
+			}
+		},
+		nameOf(i: number | string) {
+			const entries = Object.entries(this.abilities);
+			if (typeof i === "number") {
+				console.log(i);
+				if (entries[i]) {
+					return entries[i][0].toLowerCase();
+				} else {
+					return "";
+				}
+			} else {
+				return entries.filter(el => el[1].name === i)[0][0].toLowerCase();
 			}
 		}
 	},
@@ -103,30 +116,6 @@ export default defineComponent({
 				this.abilities[el.name.toLowerCase()] = el;
 			});
 		}, deep:true}
-		// abilities: {handler(newVal, oldVal) {
-
-		// 	// console.log(newVal, oldVal);
-
-		// 	const newW = Object.keys(newVal).filter(el => Object.keys(oldVal).includes(el))[0];
-		// 	const old  = Object.keys(oldVal).filter(el => Object.keys(newVal).includes(el))[0];
-
-
-		// 	this.abilities[newW] = this.abilities[old];
-		// 	delete this.abilities[old];
-		// }, deep: true}
-		// abilityArr: {
-		// 	handler(newArr, oldArr) {
-		// 		newArr.forEach(el => {
-		// 			if ((ability as any).false) {
-		// 				delete (ability as any).false;
-				
-		// 				// eslint-disable-next-line vue/no-mutating-props
-		// 				this.abilityArr.push(ability);
-		// 			}
-		// 		});
-		// 	},
-		// 	deep: true
-		// }
 	}
 });
 

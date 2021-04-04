@@ -15,7 +15,8 @@
     "baseUrl": ".",
     "types": [
       // "webpack-env",
-      "vite/client"
+      "vite/client",
+      "@intlify/vite-plugin-vue-i18n/client"
     ],
     "paths": {
       "@/*": [
@@ -35,7 +36,7 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx"
-  ],
+, "src/registerServiceWorker.ts.old"  ],
   "exclude": [
     "node_modules"
   ]

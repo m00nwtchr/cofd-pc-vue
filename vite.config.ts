@@ -1,22 +1,17 @@
+import path from "path";
+
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import vueI18n from "@intlify/vite-plugin-vue-i18n";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [vue()],
+	plugins: [
+		vue(),
+		vueI18n({
+			include: path.resolve(__dirname, "./src/locales/**")
+		})
+	],
 	base: "./",
-	// define: { "process.env": {} },
-	/* remove the need to specify .vue files https://vitejs.dev/config/#resolve-extensions
-  resolve: {
-	extensions: [
-	'.js',
-	  '.json',
-	  '.jsx',
-	  '.mjs',
-	  '.ts',
-	  '.tsx',
-	  '.vue',
-	]
-  },
-  */
+	define: { "process.env": process.env }
 });
