@@ -12,6 +12,8 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable vue/no-mutating-props */
+
 import { Ability } from "@/definitions/Character";
 import { defineComponent } from "vue";
 export default defineComponent({
@@ -25,6 +27,11 @@ export default defineComponent({
 			required: true,
 			type: Array
 		},
+		"maxMarkValue": {
+			required: false,
+			default: 3,
+			type: Number
+		},
 		"name": {
 			required: true,
 			type: String
@@ -36,21 +43,21 @@ export default defineComponent({
 			const c: number =  healthTrack[n];
 
 
-			const n2 = c===3?healthTrack.lastIndexOf(c) : healthTrack.indexOf(c);
-
-			// // n2 = n2 === -1 ? 0 : n2;
+			const n2 = c === this.maxMarkValue ? healthTrack.lastIndexOf(c) : healthTrack.indexOf(c);
 
 			if (n !== n2) {
 				n = n2;
 			}
 
 			healthTrack[n] = c+1;
-			if (healthTrack[n] > 3) {
+			if (healthTrack[n] > this.maxMarkValue) {
 				healthTrack[n] = 0;
+			
+				if (this.healthTrack[n+1] !== 0) {
+					this.healthTrack.splice(n,1);
+					this.healthTrack.push(0);
+				}
 			}
-
-			// console.log(n, c);		
-			// console.log(healthTrack);
 		}
 	},
 	computed: {
@@ -65,21 +72,29 @@ export default defineComponent({
 	beforeMount() {
 		if (this.healthTrack.length < this.maxHealth) {
 			for (let iii = this.healthTrack.length; iii < this.maxHealth; iii++) {
-				// eslint-disable-next-line vue/no-mutating-props
 				this.healthTrack.push(0);
 			}
 		}
 	},
 	watch: {
-		maxHealth: function() {
+		maxHealth() {
 			if (this.healthTrack.length < this.maxHealth) {
 				for (let iii = this.healthTrack.length; iii < this.maxHealth; iii++) {
-					// eslint-disable-next-line vue/no-mutating-props
 					this.healthTrack.push(0);
 				}
 			}
 			// console.log(this.healthTrack.length);
-		}
+		},
+		// healthTrack() {
+		// 	this.healthTrack.forEach((el, i) => {
+		// 		if (el === 0) {
+		// 			if (this.healthTrack[i+1] !== 0) {
+		// 				this.healthTrack.splice(i,1);
+		// 				this.healthTrack.push(0);
+		// 			}
+		// 		}
+		// 	});
+		// }
 	}
 });
 

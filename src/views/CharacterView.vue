@@ -6,16 +6,20 @@
 		
 		<dice-roller></dice-roller>
 
+
+		<div class="fab">
+			<button @click="rollSelected()">Roll Selected</button>
+			<modal-component modalWidth="80%" modalHeight="80%" v-if="character.splat === EnumSplat.MAGE" value="Cast Spell" title="Improvised Spellcasting">
+				<spell-calculator :character="character" class="col-12" />
+			</modal-component>
+		</div>
+
 		<!-- <teleport v-if="character.splat !== EnumSplat.VAMPIRE" :to="`#${EnumSplat[character.splat].toLowerCase()}-conditions`"> -->
 		<!-- </teleport> -->
 		<div id="charsheet" :class="{
 			['charsheet-'+(EnumSplat && EnumSplat[character.splat]).toLowerCase()]: true
 		}">
 			<!-- <fab /> -->
-
-			<div class="fab">
-				<button @click="rollSelected()">Roll Selected</button>
-			</div>
 
 			{{selectedTraits}}
 
@@ -204,8 +208,12 @@
 									</span>
 								</div>
 							</div>
+
+							<!-- <span class="col-12" v-if="splat && splat.integrityTraitName"> -->
+								<!-- <health-component    v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.maxClarity" :healthTrack="character.clarityTrack" :name="splat.integrityTraitName" class="col-12" id="integrityTrait" /> -->
 							<integrity-component v-if="splat && splat.integrityTraitName" :character="character" :splat="splat" class="col-12" id="integrityTrait" />
-						
+							<!-- </span> -->
+
 							<div class="col-12" v-if="character.splat===EnumSplat.WEREWOLF" style="color: black;" id="kuruth-triggers">
 								<h3 class="separator col-sm-12">Kuruth Trigers</h3>
 								<!-- <div class="row col-12"> -->
@@ -332,6 +340,9 @@ import IntegrityComponent from "../components/sheetComponents/IntegrityComponent
 import ItemList from "../components/sheetComponents/ItemList.vue";
 import ObjectList from "../components/sheetComponents/ObjectList.vue";
 import DiceRollerComponent from "../components/sheetComponents/diceRoller/DiceRoller.vue";
+import ModalComponent from "../components/ModalComponent.vue";
+
+import SpellCalculator from "../components/sheetComponents/SpellCalculator.vue";
 
 // import fab from "vue-fab";
 
@@ -361,7 +372,9 @@ const x = defineComponent({
 		"IntegrityComponent": IntegrityComponent,
 		"ItemList": ItemList,
 		"ObjectList": ObjectList,
-		"DiceRoller": DiceRollerComponent
+		"DiceRoller": DiceRollerComponent,
+		"ModalComponent": ModalComponent,
+		"SpellCalculator": SpellCalculator
 		// "fab": fab
 	},
 	computed: {
@@ -857,6 +870,8 @@ button.sheet-dot-small {
 
 	right: 10px;
 	bottom: 10px;
+
+	z-index: 1;
 }
 
 #rotes {

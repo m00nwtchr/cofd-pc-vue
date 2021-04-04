@@ -166,7 +166,7 @@ export default class Character {
 	fuel = 0;
 	// maxFuel = 10;
 
-	integrityTrait?= 7;
+	integrityTrait? = 7;
 
 	touchstones: { name: string; type?: string }[] = [];
 
@@ -212,6 +212,8 @@ export default class Character {
 	alternateBeats?= 0;
 	alternateExperience?= 0;
 
+	/* Mage */
+
 	activeSpells!: string[];
 	yantras!: string[];
 	magicalTools!: string[];
@@ -226,10 +228,17 @@ export default class Character {
 		roteSkill: string;
 	}[];
 
+	/* Werewolf */
+
 	currentForm?: Ref<string> = undefined;
 	currentFormObj!: ComputedRef<Form>;
 
 	kuruthTriggers?: {passive: string; common: string; specific: string};
+
+	/* Changeling */
+
+	clarityTrack!: number[];
+	maxClarity!: ComputedRef<number>;
 
 	getNum(arg: string) {
 		return getNum.call(this, arg);
@@ -242,11 +251,9 @@ export default class Character {
 
 		// const giantBonus = 
 
-		let ablList: string[] = [];
-
 		switch (opts.splat) {
 		case (EnumSplat.VAMPIRE):
-			ablList = ["Animalism", "Auspex", "Celerity", "Dominate", "Majesty", "Nightmare", "Obfuscate", "Protean", "Resilience", "Vigor"];
+			// ablList = ["Animalism", "Auspex", "Celerity", "Dominate", "Majesty", "Nightmare", "Obfuscate", "Protean", "Resilience", "Vigor"];
 			break;
 		case (EnumSplat.MAGE):
 			// ablList = ["Death", "Fate", "Forces", "Life", "Matter", "Mind", "Prime", "Spirit", "Space", "Time"];
@@ -259,7 +266,7 @@ export default class Character {
 			this.rotes = [];
 			break;
 		case (EnumSplat.WEREWOLF):
-			ablList = ["Purity", "Glory", "Honor", "Wisdom", "Cunning"];
+			// ablList = ["Purity", "Glory", "Honor", "Wisdom", "Cunning"];
 			this.currentForm = ref("hishu");
 
 			this.currentFormObj = computed(function() {
@@ -277,6 +284,15 @@ export default class Character {
 				};
 			});
 			this.kuruthTriggers = {passive: "", common: "", specific: ""};
+			break;
+		case (EnumSplat.CHANGELING):
+			this.clarityTrack = [];
+
+			this.maxClarity = computed(function() {
+				const val = self.attributes.value.wits + self.attributes.value.composure;
+	
+				return val;
+			});
 			break;
 		}
 
