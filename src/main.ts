@@ -431,8 +431,8 @@ const characters: { [index: string]: Character | any } = {
 // interface ImportMeta {
 // 	env: any;
 // }
-
-if (import.meta.env.MODE === "development" || !localStorage.characters) {
+// import.meta.env.MODE === "development" || 
+if (!localStorage.characters) {
 	localStorage.characters = JSON.stringify(characters);
 }
 
