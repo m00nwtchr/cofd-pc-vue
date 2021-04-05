@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "tsc --noEmit && vite build",
-    "devBuild": "npm run build -m development",
+    "demoBuild": "DEMO=1 yarn build -m development",
     "lint": "vue-cli-service lint",
     "dev": "vite",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(ts|js|vue)\" --locales \"./src/locales/**/*.json\"",
