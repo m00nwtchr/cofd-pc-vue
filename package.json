@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@types/cannon": "^0.1.5",
-    "@types/deepmerge": "^2.2.0",
     "@types/three": "^0.126.1",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
