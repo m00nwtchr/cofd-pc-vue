@@ -123,7 +123,7 @@ export class Splat {
 		const name = EnumSplat[this.en].toLowerCase();
 
 		this.nameName = t(`splat.${name}.nameName`, t("character.name"));
- 
+
 		this.virtueAnchorName = t(`splat.${name}.virtueAnchor`, t("splat.virtueAnchor"));
 		this.viceAnchorName = t(`splat.${name}.viceAnchor`, t("splat.viceAnchor"));
 
