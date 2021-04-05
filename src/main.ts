@@ -432,7 +432,7 @@ const characters: { [index: string]: Character | any } = {
 // 	env: any;
 // }
 // import.meta.env.MODE === "development" || 
-if (!localStorage.characters) {
+if ((import.meta.env.MODE === "development" && !process.env.DEMO) || !localStorage.characters) {
 	localStorage.characters = JSON.stringify(characters);
 }
 
