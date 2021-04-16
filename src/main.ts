@@ -381,6 +381,17 @@ const characters: { [index: string]: Character | any } = {
 		"alternateExperience": 0,
 		"roteSkills": [],
 		"currentForm": "hishu",
+		"baseFormMods": {
+			"gauru": {
+				dexterityMod: 0,
+				manipulationMod: 0,
+				perceptionMod: 0,
+				sizeMod: 0,
+				staminaMod:0,
+				strengthMod:1,
+				speedMod: 0,
+			}
+		},
 		"name": "Amos Gray",
 		"splat": EnumSplat.WEREWOLF,
 		"player": "m00n",

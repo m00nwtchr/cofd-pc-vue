@@ -1,6 +1,6 @@
 import { computed } from "vue";
 import g from "../i18n";
-import { Ability } from "./Character";
+import Character, { Ability, ChangelingCharacter, MageCharacter, VampireCharacter, WerewolfCharacter } from "./Character";
 
 const i18n = g.global;
 const t = i18n.t.bind(i18n);
@@ -17,6 +17,8 @@ export const SPLATS: { [index: number]: Splat } = {};
 export class Splat {
 
 	en: EnumSplat;
+	characterFactory: new (opts: any) => Character;
+
 	nameName: string;
 
 	virtueAnchorName: string;
@@ -67,8 +69,9 @@ export class Splat {
 	}[];
 
 
-	constructor({ en, isSup, hasPowerTrait, hasFuelTrait, abilities, integrityTrackType, alternateBeatOptional, finiteAbilities, legacies, organizations, subTypes, viceAnchors, virtueAnchors }: {
+	constructor({ en, characterFactory, isSup, hasPowerTrait, hasFuelTrait, abilities, integrityTrackType, alternateBeatOptional, finiteAbilities, legacies, organizations, subTypes, viceAnchors, virtueAnchors }: {
 		en: EnumSplat;
+		characterFactory?: new (opts: any) => Character;
 
 		isSup?: boolean;
 		hasPowerTrait?: boolean;
@@ -107,8 +110,7 @@ export class Splat {
 		}[];
 	}) {
 		this.en = en || EnumSplat.MORTAL;
-		console.log(this.en);
-
+		
 		if (isSup === undefined) {
 			isSup = true;
 		}
@@ -119,8 +121,9 @@ export class Splat {
 		}
 
 		SPLATS[en] = this;
-
 		const name = EnumSplat[this.en].toLowerCase();
+
+		this.characterFactory = characterFactory || Character;
 
 		this.nameName = t(`splat.${name}.nameName`, t("character.name"));
 
@@ -213,6 +216,7 @@ new Splat({
 
 new Splat({
 	en: EnumSplat.MAGE,
+	characterFactory: MageCharacter,
 	// nameName: "Shadow Name",
 	// virtueAnchorName: "Virtue",
 	// viceAnchorName: "Vice",
@@ -302,6 +306,7 @@ new Splat({
 
 new Splat({
 	en: EnumSplat.VAMPIRE,
+	characterFactory: VampireCharacter,
 	// virtueAnchorName: "Mask",
 	// viceAnchorName: "Dirge",
 	virtueAnchors: VAMP_ANCHORS,
@@ -347,8 +352,9 @@ new Splat({
 	alternateBeatOptional: true
 });
 
-new Splat({
+const WEREWOLF = new Splat({
 	en: EnumSplat.WEREWOLF,
+	characterFactory: WerewolfCharacter,
 	// virtueAnchorName: "Blood",
 	// viceAnchorName: "Bone",
 	virtueAnchors: [
@@ -455,217 +461,31 @@ new Splat({
 	// fuelTraitName: "Essence"
 });
 
-// export const SPLATS: { [index: string]: Splat } = {
-// 	[EnumSplat.MORTAL]: new Splat({en:EnumSplat.MORTAL}),
-// 	[EnumSplat.MAGE]: new Splat({
-// 		en: EnumSplat.MAGE,
-// 		nameName: "Shadow Name",
-// 		virtueAnchorName: "Virtue",
-// 		viceAnchorName: "Vice",
-// 		subTypeName: "Path",
-// 		legacyName: "Legacy",
-// 		orgName: "Order",
-// 		subTypes: [
-// 			{
-// 				name: t("splat.mage.subtype.acanthus"),
-// 				abilities: ["time", "fate"],
-// 				inferiorArcanum: "forces"
-// 			},
-// 			{
-// 				name:  t("splat.mage.subtype.mastigos"),
-// 				abilities: ["space", "mind"],
-// 				inferiorArcanum: "matter"
-// 			},
-// 			{
-// 				name:  t("splat.mage.subtype.moros"),
-// 				abilities: ["matter", "death"],
-// 				inferiorArcanum: "spirit"
-// 			},
-// 			{
-// 				name:  t("splat.mage.subtype.obrimos"),
-// 				abilities: ["forces", "prime"],
-// 				inferiorArcanum: "death"
-// 			},
-// 			{
-// 				name:  t("splat.mage.subtype.thyrsus"),
-// 				abilities: ["life", "spirit"],
-// 				inferiorArcanum: "mind"
-// 			},
-// 		],
-// 		organizations: [
-// 			{
-// 				name:  t("splat.mage.organization.adamantinearrow"),
+new Splat({
+	en: EnumSplat.CHANGELING,
+	characterFactory: ChangelingCharacter,
+	// virtueAnchorName: "Blood",
+	// viceAnchorName: "Bone",
+	virtueAnchors: [],
+	viceAnchors: [],
+	// subTypeName: "Auspice",
+	// legacyName: "Lodge",
+	// orgName: "Tribe",
+	abilities: {
+	},
+	subTypes: {
+	},
+	organizations: [
+	],
+	// powerTraitName: "Primal Urge",
+	// integrityTraitName: "Harmony",
+	integrityTrackType: "healthTrack",
+	// abilityName: "Renown",
+	finiteAbilities: true,
+	// fuelTraitName: "Essence"
+});
 
-// 				skills: ["athletics", "intimidation", "medicine"]
-// 			},
-// 			{
-// 				name: t("splat.mage.organization.guardiansoftheveil"),
-
-// 				skills: ["investigation", "stealth", "subterfuge"]
-// 			},
-// 			{
-// 				name: t("splat.mage.organization.mysterium"),
-
-// 				skills: ["investigation", "occult", "survival"]
-// 			},
-// 			{
-// 				name: t("splat.mage.organization.silverladder"),
-
-// 				skills: ["expression", "persuasion", "subterfuge"]
-// 			},
-// 			{
-// 				name: t("splat.mage.organization.freecouncil"),
-
-// 				skills: ["crafts", "persuasion", "science"]
-// 			},
-// 			{
-// 				name: t("splat.mage.organization.seersofthethrone"),
-
-// 				skills: ["investigation", "occult", "persuasion"]
-// 			},
-// 		],
-// 		// legacies: [],
-// 		powerTraitName: t("splat.mage.gnosis"),
-// 		integrityTraitName: "Wisdom",
-// 		abilityName: "Arcana",
-// 		finiteAbilities: true,
-// 		fuelTraitName: "Mana",
-// 		alternateBeatName: "Arcane",
-// 		alternateBeatOptional: false
-// 	}),
-// 	[EnumSplat.VAMPIRE]: new Splat({
-// 		en: EnumSplat.VAMPIRE,
-// 		virtueAnchorName: "Mask",
-// 		viceAnchorName: "Dirge",
-// 		virtueAnchors: VAMP_ANCHORS,
-// 		viceAnchors: VAMP_ANCHORS,
-// 		subTypeName: "Clan",
-// 		legacyName: "Bloodline",
-// 		orgName: "Covenant",
-// 		subTypes: [
-// 			{ name: "Davea", abilities: ["celerity", "majesty", "vigor"] },
-// 			{ name: "Gangrel", abilities: ["animalism", "protean", "resilience"] },
-// 			{ name: "Mekhet", abilities: ["celerity", "auspex", "obfuscate"] },
-// 			{ name: "Nosferatu", abilities: ["obfuscate", "nightmare", "vigor"] },
-// 			{ name: "Ventrue", abilities: ["animalism", "dominate", "resilience"] },
-// 		],
-// 		organizations: [
-// 			{ name: "The Carthian Movement" },
-// 			{ name: "The Circle of the Crone" },
-// 			{ name: "The Invictus" },
-// 			{ name: "The Lancea et Sanctum" },
-// 			{ name: "The Ordo Dracul" },
-// 			{ name: "VII" },
-// 		],
-// 		powerTraitName: "Blood Potency",
-// 		integrityTraitName: "Humanity",
-// 		integrityTrackType: "verticalTouchstoneTrack",
-// 		abilityName: "Disciplines",
-// 		finiteAbilities: false,
-// 		fuelTraitName: "Vitae",
-// 		alternateBeatName: "Blood",
-// 		alternateBeatOptional: true
-// 	}),
-// 	[EnumSplat.WEREWOLF]: new Splat({
-// 		en: EnumSplat.WEREWOLF,
-// 		virtueAnchorName: "Blood",
-// 		viceAnchorName: "Bone",
-// 		virtueAnchors: ["Alpha", "Challenger", "Destroyer", "Fox", "The Monster", "Soldier"],
-// 		viceAnchors: ["Community Organizer", "Cub", "Guru", "Hedonist", "Lone Wolf", "Wallflower"],
-// 		subTypeName: "Auspice",
-// 		legacyName: "Lodge",
-// 		orgName: "Tribe",
-// 		subTypes: [
-// 			{
-// 				name: "Cahalith",
-// 				abilities: ["glory"],
-// 				moonGifts: ["Gibbous"],
-// 				gifts: ["inspiration", "knowledge"],
-// 				skills: ["crafts", "expression", "persuasion"]
-// 			},
-// 			{
-// 				name: "Elodoth",
-// 				abilities: ["honor"],
-// 				moonGifts: ["Half"],
-// 				gifts: ["insight", "warding"],
-// 				skills: ["empathy", "investigation", "politics"]
-// 			},
-// 			{
-// 				name: "Irraka",
-// 				abilities: ["cunning"],
-// 				moonGifts: ["New"],
-// 				gifts: ["evasion", "stealth"],
-// 				skills: ["larceny", "stealth", "subterfuge"]
-// 			},
-// 			{
-// 				name: "Itheur",
-// 				abilities: ["wisdom"],
-// 				moonGifts: ["Crescent"],
-// 				gifts: ["elemental", "shaping"],
-// 				skills: ["animal_ken", "medicine", "occult"]
-// 			},
-// 			{
-// 				name: "Rahu",
-// 				abilities: ["purity"],
-// 				moonGifts: ["Full"],
-// 				gifts: ["dominance", "strength"],
-// 				skills: ["brawl", "intimidation", "survival"]
-// 			},
-// 		],
-// 		organizations: [
-// 			{
-// 				name: "Blood Talons",
-
-// 				renown: "glory",
-// 				gifts: ["inspiration", "rage", "strength"]
-// 			},
-// 			{
-// 				name: "Bone Shadows",
-
-// 				renown: "wisdom",
-// 				gifts: ["death", "elements", "insight"]
-// 			},
-// 			{
-// 				name: "Hunters in Darkness",
-
-// 				renown: "purity",
-// 				gifts: ["nature", "stealth", "warding"]
-// 			},
-// 			{
-// 				name: "Iron Masters",
-
-// 				renown: "cunning",
-// 				gifts: ["knowledge", "shaping", "technology"]
-// 			},
-// 			{
-// 				name: "Storm Lords",
-
-// 				renown: "honor",
-// 				gifts: ["evasion", "dominance", "weather"]
-// 			},
-// 			{
-// 				name: "Ghost Wolves",
-
-// 				renown: "",
-// 				gifts: []
-// 			},
-// 		],
-// 		powerTraitName: "Primal Urge",
-// 		integrityTraitName: "Harmony",
-// 		integrityTrackType: { type: "dualTouchstone", names: ["Flesh", "Spirit"] },
-// 		abilityName: "Renown",
-// 		finiteAbilities: true,
-// 		fuelTraitName: "Essence"
-// 	})
-// };
-
-const wolf = (SPLATS[EnumSplat.WEREWOLF] as any);
-
-export interface Form {
-	name: string;
-	desc: string;
-	traits: string[];
-
+export interface FormMods {
 	strengthMod: number;
 	dexterityMod: number;
 	staminaMod: number;
@@ -675,9 +495,17 @@ export interface Form {
 	speedMod: number;
 
 	perceptionMod: number;
+
+	armorMod?: {};
 }
 
-wolf.forms = {
+export interface Form extends FormMods {
+	name: string;
+	desc: string;
+	traits: string[];
+}
+
+(WEREWOLF as any).forms = {
 	hishu: {
 		name: "Hishu",
 		desc: t("splat.werewolf.form.human"),
@@ -771,6 +599,3 @@ wolf.forms = {
 		perceptionMod: 4
 	}
 } as { [index: string]: Form };
-
-// wolf.forms    = ["Hishu", "Dalu"      , "Gauru"   , "Urshul"   , "Urhan"];
-// wolf.formDesc = ["Human", "Near Human", "Wolf-Man", "Near-Wolf", "Wolf" ];

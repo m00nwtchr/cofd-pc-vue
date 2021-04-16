@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<health-component v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.maxClarity" :healthTrack="character.clarityTrack" :name="splat.integrityTraitName" />
+		<health-component v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.integrityTrait" :healthTrack="character.integrityTrack" :name="splat.integrityTraitName" />
 		<span v-else>
 			<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
 				<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[0] }} Touchstone</h3>
@@ -57,16 +57,6 @@ export default defineComponent({
 		return {
 			// tmpVals: []
 		};
-	},
-	beforeMount() {
-		console.log(this.integrityTrackType);
-
-		if (this.integrityTrackType === "verticalTouchstoneTrack") {
-			for (let i = 0; i < 10; i++) {
-				// this.character.touchstones[i] = {name: ""};
-			}
-		}
-		console.log(this.character.touchstones);
 	},
 	methods: {
 		doInput(n: number) {
