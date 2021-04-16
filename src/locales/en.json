@@ -179,6 +179,27 @@
         "lone_wolf": "Lone Wolf",
         "wallflower": "Wallflower"
       }
+    },
+    "changeling": {
+      "name": "Changeling",
+      "virtueAnchor": "Needle",
+      "viceAnchor": "Thread",
+      "legacy": "Kith",
+      "organization": "Court",
+      "powerTrait": "Wyrd",
+      "integrityTrait": "Clarity",
+      "fuelTrait": "Glamour",
+      "ability": {
+        "name": "Renown",
+        "cunning": "Cunning",
+        "glory": "Glory",
+        "honor": "Honor",
+        "purity": "Purity",
+        "wisdom": "Wisdom"
+      },
+      "subType": {
+        "name": "Seeming"
+      }
     }
   }
 

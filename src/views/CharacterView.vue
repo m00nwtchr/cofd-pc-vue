@@ -288,11 +288,11 @@
 				</div>
 
 				<div id="werewolf-forms" class="row col w-100" v-if="character.splat===EnumSplat.WEREWOLF">
-					<div v-for="(form) in splat.forms"
+					<div v-for="(form) in character.getForms()"
 						:key="form" style="text-align:left;width:100%" class="col-sm">
 						<h4 @click="character.currentForm = form.name.toLowerCase()" :class="{'form-active': character.currentForm.toLowerCase() === form.name.toLowerCase()}" class="separator col-sm-12">{{ form.name }}</h4>
 						<i class="subtitle">({{ form.desc }})</i>
-						
+		
 						<div>
 							{{ $t("character.attribute.strength") }}: {{ character.attributes.strength         - currentForm.strengthMod     + form.strengthMod }}<br>
 							{{ $t("character.attribute.dexterity") }}: {{ character.attributes.dexterity       - currentForm.dexterityMod    + form.dexterityMod }}<br>
@@ -331,7 +331,7 @@
 import { computed, defineComponent, ref, Ref, toRefs } from "vue";
 
 import { Splat, SPLATS, EnumSplat, Form } from "../definitions/Splat";
-import Character, { Ability, Attributes } from "../definitions/Character";
+import Character, { Ability, Attributes, createCharacter, MageCharacter, WerewolfCharacter } from "../definitions/Character";
 
 import AbilityList from "../components/sheetComponents/AbilityList.vue";
 import HealthComponent from "../components/sheetComponents/HealthComponent.vue";
@@ -422,7 +422,7 @@ const x = defineComponent({
 			return (this as any).character.attributes.dexterity + (this as any).character.attributes.composure;
 		},
 		maxFuel() {
-			const character: Character = this.character;
+			const character: Character = this.character as any;
 			return character.power === 0 ? (this as any).character.splat === EnumSplat.VAMPIRE ? (this as any).attributes.stamina : 0 : character.power >= 5 ? character.power >= 9 ? character.power === 10 ? 75 : (50) : (10 + (character.power-4)*5) : (10 + character.power - 1);
 		},
 		perception() {
@@ -437,7 +437,7 @@ const x = defineComponent({
 		// 	return obj;
 		// },
 		currentForm(): Form {
-			return this.character.currentFormObj;
+			return this.character instanceof WerewolfCharacter ? this.character.currentFormObj().value : {} as Form;
 		},
 		rotes() {
 			const rotes = [...(this as any).character.rotes];
@@ -506,21 +506,16 @@ const x = defineComponent({
 					this.selectedTraits = {};
 				}
 
-				// eslint-disable-next-line @typescript-eslint/no-this-alias
-				const self = this;
-				console.log(name);
-
-				this.selectedTraits[name] = computed(function() {
-					const attributes = self.character.attributes;
-					const skills = self.character.skills;
-					const abilities = self.character.abilities;
-					const merits = self.character.merits;
-					const obj = (opts.attr ? attributes : opts.skill ? skills : opts.ability ? abilities[name] ? abilities : merits : self.character);
+				this.selectedTraits[name] = computed(() => {
+					const attributes = this.character.attributes;
+					const skills     = this.character.skills;
+					const abilities  = this.character.abilities;
+					const merits     = this.character.merits;
+					const obj        = (opts.attr ? attributes : opts.skill ? skills : opts.ability ? abilities[name] ? abilities : merits : this.character) as any;
 
 					const res = (opts.ability ? obj[name].level : obj[name]) || 0;
-					return res+(res === 0 && opts.skill ? Object.values(self.skillCats)[opts.skillCat as any] : 0);
-				});
-				console.log(this.selectedTraits);
+					return res+(res === 0 && opts.skill ? Object.values(this.skillCats)[opts.skillCat as any] : 0);
+				}) as any;
 			}
 		},
 		setAttr(attr: string, val: number) {
@@ -566,18 +561,20 @@ const x = defineComponent({
 			}
 		},
 		doInputRote(ability: any, i: number) {
-			if (!this.character.rotes[i]) {
-				this.character.rotes[i] = ability;
-			}
-			// console.log(ability);
-			if (!ability.arcanum &&
-				!ability.spell  &&
-				!ability.creator &&
-				!ability.roteSkill
-			) {
+			if (this.character instanceof MageCharacter) {
+				if (!this.character.rotes[i]) {
+					this.character.rotes[i] = ability;
+				}
 				// console.log(ability);
-				// eslint-disable-next-line vue/no-mutating-props
-				this.character.rotes.splice(i, 1);
+				if (!ability.arcanum &&
+					!ability.spell  &&
+					!ability.creator &&
+					!ability.roteSkill
+				) {
+					// console.log(ability);
+					// eslint-disable-next-line vue/no-mutating-props
+					this.character.rotes.splice(i, 1);
+				}
 			}
 		},
 		formDefense(form: Form) {
@@ -587,7 +584,7 @@ const x = defineComponent({
 		specialtyDropDown(skill: string) {
 			if (this.specialtyDropSelect === skill) {
 				if (this.character.specialties[skill] && this.character.specialties[skill].length === 0) {
-					this.character.specialties[skill] = undefined;
+					delete this.character.specialties[skill];
 				}
 
 				this.specialtyDropSelect = null;
@@ -602,8 +599,8 @@ const x = defineComponent({
 	},
 	data() {
 		return {
-			characters: null as any,
-			character: null as any,
+			characters: {} as { [key: string]: Character },
+			character: null as unknown as Character,
 			sizeMinusForm: null as any,
 
 			dotsOverFive: false,
@@ -639,7 +636,7 @@ const x = defineComponent({
 		// this.character = Object.assign({}, blankChara, this.character);
 
 		// this.character = toRefs(new Character(this.character));
-		this.character = new Character(this.character);
+		this.character = createCharacter(this.character as any) as any;
 
 		// this.character.abilityArr = Object.values(this.abilities);
 
@@ -650,7 +647,7 @@ const x = defineComponent({
 				return self.character.size - self.currentForm.sizeMod;	
 			},
 			set(val) {
-				self.character.size = val;
+				self.character.size = val as any;
 			}
 		});
 
@@ -658,8 +655,14 @@ const x = defineComponent({
 	},
 	watch: {
 		characters: {
-			handler(newVal, oldVal) {
+			handler(newVal: { [key: string]: Character }, oldVal) {
 				// (this as any).characters[(this as any).id] = newVal;
+
+				Object.entries(newVal)
+					.filter(el => el[1].getData)
+					.forEach(el => {
+						newVal[el[0]] = el[1].getData();
+					});
 				localStorage.characters = JSON.stringify(newVal);
 			},
 			deep: true,

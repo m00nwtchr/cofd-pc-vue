@@ -1,62 +1,11 @@
 import deepmerge from "deepmerge";
-import { computed, ComputedRef, isRef, reactive, Ref, ref, toRefs } from "vue";
-import { Computed } from "vuex";
-import { EnumSplat, Form, SPLATS } from "./Splat";
+import { computed, ComputedRef, isRef, reactive, Ref, ref, toRefs, WritableComputedRef } from "vue";
+import { EnumSplat, Form, FormMods, SPLATS } from "./Splat";
 
 export interface Ability {
 	name: string;
 	level: number;
 }
-
-interface SplatTraits {
-	abilities: Ability[];
-	// finiteAbilities: boolean;
-}
-
-interface MageTraits extends SplatTraits {
-	roteSkills: string[];
-	abilities: Ability[];
-}
-
-// class VampireTraits implements SplatTraits {
-// 	abilities: Ability[] = [
-// 		{name: "Animalism", level: 0},
-// 		{name: "Auspex", level: 0},
-// 		{name: "Celerity", level: 0},
-// 		{name: "Dominate", level: 0},
-// 		{name: "Majesty", level: 0},
-// 		{name: "Nightmare", level: 0},
-// 		{name: "Obfuscate", level: 0},
-// 		{name: "Protean", level: 0},
-// 		{name: "Resilience", level: 0},
-// 		{name: "Vigor", level: 0}
-// 	];
-// }
-
-// class WerewolfTraits implements SplatTraits {
-// 	abilities: Ability[] = [
-// 		{name: "Cunning", level: 0},
-// 		{name: "Glory", level: 0},
-// 		{name: "Honor", level: 0},
-// 		{name: "Purity", level: 0},
-// 		{name: "Wisdom", level: 0}
-// 	];
-// }
-
-
-// const TRAIT_SPLAT_MAP: {[index: number]: any} = {
-// 	[EnumSplat.WEREWOLF]: WerewolfTraits,
-// 	[EnumSplat.VAMPIRE]: VampireTraits,
-// 	[EnumSplat.MAGE]: MageTraits,
-// };
-
-// function get(baseObj: any, traitName: string): Ref<any> {
-// 	return computed(() => {
-// 		return (baseObj as any)[traitName] || {};
-// 	});
-// }
-
-// (window as any).get = get;
 function sortObj(obj: any) {
 	return Object.keys(obj).sort().reduce((result, key) => {
 		(result as any)[key] = obj[key];
@@ -69,7 +18,7 @@ export function getNum(val: string): number {
 	// const ret = (() => {
 	try {
 		return eval(val) || 0;
-	} catch(e) {
+	} catch (e) {
 		return 0;
 	}
 	// })();
@@ -118,6 +67,8 @@ export interface Attributes {
 	composure: number;
 }
 
+// interface IntegrityTrack {}
+
 export default class Character {
 	name!: string;
 	age?: number;
@@ -148,7 +99,7 @@ export default class Character {
 	// abilityArr: Ability[] | Ref<Ability[]>;
 	abilities: { [index: string]: Ability };
 
-	merits: {[index in number | string]: Ability} = [] as unknown as {[index in number | string]: Ability};
+	merits: { [index in number | string]: Ability } = [] as unknown as { [index in number | string]: Ability };
 
 	// abilities: {[index: string]: Ability} = {};;
 	// merits: {[index: string]: Ability} = {};
@@ -166,7 +117,8 @@ export default class Character {
 	fuel = 0;
 	// maxFuel = 10;
 
-	integrityTrait? = 7;
+	integrityTrait = ref(7);
+	integrityTrack?: number[];
 
 	touchstones: { name: string; type?: string }[] = [];
 
@@ -212,8 +164,112 @@ export default class Character {
 	alternateBeats?= 0;
 	alternateExperience?= 0;
 
-	/* Mage */
+	traitMods: {trait: string; mod: Ref<number>|number}[] = reactive([]);
 
+	getNum(arg: string) {
+		return getNum.call(this, arg);
+	}
+
+	constructor(opts: Character) {
+		
+		this.addTraitMod("size", def(() => this.merits.giant.level >= 3 ? 1 : 0));
+
+		if (SPLATS[opts.splat].integrityTrackType === "healthTrack") {
+			this.integrityTrack = [];
+		}
+
+		{
+			const defaultAbl: { [index: string]: Ability } = {};
+
+			Object.entries(SPLATS[opts.splat].abilities || {}).forEach((el) => {
+				defaultAbl[el[0]] = { name: el[1], level: 0 };
+			});
+			Object.assign(this, opts);
+	
+			const ablTemp = Object.assign({}, defaultAbl, (this as any).abilities);
+
+			Object.keys(ablTemp).forEach(key => {
+				const value = ablTemp[key];
+				const def = defaultAbl[key];
+
+				if (def && value.name != def.name) {
+					value.name = def.name;
+				}
+			});
+
+			this.abilities = reactive(sortObj(ablTemp));
+		}
+		this.baseAttributes = reactive(this.baseAttributes);
+		
+		const mod = (name: string) => {
+			const na = name.toLowerCase();
+			return this.traitMods
+				.filter(el => el.trait.toLocaleLowerCase() === na)
+				.map(el => el.mod)
+				.reduce((prev: any, val: any) => prev+val, 0) || 0;
+		};
+
+		this.attributes = computed(() => {
+			return {
+				intelligence: this.baseAttributes.intelligence + mod("intelligence"),
+				wits:         this.baseAttributes.wits         + mod("wits"),
+				resolve:      this.baseAttributes.resolve      + mod("resolve"),
+	
+				strength:     this.baseAttributes.strength     + mod("strength"),
+				dexterity:    this.baseAttributes.dexterity    + mod("dexterity"),
+				stamina:      this.baseAttributes.stamina      + mod("stamina"),//((self.abilities.value.resilience || {}).level || 0),//vue.getNum("this.character.abilities.value.resilience.level"),
+	
+				presence:     this.baseAttributes.presence     + mod("presence"),
+				manipulation: this.baseAttributes.manipulation + mod("manipulation"),
+				composure:    this.baseAttributes.composure    + mod("composure"),
+			};
+		});
+		
+		this.size = computed({
+			get: () => {
+				return this.baseSize.value + mod("size");
+			},
+			set: (val) => {
+				this.baseSize.value = val - mod("size");
+			}
+		});
+
+		this.maxHealth = computed(() => {
+			let val = this.attributes.value.stamina + this.size.value;
+
+			if (this.splat === EnumSplat.WEREWOLF) {
+				if (this.subType.toLowerCase() === "rahu") {
+					const purity = def(() => this.abilities.purity.level, 0).value;
+					val += purity >= 2 ? purity : 0;
+				}
+			}
+
+			return val;
+		});
+
+		this.speed = computed(() => {
+			return this.attributes.value.strength + this.attributes.value.dexterity + 5 + mod("speed");
+		});
+
+		this.defense = computed(() => {
+			return Math.min(this.attributes.value.dexterity, this.attributes.value.wits) + def(() => this.skills.athletics).value + mod("defense");
+		});
+	}
+
+	addTraitMod(name: string, ref: Ref<number>) {
+		this.traitMods.push({trait: name, mod: ref});
+	}
+
+	getData() {
+		const obj = Object.assign({}, this) as any;
+
+		delete obj.traitMods;
+
+		return obj;
+	}
+}
+
+export class MageCharacter extends Character {
 	activeSpells!: string[];
 	yantras!: string[];
 	magicalTools!: string[];
@@ -228,239 +284,238 @@ export default class Character {
 		roteSkill: string;
 	}[];
 
-	/* Werewolf */
+	constructor(opts: MageCharacter) {
+		super(opts as any);
 
-	currentForm?: Ref<string> = undefined;
-	currentFormObj!: ComputedRef<Form>;
+		this.activeSpells = [];
+		this.yantras = [];
+		this.magicalTools = [];
+		this.praxes = [];
+		this.inuredSpells = [];
 
-	kuruthTriggers?: {passive: string; common: string; specific: string};
+		this.rotes = [];
+	}
+}
 
-	/* Changeling */
+export class VampireCharacter extends Character {
+	constructor(opts: VampireCharacter) {
+		super(opts as any);
 
-	clarityTrack!: number[];
-	maxClarity!: ComputedRef<number>;
+		this.addTraitMod("stamina", def(() => this.abilities.resilience.level));
+		this.addTraitMod("strength", def(() => this.abilities.vigor.level));
 
-	getNum(arg: string) {
-		return getNum.call(this, arg);
+		this.addTraitMod("defense", def(() => this.abilities.celerity.level));
+	}
+}
+
+export class WerewolfCharacter extends Character {
+
+	currentForm: Ref<string> = ref("hishu");
+	// currentFormObj!: ComputedRef<Form>;
+	baseFormMods!: { [key: string]: FormMods };
+
+	kuruthTriggers?: { passive: string; common: string; specific: string };
+
+	constructor(opts: WerewolfCharacter) {
+		super(opts);
+
+		this.baseFormMods = opts.baseFormMods || {};
+		this.kuruthTriggers = { passive: "", common: "", specific: "" };
+
+		this.addTraitMod("strength",     def(() => this.currentFormObj().value.strengthMod));
+		this.addTraitMod("dexterity",    def(() => this.currentFormObj().value.dexterityMod));
+		this.addTraitMod("stamina",      def(() => this.currentFormObj().value.staminaMod));
+		this.addTraitMod("manipulation", def(() => this.currentFormObj().value.manipulationMod));
+
+		this.addTraitMod("size",       def(() => this.currentFormObj().value.sizeMod));
+		this.addTraitMod("speed",      def(() => this.currentFormObj().value.speedMod));
+		this.addTraitMod("perception", def(() => this.currentFormObj().value.perceptionMod));
+
+		// this.currentFormObj = computed({
+		// 	get() {
+		// 		const form = vue.splat.forms && self.currentForm ? vue.splat.forms[self.currentForm.value] : {
+		// 			name: "",
+		// 			desc: "",
+		// 			dexterityMod: 0,
+		// 			manipulationMod: 0,
+		// 			perceptionMod: 0,
+		// 			sizeMod: 0,
+		// 			staminaMod: 0,
+		// 			strengthMod: 0,
+		// 			speedMod: 0,
+		// 			traits: []
+		// 		};
+
+		// 		const baseMod = self.currentForm && self.baseFormMods[self.currentForm.value] ? self.baseFormMods[self.currentForm.value] : {
+		// 			dexterityMod: 0,
+		// 			manipulationMod: 0,
+		// 			perceptionMod: 0,
+		// 			sizeMod: 0,
+		// 			staminaMod: 0,
+		// 			strengthMod: 0,
+		// 			speedMod: 0,
+		// 		};
+
+		// 		console.log("baseMod", baseMod);
+
+		// 		const e = Object.assign({}, form, {
+		// 			dexterityMod: form.dexterityMod + baseMod.dexterityMod,
+		// 			manipulationMod: form.manipulationMod + baseMod.manipulationMod,
+		// 			perceptionMod: form.perceptionMod + baseMod.perceptionMod,
+		// 			sizeMod: form.sizeMod + baseMod.sizeMod,
+		// 			staminaMod: form.staminaMod + baseMod.staminaMod,
+		// 			strengthMod: form.strengthMod + baseMod.strengthMod,
+		// 			speedMod: form.speedMod + baseMod.speedMod
+		// 		});
+		// 		console.log(e);
+		// 		return e;
+		// 	}, set(val) {
+		// 		console.log("EEE");
+		// 		if (self.currentForm) {
+		// 			// if (!self.baseFormMods[self.currentForm.value]) {
+		// 			// 	self.baseFormMods[self.currentForm.value] = {} as any;
+		// 			// }
+		// 			const form = vue.splat.forms && self.currentForm ? vue.splat.forms[self.currentForm.value] : {
+		// 				name: "",
+		// 				desc: "",
+		// 				dexterityMod: 0,
+		// 				manipulationMod: 0,
+		// 				perceptionMod: 0,
+		// 				sizeMod: 0,
+		// 				staminaMod: 0,
+		// 				strengthMod: 0,
+		// 				speedMod: 0,
+		// 				traits: []
+		// 			};
+
+		// 			const baseMod = self.currentForm && self.baseFormMods[self.currentForm.value] ? self.baseFormMods[self.currentForm.value] : {
+		// 				dexterityMod: 0,
+		// 				manipulationMod: 0,
+		// 				perceptionMod: 0,
+		// 				sizeMod: 0,
+		// 				staminaMod: 0,
+		// 				strengthMod: 0,
+		// 				speedMod: 0,
+		// 			};
+
+		// 			val = Object.assign({}, form, val);
+
+		// 			self.baseFormMods[self.currentForm.value] = {
+		// 				dexterityMod: val.dexterityMod - form.dexterityMod,
+		// 				manipulationMod: val.manipulationMod - form.manipulationMod,
+		// 				perceptionMod: val.perceptionMod - form.perceptionMod,
+		// 				sizeMod: val.sizeMod - form.sizeMod,
+		// 				staminaMod: val.staminaMod - form.staminaMod,
+		// 				strengthMod: val.strengthMod - form.strengthMod,
+		// 				speedMod: val.speedMod - form.speedMod
+		// 			};
+		// 		}
+		// 	}
+		// });
 	}
 
-	constructor(opts: Character) {
+	currentFormObj(): WritableComputedRef<Form> {
+		return this.getForm(this.currentForm);
+	}
+
+	getForm(name: Ref<string> | string): WritableComputedRef<Form> {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const self = this;
 		const vue = (window as any).vue;
+		
+		return computed({
+			get() {
+				const key = isRef(name) ? name.value : name;
 
-		// const giantBonus = 
-
-		switch (opts.splat) {
-		case (EnumSplat.VAMPIRE):
-			// ablList = ["Animalism", "Auspex", "Celerity", "Dominate", "Majesty", "Nightmare", "Obfuscate", "Protean", "Resilience", "Vigor"];
-			break;
-		case (EnumSplat.MAGE):
-			// ablList = ["Death", "Fate", "Forces", "Life", "Matter", "Mind", "Prime", "Spirit", "Space", "Time"];
-			this.activeSpells = [];
-			this.yantras = [];
-			this.magicalTools = [];
-			this.praxes = [];
-			this.inuredSpells = [];
-			
-			this.rotes = [];
-			break;
-		case (EnumSplat.WEREWOLF):
-			// ablList = ["Purity", "Glory", "Honor", "Wisdom", "Cunning"];
-			this.currentForm = ref("hishu");
-
-			this.currentFormObj = computed(function() {
-				return vue.splat.forms && self.currentForm ? vue.splat.forms[self.currentForm.value] : {
+				const form = vue.splat.forms[key] || {
 					name: "",
 					desc: "",
 					dexterityMod: 0,
 					manipulationMod: 0,
 					perceptionMod: 0,
 					sizeMod: 0,
-					staminaMod:0,
-					strengthMod:0,
+					staminaMod: 0,
+					strengthMod: 0,
 					speedMod: 0,
 					traits: []
 				};
-			});
-			this.kuruthTriggers = {passive: "", common: "", specific: ""};
-			break;
-		case (EnumSplat.CHANGELING):
-			this.clarityTrack = [];
 
-			this.maxClarity = computed(function() {
-				const val = self.attributes.value.wits + self.attributes.value.composure;
-	
-				return val;
-			});
-			break;
-		}
+				const baseMod = Object.assign({
+					dexterityMod: 0,
+					manipulationMod: 0,
+					perceptionMod: 0,
+					sizeMod: 0,
+					staminaMod: 0,
+					strengthMod: 0,
+					speedMod: 0,
+				}, self.baseFormMods[key]);
 
-		const defaultAbl: { [index: string]: Ability } = {};
+				// self.baseFormMods[key] = baseMod;
 
-		Object.entries(SPLATS[opts.splat].abilities || {}).forEach((el) => {
-			defaultAbl[el[0]] = {name: el[1], level: 0};
-		});
-
-		// ablList.forEach(el => {
-		// 	defaultAbl[el.toLowerCase()] = { name: el, level: 0 };
-		// });
-
-		Object.assign(this, opts);
-
-		this.abilities = reactive(Object.assign({}, defaultAbl, (this as any).abilities));
-		
-		console.log(defaultAbl);
-		Object.keys(this.abilities).forEach(key => {
-			const value = this.abilities[key];
-			const def = defaultAbl[key];
-
-			console.log(key, value.name, def);
-			if (def && value.name != def.name) {
-				value.name = def.name;
-			}
-		});
-		
-		this.abilities = sortObj(this.abilities);
-		console.log(Object.entries(this.abilities));
-
-		this.baseAttributes = reactive(this.baseAttributes);
-		
-		if (this.currentForm && !isRef(this.currentForm)) {
-			this.currentForm = ref(this.currentForm);
-		}
-
-		// console.log(toRefs(this));
-
-		// console.log((this.abilityArr as any).value);
-
-		// if (typeof this.baseSize === "number") {
-		// 	this.baseSize = ref(this.baseSize);
-		// }
-
-		// this.abilities = computed(() => {
-		// 	const obj: {[index: string]: Ability} = {};
-		// 	(self.abilityArr as Ref<Ability[]>).value.forEach((el: { name: string; level: number}) => {
-		// 		obj[el.name.toLowerCase()] = {level: el.level, name: el.name};
-		// 	});
-		// 	return obj;
-		// });
-
-		console.log(this.abilities);
-
-
-		this.attributes = computed(function() {
-			return {
-				intelligence: self.baseAttributes.intelligence,
-				wits: self.baseAttributes.wits,
-				resolve: self.baseAttributes.resolve,
-
-				strength : self.baseAttributes.strength  + def(() => self.currentFormObj.value.strengthMod).value + def(() => self.abilities.vigor.level).value,
-				dexterity: self.baseAttributes.dexterity + def(() => self.currentFormObj.value.dexterityMod).value,
-				stamina  : self.baseAttributes.stamina   + def(() => self.currentFormObj.value.staminaMod).value  + def(() => self.abilities.resilience.level).value,//((self.abilities.value.resilience || {}).level || 0),//vue.getNum("this.character.abilities.value.resilience.level"),
-
-				presence: self.baseAttributes.presence,
-				manipulation: self.baseAttributes.manipulation + def(() => self.currentFormObj.value.manipulationMod).value,
-				composure: self.baseAttributes.composure,
-			};
-		}/*,set(val) {
-			console.log(val);
-			self.baseAttributes.value = {
-				intelligence: val.intelligence,
-				wits: val.wits,
-				resolve: val.resolve,
-
-				strength : val.strength  - vue.getNum("this.currentForm.strengthMod") - self.abilities.value.vigor.level,
-				dexterity: val.dexterity - vue.getNum("this.currentForm.dexterityMod"),
-				stamina  : val.stamina   - vue.getNum("this.currentForm.staminaMod")  - self.abilities.value.resilience.level,
-
-				presence: val.presence,
-				manipulation: val.manipulation - vue.getNum("this.currentForm.manipulationMod"),
-				composure: val.composure,
-			};
-		}}*/);
-
-		const giantMod = def(() => self.merits.giant.level >= 3 ? 1 : 0);
-		const sizeMod = def(() => self.currentFormObj.value.sizeMod);
-		this.size = computed({
-			get() {
-				return self.baseSize.value + sizeMod.value + giantMod.value;
+				return Object.assign({}, form, {
+					dexterityMod:    form.dexterityMod    + baseMod.dexterityMod,
+					manipulationMod: form.manipulationMod + baseMod.manipulationMod,
+					perceptionMod:   form.perceptionMod   + baseMod.perceptionMod,
+					sizeMod:         form.sizeMod         + baseMod.sizeMod,
+					staminaMod:      form.staminaMod      + baseMod.staminaMod,
+					strengthMod:     form.strengthMod     + baseMod.strengthMod,
+					speedMod:        form.speedMod        + baseMod.speedMod
+				});
 			},
 			set(val) {
-				self.baseSize.value = val - sizeMod.value - giantMod.value;
+				const key = isRef(name) ? name.value : name;
+
+				const form = vue.splat.forms[key] || {
+					name: "",
+					desc: "",
+					dexterityMod: 0,
+					manipulationMod: 0,
+					perceptionMod: 0,
+					sizeMod: 0,
+					staminaMod: 0,
+					strengthMod: 0,
+					speedMod: 0,
+					traits: []
+				};
+
+				val = Object.assign({}, form, val);
+
+				self.baseFormMods[key] = Object.assign({}, {
+					dexterityMod:    val.dexterityMod    - form.dexterityMod,
+					manipulationMod: val.manipulationMod - form.manipulationMod,
+					perceptionMod:   val.perceptionMod   - form.perceptionMod,
+					sizeMod:         val.sizeMod         - form.sizeMod,
+					staminaMod:      val.staminaMod      - form.staminaMod,
+					strengthMod:     val.strengthMod     - form.strengthMod,
+					speedMod:        val.speedMod        - form.speedMod
+				});
 			}
-		});
-
-		this.maxHealth = computed(function() {
-			let val = self.attributes.value.stamina + self.size.value;
-			
-			if (self.splat === EnumSplat.WEREWOLF) {
-				if (self.subType.toLowerCase() === "rahu") {
-					const purity = def(() => self.abilities.purity.level, 0).value;
-					val += purity >= 2 ? purity : 0;
-				}
-			}
-
-			return val;
-		});
-		
-		this.speed = computed(function() {
-			// this.getNum;
-			return self.attributes.value.strength + self.attributes.value.dexterity + 5 + def(() => self.abilities.celerity.level).value + def(() => self.currentFormObj.value.speedMod).value;
-		});
-
-		this.defense = computed(function() {
-			console.log(def(() => self.skills.athletics));
-			return Math.min(self.attributes.value.dexterity, self.attributes.value.wits) + def(() => self.skills.athletics).value;
 		});
 	}
 
-	// splatTraits: {
-	// 	// [index: number]: SplatTraits;
-	// 	[EnumSplat.MORTAL]: undefined;
-	// 	[EnumSplat.WEREWOLF]: SplatTraits;
-	// 	[EnumSplat.MAGE]: MageTraits;
-	// 	[EnumSplat.VAMPIRE]: SplatTraits;
-	// } = {
-	// 	[EnumSplat.MORTAL]: undefined,
-	// 	[EnumSplat.VAMPIRE]: {
-	// 		abilities: [
-	// 			{name: "Animalism", level: 0},
-	// 			{name: "Auspex", level: 0},
-	// 			{name: "Celerity", level: 0},
-	// 			{name: "Dominate", level: 0},
-	// 			{name: "Majesty", level: 0},
-	// 			{name: "Nightmare", level: 0},
-	// 			{name: "Obfuscate", level: 0},
-	// 			{name: "Protean", level: 0},
-	// 			{name: "Resilience", level: 0},
-	// 			{name: "Vigor", level: 0}
-	// 		],
-	// 	},
-	// 	[EnumSplat.MAGE]: {
-	// 		abilities: [
-	// 			{name: "Death", level: 0},
-	// 			{name: "Fate", level: 0},
-	// 			{name: "Forces", level: 0},
-	// 			{name: "Life", level: 0},
-	// 			{name: "Matter", level: 0},
-	// 			{name: "Mind", level: 0},
-	// 			{name: "Prime", level: 0},
-	// 			{name: "Spirit", level: 0},				
-	// 			{name: "Space", level: 0},
-	// 			{name: "Time", level: 0}
-	// 		],
-	// 		roteSkills: []
+	getForms() {
+		const vue = (window as any).vue;
+		const forms: {[key: string]: Form} = {};
 
-	// 	},
-	// 	[EnumSplat.WEREWOLF]: {
-	// 		abilities: [
-	// 			{name: "Cunning", level: 0},
-	// 			{name: "Glory", level: 0},
-	// 			{name: "Honor", level: 0},
-	// 			{name: "Purity", level: 0},
-	// 			{name: "Wisdom", level: 0}
-	// 		],
-	// 	},
-	// };
+		Object.keys(vue.splat.forms)
+			.forEach(el => forms[el] = this.getForm(el) as any);
+
+		return reactive(forms);
+	}
+}
+
+export class ChangelingCharacter extends Character {
+	constructor(opts: ChangelingCharacter) {
+		super(opts as any);
+		
+		this.integrityTrait = computed(() => {
+			const val = this.attributes.value.wits + this.attributes.value.composure;
+
+			return val;
+		});
+	}
+}
+
+export function createCharacter<T extends Character>(opts: T): Character {
+	return new SPLATS[opts.splat].characterFactory(opts);
 }

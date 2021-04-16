@@ -50,7 +50,6 @@ export default defineComponent({
 		abilityArr: []
 	} as {abilityArr: Ability[]};},
 	beforeMount() {
-		console.log(this.abilities);
 		this.abilityArr = Object.values(this.abilities);
 	},
 	methods: {
@@ -71,7 +70,6 @@ export default defineComponent({
 			}
 		},
 		doInput(ability: Ability) {
-			console.log("E");
 			if (this.optionsMutable &&  ability && (ability as any).false && ability.name !== "" && ability.level > 0) {
 				delete (ability as any).false;
 				
@@ -86,7 +84,6 @@ export default defineComponent({
 		nameOf(i: number | string) {
 			const entries = Object.entries(this.abilities);
 			if (typeof i === "number") {
-				console.log(i);
 				if (entries[i]) {
 					return entries[i][0].toLowerCase();
 				} else {
