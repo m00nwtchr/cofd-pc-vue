@@ -3,7 +3,8 @@ import * as CANNON from "cannon";
 
 import {DOMContext, DOMElement } from "three-dom-elements";
 
-import { DiceRoller } from "@/DiceRoller";
+import { DiceRoller } from "../../../DiceRoller";
+import { Vector3 } from "three";
 
 const DICE_MESH_FACTORY: { [key: string]: () => THREE.Mesh } = {};
 
@@ -58,6 +59,7 @@ export class WebGLDiceRoller extends DiceRoller {
 	constructor(container: HTMLElement, opts: Options) {
 		super();
 
+		// if (document.getElementById())
 		this.domCanvasContainer = document.createElement("div");
 		this.domCanvasContainer.className = "canvas";
 		container.appendChild(this.domCanvasContainer);
@@ -74,19 +76,26 @@ export class WebGLDiceRoller extends DiceRoller {
 		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; 
 		this.domCanvasContainer.appendChild(this.renderer.domElement);
 
-		if (opts.domElement) {
-			console.log(opts.domElement);
+		// if (opts.domElement) {
+		// 	console.log(opts.domElement);
+		// 	this.domContext = new DOMContext(this.camera);
+		// 	this.domCanvasContainer.appendChild(this.domContext.domElement);
+
+		// 	this.domElement = new DOMElement(this.domContext, opts.domElement);
+		// 	this.domElement.receiveShadow = this.config.useShadows;
+		// 	this.scene.add(this.domElement);
+
+		// 	// const img = document.createElement("img");
+		// 	// img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg";
+			
+		// 	// this.scene.add(new DOMElement(this.domContext, img));
+		// }
+		if(opts.domElement) {
 			this.domContext = new DOMContext(this.camera);
 			this.domCanvasContainer.appendChild(this.domContext.domElement);
-
+		
 			this.domElement = new DOMElement(this.domContext, opts.domElement);
 			this.domElement.receiveShadow = this.config.useShadows;
-			this.scene.add(this.domElement);
-
-			const img = document.createElement("img");
-			img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg";
-			
-			this.scene.add(new DOMElement(this.domContext, img));
 		}
 
 		this.__reinit(container, opts);
@@ -100,7 +109,7 @@ export class WebGLDiceRoller extends DiceRoller {
 		this.box = new THREE.Mesh(new THREE.BoxGeometry(100, 100, 100), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ));
 		// this.box.position.y = 0.5;
 		// this.box.position.x = 0.8;
-		this.box.position.z+=20;
+		this.box.position.z=2;
 		this.box.receiveShadow = true;
 		this.box.castShadow = true;
 		this.scene.add(this.box);
@@ -135,8 +144,8 @@ export class WebGLDiceRoller extends DiceRoller {
 		// if (this.camera) this.scene.remove(this.camera);
 		// this.camera = new THREE.PerspectiveCamera(20, this.cw / this.ch, 1, this.wh * 1.3);
 		this.camera.aspect = this.cw/this.ch;
-		// this.camera.near = 1;
-		// this.camera.far = this.wh*1.3;
+		this.camera.near = 1;
+		this.camera.far = this.wh*1.3;
 
 		this.camera.updateProjectionMatrix();
 
@@ -147,9 +156,8 @@ export class WebGLDiceRoller extends DiceRoller {
 		// }
 		// if (this.domElement) this.scene.remove(this.domElement);
 
-		if (opts?.domElement) {
+		if (this.domContext) {
 			this.domContext.setSize(this.cw * 2, this.ch * 2);
-			console.log(this.domElement!.position);
 		}
 		
 		const mw = Math.max(this.w, this.h);
@@ -183,6 +191,21 @@ export class WebGLDiceRoller extends DiceRoller {
 		);
 		this.desk.receiveShadow = this.config.useShadows;
 
+		if (opts?.domElement && this.domElement) {
+			// if (this.domElement) this.scene.remove(this.domElement);
+
+			// this.domElement = new DOMElement(this.domContext, opts.domElement);
+			// this.domElement.size = new Vector3(this.w * 2, this.h * 2, 1);
+			// this.domElement.size = new Vector3(this.w * 2, this.h * 2, 1);
+			// this.domElement.setPosition();
+			// this.scene.add(this.domElement);
+
+			// const img = document.createElement("img");
+			// img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg";
+			
+			// this.scene.add(new DOMElement(this.domContext, img));
+		}
+
 		this.scene.add(this.desk);
 	}
 
@@ -213,6 +236,7 @@ export class WebGLDiceRoller extends DiceRoller {
 		// this.box2.rotation.y+=mov1;
 		// this.box.rotation.y+=mov2;
 		// this.box2.rotation.x-=mov2;
+		// this.box.position.z--;
 		this.renderer.render(this.scene, this.camera);
 	}
 
