@@ -110,7 +110,7 @@ export class Splat {
 		}[];
 	}) {
 		this.en = en || EnumSplat.MORTAL;
-		
+
 		if (isSup === undefined) {
 			isSup = true;
 		}
@@ -132,7 +132,7 @@ export class Splat {
 
 		this.subTypeName = t(`splat.${name}.subType.name`, t("character.chronicle"));
 		this.legacyName = t(`splat.${name}.legacy`);
-		this.orgName = t(`splat.${name}.organization`);
+		this.orgName = t(`splat.${name}.organization.name`);
 
 		this.virtueAnchors = virtueAnchors || [
 			"Hopeful",
