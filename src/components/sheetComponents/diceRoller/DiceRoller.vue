@@ -27,15 +27,18 @@ export default defineComponent({
 	},
 	mounted() {
 		// eslint-disable-next-line quotes
-		const img = document.createElement('img');
-		img.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg";
-		this.diceRoller = new DiceRoller(/*document.body, {
-			// dimensions: {
-			// x: 500,
-			// y: 500,
-			// },
-			domElement: document.getElementById("app")as any// document.getElementById("charsheet") as any
-		}*/);
+		const img = document.createElement("img");
+		img.src =
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg";
+		this.diceRoller = new DiceRoller();
+		// this.diceRoller = new WebGLDiceRoller(document.body, {
+		// 	dimensions: {
+		// 		x: 500,
+		// 		y: 500,
+		// 	},
+		// 	domElement: document.getElementById("charsheet") as HTMLElement, // document.getElementById("charsheet") as any
+		// });
+
 		// this.diceRoller.roll(1);
 	},
 	methods: {},
@@ -43,15 +46,17 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-	.canvas {
-		// pointer-events: none;
-		// background-color:transparent;
-		// position: fixed;
-		// top: 0px;
-		// left: 0px;
-		// z-index: 1;
-		
-		width:100%;
-		height:100%;
-	}
+.canvas {
+  // pointer-events: none;
+  // background-color:transparent;
+  // position: fixed;
+  // top: 0px;
+  // left: 0px;
+  // z-index: 1;
+
+  overflow: hidden;
+
+  width: 100%;
+  height: 100%;
+}
 </style>
