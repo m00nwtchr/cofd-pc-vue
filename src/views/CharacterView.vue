@@ -903,12 +903,7 @@ const x = defineComponent({
 								: this.character) as any;
 
 					const res = (opts.ability ? obj[name].level : obj[name]) || 0;
-					return (
-						res +
-            (res === 0 && opts.skill
-            	? Object.values(this.skillCats)[opts.skillCat as any]
-            	: 0)
-					);
+					return (res + (res === 0 && opts.skill ? Object.values(this.skillCats)[opts.skillCat as any] : 0));
 				}) as any;
 			}
 		},
@@ -918,10 +913,10 @@ const x = defineComponent({
 			// if (!character.attributes)
 			// 	(character.attributes as any) = {};
 
-			(character.baseAttributes as any)[attr] =
-        (character.attributes as any)[attr] === val && val !== 1
-        	? val - 1
-        	: val;
+			(character.baseAttributes as any)[attr] = 
+			(character.attributes as any)[attr] === val && val !== 1
+				? val - 1
+				: val;
 		},
 		setSkill(attr: string, val: number) {
 			const character: Character = (this as any).character;

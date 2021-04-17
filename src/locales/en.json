@@ -76,13 +76,12 @@
     "mortal": {
       "name": "Mortal",
       "legacy": "Faction",
-      "organization": "Group Name"
+      "organization": {"name": "Group Name"}
     },
     "mage": {
       "name": "Mage",
       "nameName": "Shadow Name",
       "legacy": "Legacy",
-      "organization": "Order",
       "powerTrait": "Gnosis",
       "integrityTrait": "Wisdom",
       "fuelTrait": "Mana",
@@ -107,6 +106,9 @@
         "moros": "Moros",
         "obrimos": "Obrimos",
         "thyrsus": "Thyrsus"
+      },
+      "organization": {
+        "name":"Order"
       }
     },
     "vampire": {
@@ -114,7 +116,6 @@
       "virtueAnchor": "Mask",
       "viceAnchor": "Dirge",
       "legacy": "Bloodline",
-      "organization": "Covenant",
       "powerTrait": "Blood Potency",
       "integrityTrait": "Humanity",
       "fuelTrait": "Vitae",
@@ -134,6 +135,9 @@
       },
       "subType": {
         "name": "Clan"
+      },
+      "organization": {
+        "name":"Covenant"
       }
     },
     "werewolf": {
@@ -141,7 +145,6 @@
       "virtueAnchor": "Blood",
       "viceAnchor": "Bone",
       "legacy": "Lodge",
-      "organization": "Tribe",
       "powerTrait": "Primal Urge",
       "integrityTrait": "Harmony",
       "fuelTrait": "Essence",
@@ -155,6 +158,9 @@
       },
       "subType": {
         "name": "Auspice"
+      },
+      "organization": {
+        "name":"Tribe"
       },
       "form": {
         "human": "Human",
@@ -185,20 +191,32 @@
       "virtueAnchor": "Needle",
       "viceAnchor": "Thread",
       "legacy": "Kith",
-      "organization": "Court",
       "powerTrait": "Wyrd",
       "integrityTrait": "Clarity",
       "fuelTrait": "Glamour",
       "ability": {
-        "name": "Renown",
-        "cunning": "Cunning",
-        "glory": "Glory",
-        "honor": "Honor",
-        "purity": "Purity",
-        "wisdom": "Wisdom"
+        "name": "Favored Regalia",
+        "crown": "Crown",
+        "jewels": "Jewels",
+        "mirror": "Mirror",
+        "shield": "Shield",
+        "sword": "Sword"
       },
       "subType": {
-        "name": "Seeming"
+        "name": "Seeming",
+        "beasts": "Beasts",
+        "darklings": "Darklings",
+        "elementals": "Elementals",
+        "fairest": "Fairest",
+        "ogres": "Ogres",
+        "wizened": "Wizened"
+      },
+      "organization": {
+        "name": "Court",
+        "spring": "Spring",
+        "summer": "Summer",
+        "autumn": "Autumn",
+        "winter": "Winter"
       }
     }
   }
