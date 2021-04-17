@@ -1,31 +1,29 @@
 <template>
-	<div>
-		<health-component v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.integrityTrait" :healthTrack="character.integrityTrack" :name="splat.integrityTraitName" />
-		<span v-else>
-			<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-				<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[0] }} Touchstone</h3>
-				<!-- eslint-disable-next-line vue/no-mutating-props -->
-				<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name">
+	<health-component style="margin-bottom: 15px" v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.integrityTrait" :healthTrack="character.integrityTrack" :name="splat.integrityTraitName" />
+	<div style="margin-bottom: 15px" v-else>
+		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
+			<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[0] }} Touchstone</h3>
+			<!-- eslint-disable-next-line vue/no-mutating-props -->
+			<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name">
 			</div>
-			<h3 class="separator col-sm-12">{{ splat.integrityTraitName }}</h3>
-			<div class="sheet-dots" style="margin-top:-10px;">
-			<span v-for="n in items" :key="n" >
-					<button class="sheet-dot" @click="$parent.setTrait('integrityTrait', n)" :class="{'sheet-dot-full': character.integrityTrait >= n}"></button>
-					<span v-if="integrityTrackType === 'verticalTouchstoneTrack'">
-						<!-- <input class="line" @input="doInput(n)" v-if="character.touchstones[n-1]" v-model="character.touchstones[n-1].name"> -->
-						<!-- <input class="line" @input="doInput(n)" v-else> -->
-						<!-- eslint-disable-next-line vue/no-mutating-props -->
-						<input class="line" @input="doInput(n)" v-model="touchstonesTemp[n-1].name">
-						<br>
-					</span>
+		<h3 class="separator col-sm-12">{{ splat.integrityTraitName }}</h3>
+		<div class="sheet-dots" style="margin-top:-10px;">
+		<span v-for="n in items" :key="n" >
+				<button class="sheet-dot" @click="$parent.setTrait('integrityTrait', n)" :class="{'sheet-dot-full': character.integrityTrait >= n}"></button>
+				<span v-if="integrityTrackType === 'verticalTouchstoneTrack'">
+					<!-- <input class="line" @input="doInput(n)" v-if="character.touchstones[n-1]" v-model="character.touchstones[n-1].name"> -->
+					<!-- <input class="line" @input="doInput(n)" v-else> -->
+					<!-- eslint-disable-next-line vue/no-mutating-props -->
+					<input class="line" @input="doInput(n)" v-model="touchstonesTemp[n-1].name">
+					<br>
 				</span>
-			</div>
-			<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-				<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[1] }} Touchstone</h3>
-				<!-- eslint-disable-next-line vue/no-mutating-props -->
-				<input class="line" @input="doInput(2)" v-model="touchstonesTemp[1].name">
-			</div>
-		</span>
+			</span>
+		</div>
+		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
+			<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[1] }} Touchstone</h3>
+			<!-- eslint-disable-next-line vue/no-mutating-props -->
+			<input class="line" @input="doInput(2)" v-model="touchstonesTemp[1].name">
+		</div>
 	</div>
 </template>
 

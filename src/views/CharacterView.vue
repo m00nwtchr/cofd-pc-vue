@@ -144,8 +144,8 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div id="skills" class="bar col col-sm-4">
+    <div class="row" style="margin-top:15px">
+      <div id="skills" class="col col-sm-4">
         <h2 class="separator col-sm-12" style="margin-bottom: 20px">
           {{ $t("character.skills") }}
         </h2>
@@ -219,7 +219,7 @@
         <br />
       </div>
 
-      <div id="traits" class="bar col-sm-8">
+      <div id="traits" class="col-sm-8">
         <h2 class="separator col-sm-12" style="margin-bottom: 20px">
           {{ $t("character.other_traits") }}
         </h2>
@@ -318,7 +318,7 @@
               </div>
             </div>
           </div>
-          <div class="col col-sm-5">
+          <div class="col col-sm-5" style="padding-right: 30px">
             <health-component
               id="health"
               class="col-12"
