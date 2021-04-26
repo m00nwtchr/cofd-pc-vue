@@ -107,6 +107,14 @@ const characters: { [index: string]: Character | any } = {
 			{
 				"name": "Contacts",
 				"level": 2
+			},
+			{
+				"name": "Resources",
+				"level": 3
+			},
+			{
+				"name": "Nest Guardian",
+				"level": 3
 			}
 		],
 		"spentWillpowerDots": 0,
