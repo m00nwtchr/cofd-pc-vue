@@ -2,9 +2,9 @@
 	<div>
 		<h3 class="separator col-sm-12">{{ abilityName }}</h3>
 		<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
-		<div style="margin:0" v-for="(ability, i) in visibleArr" :key="i" class="block row col-sm-12">
+		<div style="margin:0" v-for="(ability, i) in visibleArr" :key="ability.name" class="block row col-sm-12">
 			<span class="line col-7" :class="{'selected': $parent.selectedTraits[nameOf(i)]}" @click="$parent.selectTrait(nameOf(i),{ability:true})">
-				<input v-if="optionsMutable" @input="doInput(ability)" v-model="ability.name">
+				<input v-if="optionsMutable" @input="doInput(ability)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
 				<span v-else>{{ ability.name }}</span>
 			</span>
 			<div class="sheet-dots col-5">
@@ -21,6 +21,9 @@
 					}" @click="setDots(ability, n)" v-for="n in 5" :key="n"></button>
 			</div>
 		</div>
+		<datalist v-if="datalistFilter" :id="abilityName+'List'">
+			<option v-for="el in datalistFilter" :key="el">{{ el }}</option>
+		</datalist>
 	</div>
 </template>
 
@@ -44,7 +47,12 @@ export default defineComponent({
 			required: false,
 			default: true,
 			type: Boolean
-		}		
+		},
+		"datalist": {
+			required: false,
+			default: undefined,
+			type: Object
+		}
 	},
 	data() {return {
 		abilityArr: []
@@ -70,15 +78,20 @@ export default defineComponent({
 			}
 		},
 		doInput(ability: Ability) {
-			if (this.optionsMutable &&  ability && (ability as any).false && ability.name !== "" && ability.level > 0) {
-				delete (ability as any).false;
-				
-				// eslint-disable-next-line vue/no-mutating-props
-				this.abilityArr.push(ability);
-			}
-			if (!(ability as any).false && this.optionsMutable && ability && ability.name === "") {
-				// eslint-disable-next-line vue/no-mutating-props
-				this.abilityArr.splice(this.abilityArr.indexOf(ability), 1);
+			if (this.optionsMutable && ability) {
+				if ((ability as any).false) {
+					if (ability.name !== "" && ability.level > 0) {
+						delete (ability as any).false;
+						
+						// eslint-disable-next-line vue/no-mutating-props
+						this.abilityArr.push(ability);
+					}
+				} else {
+					if (ability.name === "") {
+						// eslint-disable-next-line vue/no-mutating-props
+						this.abilityArr.splice(this.abilityArr.indexOf(ability), 1);
+					}
+				}
 			}
 		},
 		nameOf(i: number | string) {
@@ -103,12 +116,22 @@ export default defineComponent({
 			}
 
 			return arr as Ability[];
+		},
+		datalistFilter() {
+			// console.log(Object.keys((this as any).datalist));
+			return Object.keys((this as any).datalist || {})
+				.filter((el) => !(this as any).abilities[el])
+				.map(el => (this as any).datalist[el]);
 		}
 	},
 	watch: {
 		abilityArr: {handler(newVal, oldVal) {
 			// (this as any).abilities = {};
+			Object.keys(this.abilities).forEach(key => {
+				delete this.abilities[key];
+			});
 
+			console.log(newVal);
 			newVal.forEach((el: Ability) => {
 				this.abilities[el.name.toLowerCase()] = el;
 			});
