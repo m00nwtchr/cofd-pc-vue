@@ -186,18 +186,27 @@ export default class Character {
 			});
 			Object.assign(this, opts);
 	
-			const ablTemp = Object.assign({}, defaultAbl, (this as any).abilities);
+			let ablTemp = Object.assign({}, defaultAbl, (this as any).abilities);
+
+			const custom: any = {};
 
 			Object.keys(ablTemp).forEach(key => {
 				const value = ablTemp[key];
 				const def = defaultAbl[key];
 
-				if (def && value.name != def.name) {
+				if (!def) {
+					custom[key] = value;
+					delete ablTemp[key];
+				} else if (value.name != def.name) {
 					value.name = def.name;
 				}
 			});
 
-			this.abilities = reactive(sortObj(ablTemp));
+			ablTemp = sortObj(ablTemp);
+
+			Object.entries(custom).forEach(entry => ablTemp[entry[0]] = entry[1]);
+			
+			this.abilities = reactive(ablTemp);
 		}
 		this.baseAttributes = reactive(this.baseAttributes);
 		
