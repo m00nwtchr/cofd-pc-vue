@@ -230,6 +230,7 @@
               :abilities="character.abilities"
               :optionsMutable="!splat.finiteAbilities"
               :abilityName="splat.abilityName"
+              :datalist="splat.abilities"
               id="ability"
               class="block"
             />
@@ -680,11 +681,6 @@ import ModalComponent from "../components/ModalComponent.vue";
 
 import SpellCalculator from "../components/sheetComponents/SpellCalculator.vue";
 
-// import fab from "vue-fab";
-
-import deepmerge from "deepmerge";
-
-import { Random } from "../RandomUtil";
 import { DiceRoller } from "../DiceRoller";
 
 // <div class="sheet-dots">
