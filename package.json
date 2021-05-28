@@ -5,7 +5,7 @@
   "description": "Chronicles of Darkness Player Companion",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "tsc --noEmit && vite build",
+    "build": "vite build",
     "lint": "vue-cli-service lint",
     "dev": "vite",
     "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(ts|js|vue)\" --locales \"./src/locales/**/*.json\"",
