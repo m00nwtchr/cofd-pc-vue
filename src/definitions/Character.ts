@@ -124,7 +124,7 @@ export interface Armor {
 	ballistic?: number;
 }
 
-export interface TraitMod { 
+export interface TraitMod {
 	trait?: string;
 	mod?: Ref<number> | number;
 	func?: (traitName: string) => Ref<number> | number;
@@ -167,6 +167,7 @@ export default class Character {
 
 
 	healthTrack: number[] = [];
+	woundPenalty: ComputedRef<number>;
 	maxHealth: ComputedRef<number>;
 
 	willpower?: number;
@@ -208,16 +209,16 @@ export default class Character {
 		strength: number;
 		size: number;
 	}[] = [
-		{
-			name: "",
-			damage: "",
-			range: "",
-			clip: "",
-			initative: 0,
-			strength: 0,
-			size: 0,
-		}
-	];
+			{
+				name: "",
+				damage: "",
+				range: "",
+				clip: "",
+				initative: 0,
+				strength: 0,
+				size: 0,
+			}
+		];
 
 	// initative?: number;
 
@@ -275,30 +276,30 @@ export default class Character {
 			// 				const meritObj = new m(this, val);
 
 			// 				// arr.push(key);
-	
+
 			// 				this.merits[key] = meritObj;
 			// 			}
 			// 		});
 
 			// 		// // Object.values(val).forEach(value => {
 			// 		// 	let key = nameToKey(value.name);
-			
+
 			// 		// 	if (key.includes("(")) {
 			// 		// 		key = key.substr(0, key.indexOf("(")-1);
 			// 		// 	}
-			
+
 			// 		// 	const m = MERITS[key];
-			
+
 			// 		// 	// if ((value as Merit).getOptions) {
 			// 		// 	// 	console.log("replace", value.name, val, prevVal);
 			// 		// 	// }
-	
+
 			// 		// 	if (!arr.includes(key) && !(value as any).getOptions && m) {
 			// 		// 		const meritObj = new m(this, value);
 			// 		// 		// Object.assign(m, value);
-			
+
 			// 		// 		arr.push(key);
-	
+
 			// 		// 		this.merits[key] = meritObj;
 			// 		// 		console.log(this.merits[key]);
 			// 		// 	}
@@ -335,7 +336,7 @@ export default class Character {
 			let key = nameToKey(value.name);
 
 			if (key.includes("(")) {
-				key = key.substr(0, key.indexOf("(")-1);
+				key = key.substr(0, key.indexOf("(") - 1);
 			}
 
 			const m = MERITS[key];
@@ -354,16 +355,16 @@ export default class Character {
 		this.attributes = computed(() => {
 			return {
 				intelligence: this.baseAttributes.intelligence + this.mod("intelligence"),
-				wits:         this.baseAttributes.wits         + this.mod("wits"),
-				resolve:      this.baseAttributes.resolve      + this.mod("resolve"),
+				wits: this.baseAttributes.wits + this.mod("wits"),
+				resolve: this.baseAttributes.resolve + this.mod("resolve"),
 
-				strength:  this.baseAttributes.strength  + this.mod("strength"),
+				strength: this.baseAttributes.strength + this.mod("strength"),
 				dexterity: this.baseAttributes.dexterity + this.mod("dexterity"),
-				stamina:   this.baseAttributes.stamina   + this.mod("stamina"),//((self.abilities.value.resilience || {}).level || 0),//vue.getNum("this.character.abilities.value.resilience.level"),
+				stamina: this.baseAttributes.stamina + this.mod("stamina"),//((self.abilities.value.resilience || {}).level || 0),//vue.getNum("this.character.abilities.value.resilience.level"),
 
-				presence:     this.baseAttributes.presence     + this.mod("presence"),
+				presence: this.baseAttributes.presence + this.mod("presence"),
 				manipulation: this.baseAttributes.manipulation + this.mod("manipulation"),
-				composure:    this.baseAttributes.composure    + this.mod("composure"),
+				composure: this.baseAttributes.composure + this.mod("composure"),
 			};
 		});
 
@@ -375,6 +376,13 @@ export default class Character {
 			set: (val) => {
 				this.baseSize = val - this.mod("size");
 			}
+		});
+
+		this.woundPenalty = computed(() => {
+			return Math.min((this.healthTrack[this.healthTrack.length - 1] !== 0 ?
+				-3 : this.healthTrack[this.healthTrack.length - 2] !== 0 ?
+					-2 : this.healthTrack[this.healthTrack.length - 3] !== 0 ?
+						-1 : 0)+this.mod("woundPenalty"), 0);
 		});
 
 		this.maxHealth = computed(() => {
@@ -395,7 +403,7 @@ export default class Character {
 		this.armor = computed(() => {
 			return {
 				general: this.baseArmor.general + this.mod("generalArmor"),
-				ballistic: this.baseArmor.ballistic +this.mod("ballisticArmor")
+				ballistic: this.baseArmor.ballistic + this.mod("ballisticArmor")
 			};
 		});
 	}
@@ -457,10 +465,10 @@ export class VampireCharacter extends Character {
 
 	getTraitMods() {
 		return super.getTraitMods().concat([
-			{trait: "stamina", mod: def(() => this.abilities.resilience.level)},
-			{trait: "strength", mod: def(() => this.abilities.vigor.level)},
+			{ trait: "stamina", mod: def(() => this.abilities.resilience.level) },
+			{ trait: "strength", mod: def(() => this.abilities.vigor.level) },
 
-			{trait: "defense", mod: def(() => this.abilities.celerity.level)}
+			{ trait: "defense", mod: def(() => this.abilities.celerity.level) }
 		]);
 	}
 }
@@ -476,35 +484,37 @@ export class WerewolfCharacter extends Character {
 		super(opts);
 
 		this.baseFormMods = opts.baseFormMods || {};
-		this.kuruthTriggers = Object.assign({ 
+		this.kuruthTriggers = Object.assign({
 			passive: "",
-			common: "", 
-			specific: "" 
+			common: "",
+			specific: ""
 		}, this.kuruthTriggers);
 	}
 
 	getTraitMods() {
 		return super.getTraitMods().concat([
-			{trait: "health", mod: def(() => {
-				if (this.subType.toLowerCase() === "rahu") {
-					const purity = def(() => this.abilities.purity.level, 0).value;
-					return purity >= 2 ? purity : 0;
-				}
-				return 0;
-			})},
+			{
+				trait: "health", mod: def(() => {
+					if (this.subType.toLowerCase() === "rahu") {
+						const purity = def(() => this.abilities.purity.level, 0).value;
+						return purity >= 2 ? purity : 0;
+					}
+					return 0;
+				})
+			},
 			...ATTRIBUTES.flat().map(attr => {
-				return {trait: attr, mod: def(() => (this.currentFormObj().value as any)[attr+"Mod"])};
+				return { trait: attr, mod: def(() => (this.currentFormObj().value as any)[attr + "Mod"]) };
 			}),
-			{trait: "size", mod: def(() => this.currentFormObj().value.sizeMod)},
-			{trait: "speed", mod: def(() => this.currentFormObj().value.speedMod)},
-			{trait: "perception", mod: def(() => this.currentFormObj().value.perceptionMod)},
+			{ trait: "size", mod: def(() => this.currentFormObj().value.sizeMod) },
+			{ trait: "speed", mod: def(() => this.currentFormObj().value.speedMod) },
+			{ trait: "perception", mod: def(() => this.currentFormObj().value.perceptionMod) },
 
-			{trait: "ballisticArmor", mod: def(() => this.currentFormObj().value.armorMod.ballistic || 0)},
-			{trait: "defenseCalcMax", mod: def(() => this.currentFormObj().value.defenseCalcMax)},
+			{ trait: "ballisticArmor", mod: def(() => this.currentFormObj().value.armorMod.ballistic || 0) },
+			{ trait: "defenseCalcMax", mod: def(() => this.currentFormObj().value.defenseCalcMax) },
 
-			{trait: "generalArmor", mod: def(() => this.currentFormObj().value.armorMod.general || 0)},
-			{trait: "ballisticArmor", mod: def(() => this.currentFormObj().value.armorMod.ballistic || 0)},
-		]);	
+			{ trait: "generalArmor", mod: def(() => this.currentFormObj().value.armorMod.general || 0) },
+			{ trait: "ballisticArmor", mod: def(() => this.currentFormObj().value.armorMod.ballistic || 0) },
+		]);
 	}
 
 	currentFormObj(): WritableComputedRef<Form> {
@@ -521,7 +531,7 @@ export class WerewolfCharacter extends Character {
 				const form = vue.splat.forms[key] || {
 					name: "",
 					desc: "",
-					
+
 					intelligenceMod: 0,
 					witsMod: 0,
 					resolveMod: 0,
@@ -564,28 +574,28 @@ export class WerewolfCharacter extends Character {
 				// self.baseFormMods[key] = baseMod;
 
 				return Object.assign({}, form, {
-					intelligenceMod: form.intelligenceMod + baseMod.intelligenceMod  + this.mod(key+"IntelligenceMod"),
-					witsMod:	     form.witsMod         + baseMod.witsMod          + this.mod(key+"WitsMod"),
-					resolveMod:      form.resolveMod      + baseMod.resolveMod       + this.mod(key+"ResolveMod"),
+					intelligenceMod: form.intelligenceMod + baseMod.intelligenceMod + this.mod(key + "IntelligenceMod"),
+					witsMod: form.witsMod + baseMod.witsMod + this.mod(key + "WitsMod"),
+					resolveMod: form.resolveMod + baseMod.resolveMod + this.mod(key + "ResolveMod"),
 
-					strengthMod:     form.strengthMod     + baseMod.strengthMod      + this.mod(key+"StrengthMod"),
-					dexterityMod:    form.dexterityMod    + baseMod.dexterityMod     + this.mod(key+"DexterityMod"),
-					staminaMod:      form.staminaMod      + baseMod.staminaMod       + this.mod(key+"StaminaMod"),
-					
-					presenceMod:     form.presenceMod     + baseMod.presenceMod      + this.mod(key+"PresenceMod"),
-					manipulationMod: form.manipulationMod + baseMod.manipulationMod  + this.mod(key+"ManipulationMod"),
-					composureMod:    form.composureMod    + baseMod.composureMod     + this.mod(key+"ComposureMod"),
+					strengthMod: form.strengthMod + baseMod.strengthMod + this.mod(key + "StrengthMod"),
+					dexterityMod: form.dexterityMod + baseMod.dexterityMod + this.mod(key + "DexterityMod"),
+					staminaMod: form.staminaMod + baseMod.staminaMod + this.mod(key + "StaminaMod"),
 
-					sizeMod:         form.sizeMod         + baseMod.sizeMod          + this.mod(key+"SizeMod"),
-					speedMod:        form.speedMod        + baseMod.speedMod         + this.mod(key+"SpeedMod"),
-					perceptionMod:   form.perceptionMod   + baseMod.perceptionMod    + this.mod(key+"PerceptionMod"),
+					presenceMod: form.presenceMod + baseMod.presenceMod + this.mod(key + "PresenceMod"),
+					manipulationMod: form.manipulationMod + baseMod.manipulationMod + this.mod(key + "ManipulationMod"),
+					composureMod: form.composureMod + baseMod.composureMod + this.mod(key + "ComposureMod"),
 
-					defenseCalcMax: this.mod(key+"DefenseCalcMax") as boolean,
-					defenseMod: this.mod(key+"DefenseMod"),
+					sizeMod: form.sizeMod + baseMod.sizeMod + this.mod(key + "SizeMod"),
+					speedMod: form.speedMod + baseMod.speedMod + this.mod(key + "SpeedMod"),
+					perceptionMod: form.perceptionMod + baseMod.perceptionMod + this.mod(key + "PerceptionMod"),
+
+					defenseCalcMax: this.mod(key + "DefenseCalcMax") as boolean,
+					defenseMod: this.mod(key + "DefenseMod"),
 
 					armorMod: {
-						general:   (form.armorMod.general || 0)   + (baseMod.armorMod.general || 0)   + this.mod(key+"generalArmorMod"),
-						ballistic: (form.armorMod.ballistic || 0) + (baseMod.armorMod.ballistic || 0) + this.mod(key+"ballisticArmorMod")
+						general: (form.armorMod.general || 0) + (baseMod.armorMod.general || 0) + this.mod(key + "generalArmorMod"),
+						ballistic: (form.armorMod.ballistic || 0) + (baseMod.armorMod.ballistic || 0) + this.mod(key + "ballisticArmorMod")
 					}
 				});
 			},
@@ -611,25 +621,25 @@ export class WerewolfCharacter extends Character {
 				val = Object.assign({}, form, val);
 
 				this.baseFormMods[key] = Object.assign({}, {
-					intelligenceMod: val.intelligenceMod - form.intelligenceMod - this.mod(key+"IntelligenceMod"),
-					witsMod:		 val.witsMod         - form.witsMod         - this.mod(key+"WitsMod"),
-					resolveMod:      val.resolveMod      - form.resolveMod      - this.mod(key+"ResolveMod"),
-			
-					strengthMod:     val.strengthMod     - form.strengthMod     - this.mod(key+"StrengthMod"),
-					staminaMod:      val.staminaMod      - form.staminaMod      - this.mod(key+"DexterityMod"),
-					dexterityMod:    val.dexterityMod    - form.dexterityMod    - this.mod(key+"StaminaMod"),
+					intelligenceMod: val.intelligenceMod - form.intelligenceMod - this.mod(key + "IntelligenceMod"),
+					witsMod: val.witsMod - form.witsMod - this.mod(key + "WitsMod"),
+					resolveMod: val.resolveMod - form.resolveMod - this.mod(key + "ResolveMod"),
 
-					presenceMod:	 val.presenceMod     - form.presenceMod     - this.mod(key+"PresenceMod"),
-					manipulationMod: val.manipulationMod - form.manipulationMod - this.mod(key+"ManipulationMod"),
-					composureMod:    val.composureMod    - form.composureMod    - this.mod(key+"ComposureMod"),
-			
-					sizeMod:         val.sizeMod         - form.sizeMod         - this.mod(key+"SizeMod"),
-					speedMod:        val.speedMod        - form.speedMod        - this.mod(key+"SpeedMod"),
-					perceptionMod:   val.perceptionMod   - form.perceptionMod   - this.mod(key+"PerceptionMod"),
+					strengthMod: val.strengthMod - form.strengthMod - this.mod(key + "StrengthMod"),
+					staminaMod: val.staminaMod - form.staminaMod - this.mod(key + "DexterityMod"),
+					dexterityMod: val.dexterityMod - form.dexterityMod - this.mod(key + "StaminaMod"),
+
+					presenceMod: val.presenceMod - form.presenceMod - this.mod(key + "PresenceMod"),
+					manipulationMod: val.manipulationMod - form.manipulationMod - this.mod(key + "ManipulationMod"),
+					composureMod: val.composureMod - form.composureMod - this.mod(key + "ComposureMod"),
+
+					sizeMod: val.sizeMod - form.sizeMod - this.mod(key + "SizeMod"),
+					speedMod: val.speedMod - form.speedMod - this.mod(key + "SpeedMod"),
+					perceptionMod: val.perceptionMod - form.perceptionMod - this.mod(key + "PerceptionMod"),
 
 					armorMod: {
-						general: (val.armorMod.general || 0) - (form.armorMod.general || 0) - this.mod(key+"generalArmorMod"),
-						ballistic: (val.armorMod.ballistic || 0) - (form.armorMod.ballistic || 0) - this.mod(key+"ballisticArmorMod"),
+						general: (val.armorMod.general || 0) - (form.armorMod.general || 0) - this.mod(key + "generalArmorMod"),
+						ballistic: (val.armorMod.ballistic || 0) - (form.armorMod.ballistic || 0) - this.mod(key + "ballisticArmorMod"),
 					}
 				});
 			}

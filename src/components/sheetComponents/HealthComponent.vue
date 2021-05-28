@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h3 class="separator col-sm-12">{{ name }}</h3>
+		<h3 class="separator col-sm-12">{{ `${name} ${woundPenalty < 0 ? `(${woundPenalty})` : ''}` }}</h3>
 		<slot></slot>
 		<!-- <div class="sheet-dots" style="margin-top:-10px;"> -->
 			<!-- <button v-for="n in maxHealth" :key="n" class="sheet-dot" :class="{'sheet-dot-full': true}"></button> -->
@@ -26,6 +26,10 @@ export default defineComponent({
 		"healthTrack": {
 			required: true,
 			type: Array
+		},
+		"woundPenalty": {
+			required: false,
+			type: Number
 		},
 		"maxMarkValue": {
 			required: false,
@@ -61,13 +65,14 @@ export default defineComponent({
 		}
 	},
 	computed: {
-		woundPenalty: function(): number {
-			const healthTrack: number[] = this.healthTrack as any;
+		// woundPenalty: function(): number {
+		// 	const healthTrack: number[] = this.healthTrack as any;
 
-			const last = healthTrack.lastIndexOf(0);
-
-			return Math.min(healthTrack[this.maxHealth-1] !== 0 ? -3 : 0, healthTrack[this.maxHealth-2] !== 0 ? -2 : 0, healthTrack[this.maxHealth-3] !== 0 ? -1 : 0); 
-		}
+		// 	return healthTrack[this.healthTrack.length - 1] !== 0 ?
+		// 		-3 : healthTrack[this.healthTrack.length - 2] !== 0 ?
+		// 			-2 : healthTrack[this.healthTrack.length - 3] !== 0 ?
+		// 				-1 : 0;
+		// }
 	},
 	beforeMount() {
 		if (this.healthTrack.length < this.maxHealth) {
