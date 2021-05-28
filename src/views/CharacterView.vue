@@ -325,6 +325,7 @@
 							class="col-12"
 							style="margin-bottom: 15px"
 							:maxHealth="character.maxHealth"
+							:woundPenalty="character.woundPenalty"
 							:healthTrack="character.healthTrack"
 							:name="$t('character.trait.health')"
 						>

@@ -250,10 +250,28 @@ class InstinctiveDefenseMerit extends Merit {
 	}
 }
 
+function createTraitMerit(trait: string, maxLevel = 3) {
+	return class extends Merit {
+
+		constructor(character: Character, ability: Ability) {
+			super(character, ability);
+		}
+	
+		getTraitMods() {
+			return [
+				{trait, mod: def(() => Math.min(this.level, ))},
+			];
+		}
+	};
+}
+
 export const MERITS: { [index: string]: new (character: Character, ability: Ability) => Merit } = {
 	giant: GiantMerit,
 	favored_form: FavoredFormMerit,
 	defensive_combat: DefensiveCombatMerit,
 	fortified_form: FortifiedFormMerit,
-	instinctive_defense: InstinctiveDefenseMerit
+	instinctive_defense: InstinctiveDefenseMerit,
+	fleet_of_foot: createTraitMerit("speed"),
+	fast_reflexes: createTraitMerit("initative"),
+	iron_stamina: createTraitMerit("woundPenalty")
 };
