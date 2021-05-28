@@ -457,7 +457,7 @@ const characters: { [index: string]: Character | any } = {
 };
 
 if (import.meta.env.MODE === "development" || Object.keys(store.state.characters || {}).length === 0) {
-	// store.commit("UPDATE_CHARACTERS", characters);
+	store.commit("UPDATE_CHARACTERS", characters);
 }
 
 (window as any).export = (): void => {
