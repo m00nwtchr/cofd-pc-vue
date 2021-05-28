@@ -178,14 +178,14 @@ export default class Character {
 	fuel = 0;
 	// maxFuel = 10;
 
-	integrityTrait = ref(7);
+	integrityTrait = 7;
 	integrityTrack?: number[];
 
 	touchstones: { name: string; type?: string }[] = [];
 
 	conditions: string[] = [];
 
-	baseSize = ref(5);
+	baseSize = 5;
 	size: ComputedRef<number>;
 
 	defense: ComputedRef<number>;
@@ -370,10 +370,10 @@ export default class Character {
 		this.size = computed({
 			get: () => {
 				// console.log(this.baseSize, this.mod("size"));
-				return this.baseSize.value + this.mod("size");
+				return this.baseSize + this.mod("size");
 			},
 			set: (val) => {
-				this.baseSize.value = val - this.mod("size");
+				this.baseSize = val - this.mod("size");
 			}
 		});
 
@@ -396,13 +396,6 @@ export default class Character {
 			};
 		});
 	}
-
-	// addTraitMod(name: string, ref: Ref<number>) {
-	// 	const obj = { trait: name, mod: ref };
-	// 	this.traitMods.push(obj);
-		
-	// 	return obj;
-	// }
 
 	getTraitMods(): TraitMod[] {
 		return [];
@@ -461,11 +454,6 @@ export class MageCharacter extends Character {
 export class VampireCharacter extends Character {
 	constructor(opts: VampireCharacter) {
 		super(opts as any);
-
-		// this.addTraitMod("stamina", def(() => this.abilities.resilience.level));
-		// this.addTraitMod("strength", def(() => this.abilities.vigor.level));
-
-		// this.addTraitMod("defense", def(() => this.abilities.celerity.level));
 	}
 
 	getTraitMods() {
@@ -481,7 +469,6 @@ export class VampireCharacter extends Character {
 export class WerewolfCharacter extends Character {
 
 	currentForm: Ref<string> = ref("hishu");
-	// currentFormObj!: ComputedRef<Form>;
 	baseFormMods!: { [key: string]: FormMods };
 
 	kuruthTriggers?: { passive: string; common: string; specific: string };
