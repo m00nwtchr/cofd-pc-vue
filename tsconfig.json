@@ -35,8 +35,10 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx"
-, "src/registerServiceWorker.ts.old"  ],
+    "tests/**/*.tsx", 
+    "src/registerServiceWorker.ts", 
+    "src/plugins/vuetify.ts"  
+  ],
   "exclude": [
     "node_modules"
   ]
