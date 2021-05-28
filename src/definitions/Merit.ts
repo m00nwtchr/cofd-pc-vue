@@ -234,10 +234,26 @@ class FortifiedFormMerit extends Merit {
 	}
 }
 
+class InstinctiveDefenseMerit extends Merit {
+
+	constructor(character: Character, ability: Ability) {
+		super(character, ability);
+	}
+
+	getTraitMods() {
+		const mod = def(() => this.level >= 2 ? 1 : 0);
+
+		return [
+			{trait: "urhandefensecalcmax", mod},
+			{trait: "urshuldefensecalcmax", mod}
+		];
+	}
+}
 
 export const MERITS: { [index: string]: new (character: Character, ability: Ability) => Merit } = {
 	giant: GiantMerit,
 	favored_form: FavoredFormMerit,
 	defensive_combat: DefensiveCombatMerit,
-	fortified_form: FortifiedFormMerit
+	fortified_form: FortifiedFormMerit,
+	instinctive_defense: InstinctiveDefenseMerit
 };

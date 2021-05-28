@@ -503,6 +503,9 @@ export interface FormMods {
 
 	perceptionMod: number;
 
+	defenseCalcMax?: boolean;
+	defenseMod?: number;
+
 	armorMod: Armor;
 }
 
@@ -622,7 +625,7 @@ export interface Form extends FormMods {
 		composureMod: 0,
 
 		sizeMod: 1,
-		speedMod: 0,
+		speedMod: 3,
 
 		perceptionMod: 3,
 

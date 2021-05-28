@@ -178,7 +178,7 @@ export default class Character {
 	fuel = 0;
 	// maxFuel = 10;
 
-	integrityTrait = 7;
+	integrityTrait: Ref<number> = ref(7);
 	integrityTrack?: number[];
 
 	touchstones: { name: string; type?: string }[] = [];
@@ -188,6 +188,7 @@ export default class Character {
 	baseSize = 5;
 	size: ComputedRef<number>;
 
+	defenseCalcMax: ComputedRef<boolean>;
 	defense: ComputedRef<number>;
 
 	speed: ComputedRef<number>;
@@ -251,11 +252,10 @@ export default class Character {
 				defaultAbl[el[0]] = { name: el[1], level: 0 };
 			});
 			Object.assign(this, opts);
-			// Object.keys(opts).forEach(key => {
-			// 	(this as any)[key] = (opts as any)[key];
-			// });
 
-			this.merits = reactive(opts.merits);
+			this.integrityTrait = ref(this.integrityTrait);
+
+			this.merits = reactive(this.merits);
 
 			// const arr: string[] = [];
 
@@ -385,8 +385,11 @@ export default class Character {
 			return this.attributes.value.strength + this.attributes.value.dexterity + 5 + this.mod("speed");
 		});
 
+		this.defenseCalcMax = computed(() => {
+			return this.mod("defenseCalcMax") as boolean;
+		});
 		this.defense = computed(() => {
-			return Math.min(this.attributes.value.dexterity, this.attributes.value.wits) + def(() => this.skills.athletics).value + this.mod("defense");
+			return (this.defenseCalcMax ? Math.max : Math.min)(this.attributes.value.dexterity, this.attributes.value.wits) + def(() => this.skills.athletics).value + this.mod("defense");
 		});
 
 		this.armor = computed(() => {
@@ -404,14 +407,10 @@ export default class Character {
 	mod(traitName: string) {
 		const na = traitName.toLowerCase();
 
-		return [
-			...unref(this.traitMods)
-				.filter(el => el.trait && el.trait.toLowerCase() === na)
-				.map(el => el.mod),
-			...unref(this.traitMods)
-				.filter(el => el.func)
-				.map(el => (el as any).func(na))
-		].reduce((prev: any, val: any) => prev + unref(val), 0) || 0;
+		return unref(this.traitMods)
+			.filter(el => el.trait && el.trait.toLowerCase() === na)
+			.map(el => el.mod)
+			.reduce((prev: any, val: any) => prev + unref(val), 0) || 0;
 	}
 
 	getData() {
@@ -477,7 +476,11 @@ export class WerewolfCharacter extends Character {
 		super(opts);
 
 		this.baseFormMods = opts.baseFormMods || {};
-		this.kuruthTriggers = { passive: "", common: "", specific: "" };
+		this.kuruthTriggers = Object.assign({ 
+			passive: "",
+			common: "", 
+			specific: "" 
+		}, this.kuruthTriggers);
 	}
 
 	getTraitMods() {
@@ -495,6 +498,9 @@ export class WerewolfCharacter extends Character {
 			{trait: "size", mod: def(() => this.currentFormObj().value.sizeMod)},
 			{trait: "speed", mod: def(() => this.currentFormObj().value.speedMod)},
 			{trait: "perception", mod: def(() => this.currentFormObj().value.perceptionMod)},
+
+			{trait: "ballisticArmor", mod: def(() => this.currentFormObj().value.armorMod.ballistic || 0)},
+			{trait: "defenseCalcMax", mod: def(() => this.currentFormObj().value.defenseCalcMax)},
 
 			{trait: "generalArmor", mod: def(() => this.currentFormObj().value.armorMod.general || 0)},
 			{trait: "ballisticArmor", mod: def(() => this.currentFormObj().value.armorMod.ballistic || 0)},
@@ -573,6 +579,9 @@ export class WerewolfCharacter extends Character {
 					sizeMod:         form.sizeMod         + baseMod.sizeMod          + this.mod(key+"SizeMod"),
 					speedMod:        form.speedMod        + baseMod.speedMod         + this.mod(key+"SpeedMod"),
 					perceptionMod:   form.perceptionMod   + baseMod.perceptionMod    + this.mod(key+"PerceptionMod"),
+
+					defenseCalcMax: this.mod(key+"DefenseCalcMax") as boolean,
+					defenseMod: this.mod(key+"DefenseMod"),
 
 					armorMod: {
 						general:   (form.armorMod.general || 0)   + (baseMod.armorMod.general || 0)   + this.mod(key+"generalArmorMod"),

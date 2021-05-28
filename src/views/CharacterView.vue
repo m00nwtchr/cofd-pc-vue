@@ -106,7 +106,7 @@
 			</div>
 			<div class="attr-proper row col-sm-10">
 				<div
-					v-for="attrCat in attributeNames"
+					v-for="attrCat in ATTRIBUTES"
 					:key="attrCat"
 					class="block col-sm-4"
 				>
@@ -577,34 +577,22 @@
 					<i class="subtitle">({{ form.desc }})</i>
 
 					<div>
-						{{ $t("character.attribute.strength") }}:
-						{{
-							character.attributes.strength -
-							currentForm.strengthMod +
-							form.strengthMod
-						}}<br />
-						{{ $t("character.attribute.dexterity") }}:
-						{{
-							character.attributes.dexterity -
-							currentForm.dexterityMod +
-							form.dexterityMod
-						}}<br />
-						{{ $t("character.attribute.stamina") }}:
-						{{
-							character.attributes.stamina -
-							currentForm.staminaMod +
-							form.staminaMod
-						}}<br />
-						{{ $t("character.attribute.manipulation") }}:
-						{{
-							character.attributes.manipulation -
-							currentForm.manipulationMod +
-							form.manipulationMod
-						}}<br />
+						<span v-for="attr in ATTRIBUTES.flat().filter(el => [
+								'strength', 'dexterity', 'stamina', 'manipulation',
+							].includes(el) || form[el+'Mod'] !== 0)" :key="attr">						
+							{{ $t("character.attribute."+attr) }}<!--
+							-->{{ formatNum(form[attr+"Mod"]) }}:
+							{{
+								character.attributes[attr] -
+								currentForm[attr+"Mod"] +
+								form[attr+"Mod"]
+							}}<br />
+						</span>
 
 						<br />
 
-						{{ $t("character.trait.size") }}:
+						{{ $t("character.trait.size") }}<!--
+						-->{{ formatNum(form.sizeMod) }}:
 						<input
 							v-if="form.name === 'Hishu'"
 							v-model.number="sizeMinusForm"
@@ -614,11 +602,19 @@
 							character.size - currentForm.sizeMod + form.sizeMod
 						}}</span
 						><br />
-						{{ $t("character.trait.defense") }}: {{ formDefense(form) }}<br />
-						{{ $t("character.trait.initative") }}:
-						{{ initative - currentForm.dexterityMod + form.dexterityMod }}<br />
+						{{ $t("character.trait.defense") }}<!--
+						-->{{ formatNum(formDefenseMod(form)) }}:
+						{{ formDefense(form) }}<br />
+						{{ $t("character.trait.initative") }}<!--
+						-->{{ formatNum(form.dexterityMod + form.composureMod - getForm('hishu').dexterityMod - getForm('hishu').composureMod) }}:
+						{{ initative -
+							currentForm.dexterityMod -
+							currentForm.composureMod +
+							form.dexterityMod +
+							form.composureMod }}<br />
 						<!-- Armor: <input v-model="character.armor" /><br> -->
-						{{ $t("character.trait.speed") }}:
+						{{ $t("character.trait.speed") }}<!--
+						-->{{ formatNum(form.speedMod+form.strengthMod+form.dexterityMod) }}:
 						{{
 							character.speed -
 							currentForm.strengthMod -
@@ -640,7 +636,8 @@
 								form.armorMod.ballistic
 							}`
 						}}<br />
-						{{ $t("character.trait.perception") }}:
+						{{ $t("character.trait.perception") }}<!--
+						-->{{ formatNum(form.perceptionMod+form.witsMod+form.composureMod) }}:
 						{{ perception - currentForm.perceptionMod + form.perceptionMod }}
 						<br />
 						<span v-if="form.name === 'Gauru'"
@@ -671,6 +668,7 @@ import { computed, defineComponent, reactive, ref, Ref, toRefs } from "vue";
 import { Splat, SPLATS, EnumSplat, Form } from "../definitions/Splat";
 import Character, {
 	Ability,
+	ATTRIBUTES,
 	Attributes,
 	createCharacter,
 	MageCharacter,
@@ -699,7 +697,7 @@ import _ from "lodash";
 interface CharacterViewData {
 	characters: { [index: string]: Character };
 	character: Character;
-	attributeNames: string[][];
+	ATTRIBUTES: typeof ATTRIBUTES;
 	skills: string[][];
 	skillCats: { [index: string]: number };
 	attributes: Attributes;
@@ -999,14 +997,46 @@ export default defineComponent({
 		},
 		formDefense(form: Form) {
 			return (
-				Math.min(
+				(form.defenseCalcMax ? Math.max : Math.min)(
 					this.character.attributes.dexterity -
 						this.currentForm.dexterityMod +
 						form.dexterityMod,
-					this.character.attributes.wits
-				) + (this.character.skills.athletics || 0) + this.character.mod("defense")
+					this.character.attributes.wits -
+						this.currentForm.witsMod +
+						form.witsMod
+				) +
+				(this.character.skills.athletics || 0) + 
+				(
+					this.character.mod("defense") -
+					(this.currentForm.defenseMod || 0) +
+					(form.defenseMod || 0)
+				)
 			);
 			// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
+		},
+		formDefenseMod(form: Form) {
+			// const hishu = this.getForm('hishu');
+			// let sub = 0;
+
+			// const dexterity = this.character.attributes.dexterity - this.currentForm.dexterityMod + form.dexterityMod;
+			// const wits = this.character.attributes.wits - this.currentForm.witsMod + form.witsMod;
+
+			// const res = (form.defenseCalcMax ? Math.max : Math.min)(dexterity, wits);
+
+			// if (res == dexterity) {
+			// 	sub = form.dexterityMod;
+			// } else if (res == wits) {
+			// 	sub = form.witsMod;
+			// }
+
+			// return this.formDefense(form) - this.formDefense(hishu) -
+			// 	sub;
+			return form.defenseMod;
+		},
+		getForm(name: string) {
+			return this.character instanceof WerewolfCharacter
+				? this.character.getForm(name).value
+				: ({} as Form);
 		},
 		specialtyDropDown(skill: string) {
 			if (this.specialtyDropSelect === skill) {
@@ -1026,6 +1056,9 @@ export default defineComponent({
 				this.specialtyDropSelect = skill;
 			}
 		},
+		formatNum(num: number): string {
+			return num !== 0 ? `(${num > 0 ? '+' : ''}${num})` : '';
+		}
 	},
 	data() {
 		return {
@@ -1044,11 +1077,7 @@ export default defineComponent({
 			// random: new Random(),
 			roller: new DiceRoller(),
 
-			attributeNames: [
-				["intelligence", "wits", "resolve"],
-				["strength", "dexterity", "stamina"],
-				["presence", "manipulation", "composure"],
-			],
+			ATTRIBUTES,
 			skills: [
 				[
 					"academics",
