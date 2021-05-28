@@ -13,10 +13,19 @@ body {
 }
 
 .line {
-	border-bottom: 1px solid black;
 	// margin-top: -15px !important;
 	padding: 0px;
-	height: 20px;
+	// height: 20px;
+}
+
+.line input {
+	height:20px;
+	border-bottom: 1px solid black;
+}
+
+input.line {
+	height:20px;
+	border-bottom: 1px solid black;
 }
 
 .selected {

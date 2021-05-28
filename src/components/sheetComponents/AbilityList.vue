@@ -2,12 +2,30 @@
 	<div>
 		<h3 class="separator col-sm-12">{{ abilityName }}</h3>
 		<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
-		<div style="margin:0" v-for="(ability, i) in visibleArr" :key="ability.name" class="block row col-sm-12">
+		<div style="margin:0" v-for="(ability, i) in visibleArr" :key="nameToKey(ability.name)" class="block row col-sm-12">
 			<span class="line col-7" :class="{'selected': $parent.selectedTraits[nameOf(i)]}" @click="$parent.selectTrait(nameOf(i),{ability:true})">
 				<input v-if="optionsMutable" @input="doInput(ability)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
 				<span v-else>{{ ability.name }}</span>
+				
+				<br>
+				<div v-if="ability.getOptions && meritOptionDropSelect === nameOf(i)">
+					<div>
+						<span v-for="option in ability.getOptions()" :key="option">
+							{{ option.name }}: 
+							<select v-if="option.list" v-model="ability[option.name]">
+								<option v-for="(val, key) in option.list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
+							</select>
+							<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" v-model="ability[option.name][i]">
+								<option v-for="(val, key) in list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
+							</select>
+							<input  v-else :type="option.bool ? 'checkbox' : 'text'" v-model="ability[option.name]">
+							<br>
+						</span>
+					</div>
+				</div>
 			</span>
-			<div class="sheet-dots col-5">
+
+			<div class="sheet-dots col-3">
 				<button class="sheet-dot" :class="{'sheet-dot-full':ability.level>=n,
 					'dot-limit': !optionsMutable && $parent.character.splat===$parent.EnumSplat.MAGE &&
 						(
@@ -20,7 +38,19 @@
 						)	
 					}" @click="setDots(ability, n)" v-for="n in 5" :key="n"></button>
 			</div>
+			
+			<span class="col-1 options-toggle" v-if="ability.getOptions && ability.getOptions().length > 0">
+				<button
+					class="dropdown-toggle material-icons"
+					@click="meritOptionDropDown(nameOf(i))"
+					>
+						<span v-if="meritOptionDropSelect === nameOf(i)">arrow_drop_down</span>
+						<span v-else>arrow_right</span>
+				</button>
+
+			</span>
 		</div>
+		
 		<datalist v-if="datalistFilter" :id="abilityName+'List'">
 			<option v-for="el in datalistFilter" :key="el">{{ el }}</option>
 		</datalist>
@@ -28,10 +58,9 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable vue/no-mutating-props */
-
-import { Ability } from "@/definitions/Character";
+import { Ability, nameToKey } from "../../definitions/Character";
 import { defineComponent } from "vue";
+import { isUniqBy, uniqByKeepFirst, uniqByKeepLast } from "../../Util";
 export default defineComponent({
 	name: "AbilityList",
 	props: {
@@ -54,13 +83,19 @@ export default defineComponent({
 			type: Object
 		}
 	},
-	data() {return {
-		abilityArr: []
-	} as {abilityArr: Ability[]};},
-	beforeMount() {
+	data() {
+		return {
+			abilityArr: [] as Ability[],
+			meritOptionDropSelect: null
+		};
+	},
+	mounted() {
+		// this.abilityArr = uniqBy(Object.values(this.abilities), el => el.name);
+	
 		this.abilityArr = Object.values(this.abilities);
 	},
 	methods: {
+		nameToKey,
 		setDots(ability: Ability, n: number) {
 			ability.level = (ability.level === n ? n-1 : n);
 
@@ -73,7 +108,6 @@ export default defineComponent({
 			if (this.optionsMutable && (ability as any).false && ability.name !== "" && ability.level > 0) {
 				delete (ability as any).false;
 				
-				// eslint-disable-next-line vue/no-mutating-props
 				this.abilityArr.push(ability);
 			}
 		},
@@ -83,27 +117,32 @@ export default defineComponent({
 					if (ability.name !== "" && ability.level > 0) {
 						delete (ability as any).false;
 						
-						// eslint-disable-next-line vue/no-mutating-props
 						this.abilityArr.push(ability);
 					}
 				} else {
 					if (ability.name === "") {
-						// eslint-disable-next-line vue/no-mutating-props
-						this.abilityArr.splice(this.abilityArr.indexOf(ability), 1);
+						this.abilityArr.splice(this.abilityArr.indexOf(ability));
 					}
 				}
+			}
+		},
+		meritOptionDropDown(name: string) {
+			if ((this as any).meritOptionDropSelect === name) {
+				(this as any).meritOptionDropSelect = null;
+			} else {
+				(this as any).meritOptionDropSelect = name;
 			}
 		},
 		nameOf(i: number | string) {
 			const entries = Object.entries(this.abilities);
 			if (typeof i === "number") {
 				if (entries[i]) {
-					return entries[i][0].toLowerCase();
+					return nameToKey(entries[i][0]);
 				} else {
 					return "";
 				}
 			} else {
-				return entries.filter(el => el[1].name === i)[0][0].toLowerCase();
+				return nameToKey(entries.filter(el => el[1].name === i)[0][0]);
 			}
 		}
 	},
@@ -125,17 +164,25 @@ export default defineComponent({
 		}
 	},
 	watch: {
-		abilityArr: {handler(newVal, oldVal) {
+		abilityArr: {handler(newVal: Ability[]) {
 			// (this as any).abilities = {};
 			Object.keys(this.abilities).forEach(key => {
 				delete this.abilities[key];
 			});
 
-			console.log(newVal);
-			newVal.forEach((el: Ability) => {
-				this.abilities[el.name.toLowerCase()] = el;
+			if (!isUniqBy(newVal, el=>el.name)) {
+				this.abilityArr = uniqByKeepLast(newVal, el => el.name);
+			}
+
+			// console.log(newVal);
+			newVal.forEach((el) => {
+				// eslint-disable-next-line vue/no-mutating-props
+				this.abilities[nameToKey(el.name)] = el;
 			});
-		}, deep:true}
+		}, deep:true},
+		// abilities: {handler(newVal, oldVal) {
+		// 	this.abilityArr = Object.values(newVal);
+		// }, deep:true}
 	}
 });
 
@@ -162,5 +209,11 @@ export default defineComponent({
 }
 .missing-dot {
 	background-color: red;
+}
+.options-toggle {
+	height: 24px;
+}
+.options-toggle span {
+	font-size: 24px !important;
 }
 </style>

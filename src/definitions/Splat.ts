@@ -1,6 +1,6 @@
 import { computed } from "vue";
 import g from "../i18n";
-import Character, { Ability, ChangelingCharacter, MageCharacter, VampireCharacter, WerewolfCharacter } from "./Character";
+import Character, { Ability, ChangelingCharacter, MageCharacter, VampireCharacter, WerewolfCharacter, Armor } from "./Character";
 
 const i18n = g.global;
 const t = i18n.t.bind(i18n);
@@ -382,35 +382,35 @@ const WEREWOLF = new Splat({
 		cahalith: {
 			name: "Cahalith",
 			abilities: ["glory"],
-			moonGifts: ["Gibbous"],
+			moonGifts: ["gibbous"],
 			gifts: ["inspiration", "knowledge"],
 			skills: ["crafts", "expression", "persuasion"]
 		},
 		elodoth: {
 			name: "Elodoth",
 			abilities: ["honor"],
-			moonGifts: ["Half"],
+			moonGifts: ["half"],
 			gifts: ["insight", "warding"],
 			skills: ["empathy", "investigation", "politics"]
 		},
 		irraka: {
 			name: "Irraka",
 			abilities: ["cunning"],
-			moonGifts: ["New"],
+			moonGifts: ["new"],
 			gifts: ["evasion", "stealth"],
 			skills: ["larceny", "stealth", "subterfuge"]
 		},
 		itheur: {
 			name: "Itheur",
 			abilities: ["wisdom"],
-			moonGifts: ["Crescent"],
+			moonGifts: ["crescent"],
 			gifts: ["elemental", "shaping"],
 			skills: ["animal_ken", "medicine", "occult"]
 		},
 		rahu: {
 			name: "Rahu",
 			abilities: ["purity"],
-			moonGifts: ["Full"],
+			moonGifts: ["full"],
 			gifts: ["dominance", "strength"],
 			skills: ["brawl", "intimidation", "survival"]
 		},
@@ -486,17 +486,24 @@ new Splat({
 });
 
 export interface FormMods {
+	intelligenceMod: number;
+	witsMod: number;
+	resolveMod: number;
+
 	strengthMod: number;
 	dexterityMod: number;
 	staminaMod: number;
+
+	presenceMod: number;
 	manipulationMod: number;
+	composureMod: number;
 
 	sizeMod: number;
 	speedMod: number;
 
 	perceptionMod: number;
 
-	armorMod?: {};
+	armorMod: Armor;
 }
 
 export interface Form extends FormMods {
@@ -512,15 +519,25 @@ export interface Form extends FormMods {
 		traits: [
 			"Sheep's Clothing"
 		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
 		strengthMod: 0,
 		dexterityMod: 0,
 		staminaMod: 0,
+
+		presenceMod: 0,
 		manipulationMod: 0,
+		composureMod: 0,
 
 		sizeMod: 0,
 		speedMod: 0,
 
-		perceptionMod: 1
+		perceptionMod: 1,
+
+		armorMod: {}
 	},
 	dalu: {
 		name: "Dalu",
@@ -531,15 +548,25 @@ export interface Form extends FormMods {
 			"Mild Lunacy",
 			"Badass Motherfucker"
 		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
 		strengthMod: 1,
-		dexterityMod: 1,
-		staminaMod: 0,
+		dexterityMod: 0,
+		staminaMod: 1,
+
+		presenceMod: 0,
 		manipulationMod: -1,
+		composureMod: 0,
 
 		sizeMod: 1,
 		speedMod: 0,
 
-		perceptionMod: 2
+		perceptionMod: 2,
+
+		armorMod: {}
 	},
 	gauru: {
 		name: "Gauru",
@@ -552,15 +579,25 @@ export interface Form extends FormMods {
 			"Rage",
 			"Primal Fear"
 		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
 		strengthMod: 3,
 		dexterityMod: 1,
 		staminaMod: 2,
+
+		presenceMod: 0,
 		manipulationMod: 0,
+		composureMod: 0,
 
 		sizeMod: 2,
 		speedMod: 0,
 
-		perceptionMod: 3
+		perceptionMod: 3,
+
+		armorMod: {}
 	},
 	urshul: {
 		name: "Urshul",
@@ -571,15 +608,25 @@ export interface Form extends FormMods {
 			"Moderate Lunacy",
 			"Weaken the Prey"
 		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
 		strengthMod: 2,
 		dexterityMod: 2,
 		staminaMod: 2,
+
+		presenceMod: 0,
 		manipulationMod: -1,
+		composureMod: 0,
 
 		sizeMod: 1,
 		speedMod: 0,
 
-		perceptionMod: 3
+		perceptionMod: 3,
+
+		armorMod: {}
 	},
 	urhan: {
 		name: "Urhan",
@@ -588,14 +635,24 @@ export interface Form extends FormMods {
 			"Teeth +1L",
 			"Chase Down"
 		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
 		strengthMod: 0,
 		dexterityMod: 2,
 		staminaMod: 1,
+
+		presenceMod: 0,
 		manipulationMod: -1,
+		composureMod: 0,
 
 		sizeMod: -1,
 		speedMod: 3,
 
-		perceptionMod: 4
+		perceptionMod: 4,
+
+		armorMod: {}
 	}
 } as { [index: string]: Form };

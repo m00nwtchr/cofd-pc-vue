@@ -1,7 +1,10 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+
+import store, { Characters } from "./store";
 import router from "./router";
-import store from "./store";
+import i18n from "./i18n";
+
 // import "./registerServiceWorker.ts";
 
 // import Vuetify from "./plugins/vuetify";
@@ -16,12 +19,11 @@ import "./style/style.scss";
 
 
 
-import Character from "./definitions/Character";
+import Character, { createCharacter } from "./definitions/Character";
 import { EnumSplat } from "./definitions/Splat";
 import { WebGLDiceRoller } from "./components/sheetComponents/diceRoller/3DDiceRoller";
-import i18n from "./i18n";
 
-const app = createApp(App).use(i18n);
+const app = createApp(App);
 
 app.use(store)
 	.use(router)
@@ -32,6 +34,9 @@ app.use(store)
 
 const characters: { [index: string]: Character | any } = {
 	"488669fb-7e01-4ed7-b368-fbba0d37379a": {
+		"name": "Darren Webb",
+		"splat": EnumSplat.VAMPIRE,
+		"player": "m00n",
 		"skills": {
 			"investigation": 2,
 			"occult": 3,
@@ -63,60 +68,60 @@ const characters: { [index: string]: Character | any } = {
 				"level": 1
 			}
 		},
-		"merits": [
-			{
+		"merits": {
+			"ordo_dracul_status": {
 				"name": "Ordo Dracul Status",
 				"level": 1
 			},
-			{
+			"city_status": {
 				"name": "City Status",
 				"level": 1
 			},
-			{
+			"cacophony_savvy": {
 				"name": "Cacophony Savvy",
 				"level": 3
 			},
-			{
+			"fast-talking": {
 				"name": "Fast-Talking",
 				"level": 1
 			},
-			{
+			"professional_training": {
 				"name": "Professional Training",
 				"level": 2
 			},
-			{
+			"feeding_grounds": {
 				"name": "Feeding Grounds",
 				"level": 0
 			},
-			{
+			"sleight_of_hand": {
 				"name": "Sleight of Hand",
 				"level": 0
 			},
-			{
+			"striking_looks": {
 				"name": "Striking Looks",
 				"level": 0
 			},
-			{
+			"honey_trap": {
 				"name": "Honey Trap",
 				"level": 0
 			},
-			{
+			"safe_place": {
 				"name": "Safe Place",
 				"level": 3
 			},
-			{
+			"contacts": {
 				"name": "Contacts",
 				"level": 2
 			},
-			{
+			"resources": {
 				"name": "Resources",
 				"level": 3
 			},
-			{
+			"nest_guardian": {
 				"name": "Nest Guardian",
 				"level": 3
 			}
-		],
+		},
 		"spentWillpowerDots": 0,
 		"power": 1,
 		"fuel": 8,
@@ -129,9 +134,6 @@ const characters: { [index: string]: Character | any } = {
 		"experience": 1,
 		"alternateBeats": 0,
 		"alternateExperience": 0,
-		"name": "Darren Webb",
-		"splat": EnumSplat.VAMPIRE,
-		"player": "m00n",
 		"chronicle": "Chicago: Night Trains",
 		"concept": "Occult Journalist Mastermind",
 		"virtueAnchor": "Scholar",
@@ -226,36 +228,36 @@ const characters: { [index: string]: Character | any } = {
 				"level": 2
 			}
 		},
-		"merits": [
-			{
+		"merits": {
+			"mysterium_order_status": {
 				"name": "Mysterium Order Status",
 				"level": 1
 			},
-			{
+			"high_speech": {
 				"name": "High Speech",
 				"level": 1
 			},
-			{
+			"shadow_name": {
 				"name": "Shadow Name",
 				"level": 3
 			},
-			{
+			"occultation": {
 				"name": "Occultation",
 				"level": 3
 			},
-			{
+			"resources": {
 				"name": "Resources",
 				"level": 2
 			},
-			{
+			"safe_place": {
 				"name": "Safe Place",
 				"level": 2
 			},
-			{
+			"trained_observer": {
 				"name": "Trained Observer",
 				"level": 3
 			}
-		],
+		},
 		rotes: [
 			{arcanum: "Mind", level: 1, spell: "Mental Scan", roteSkill: "occult"},
 			{arcanum: "Mind", level: 2, spell: "Psychic Domination", roteSkill: "subterfuge"},
@@ -330,40 +332,52 @@ const characters: { [index: string]: Character | any } = {
 				"name": "Glory"
 			}
 		},
-		"merits": [
-			{
+		"merits": {
+			"giant": {
 				"name": "Giant",
 				"level": 3
 			},
-			{
+			"trained_observer": {
 				"name": "Trained Observer",
 				"level": 1
 			},
-			{
+			"defensive_combat_(brawl)": {
 				"name": "Defensive Combat (Brawl)",
-				"level": 1
+				"level": 1,
+				"skill": "brawl",
+				"use": true
 			},
-			{
+			"favored_form_(gauru)": {
 				"name": "Favored Form (Gauru)",
-				"level": 2
+				"level": 2,
+				"form": "gauru",
+				"physicalSkill": "brawl",
+				"attribute": "strength",
+				"penaltyChoice1": [ "urhan", "stamina" ],
+				"penaltyChoice2": [ "dalu", "stamina" ]
 			},
-			{
+			"efficient_killer": {
 				"name": "Efficient Killer",
 				"level": 2
 			},
-			{
+			"relentless_assault": {
 				"name": "Relentless Assault",
 				"level": 2
 			},
-			{
+			"language": {
 				"name": "Language",
 				"level": 1
 			},
-			{
+			"totem": {
 				"name": "Totem",
 				"level": 1
+			},
+			"fortified_form_(gauru)": {
+				"name": "Fortified Form (Gauru)",
+				"level": 0,
+				"form": "gauru"
 			}
-		],
+		},
 		"healthTrack": [
 			0,
 			0,
@@ -387,18 +401,17 @@ const characters: { [index: string]: Character | any } = {
 		"experience": 0,
 		"alternateBeats": 0,
 		"alternateExperience": 0,
-		"roteSkills": [],
 		"currentForm": "hishu",
 		"baseFormMods": {
-			"gauru": {
-				dexterityMod: 0,
-				manipulationMod: 0,
-				perceptionMod: 0,
-				sizeMod: 0,
-				staminaMod:0,
-				strengthMod:1,
-				speedMod: 0,
-			}
+			// "gauru": {
+			// 	dexterityMod: 0,
+			// 	manipulationMod: 0,
+			// 	perceptionMod: 0,
+			// 	sizeMod: 0,
+			// 	staminaMod:0,
+			// 	strengthMod:1,
+			// 	speedMod: 0,
+			// }
 		},
 		"name": "Amos Gray",
 		"splat": EnumSplat.WEREWOLF,
@@ -427,37 +440,37 @@ const characters: { [index: string]: Character | any } = {
 			"specific": "Hear a wolf or werewolf howl when your auspice moon is in the sky."
 		}
 	},
-	"db32e1fe-f3c3-4b80-b5b1-b86ad99124de": {
-		"splat": EnumSplat.CHANGELING,
-		"baseAttributes": {
-			"intelligence": 1,
-			"wits": 3,
-			"resolve": 2,
-			"strength": 3,
-			"dexterity": 2,
-			"stamina": 3,
-			"presence": 3,
-			"manipulation": 1,
-			"composure": 3
-		},
-	}
+	// "db32e1fe-f3c3-4b80-b5b1-b86ad99124de": {
+	// 	"splat": EnumSplat.CHANGELING,
+	// 	"baseAttributes": {
+	// 		"intelligence": 1,
+	// 		"wits": 3,
+	// 		"resolve": 2,
+	// 		"strength": 3,
+	// 		"dexterity": 2,
+	// 		"stamina": 3,
+	// 		"presence": 3,
+	// 		"manipulation": 1,
+	// 		"composure": 3
+	// 	},
+	// }
 };
 
-// Object.keys(characters).forEach(key => {
-// 	characters[key] = Object.assign({}, new Character({splat: characters[key].splat}), characters[key]);
-// });
-
-// interface ImportMeta {
-// 	env: any;
-// }
-// import.meta.env.MODE === "development" || 
-if ((import.meta.env.MODE === "development" && !process.env.DEMO) || !localStorage.characters) {
-	localStorage.characters = JSON.stringify(characters);
+if (import.meta.env.MODE === "development" || Object.keys(store.state.characters || {}).length === 0) {
+	store.commit("UPDATE_CHARACTERS", characters);
 }
 
 (window as any).export = (): void => {
-	const url = `data:application/json;base64,${btoa(JSON.stringify(JSON.parse(localStorage.characters),null,"\t"))}`;
-	console.log(url);
+	const chara = {} as Characters;
+	Object.entries(store.state.characters)
+		.map(entry => [entry[0],createCharacter(entry[1])] as [string, Character])
+		.forEach(entry => {
+			chara[entry[0]] = entry[1];
+		});
+	store.commit("UPDATE_CHARACTERS", chara);
+
+	console.log(store.getters.export);
 };
 
 // new WebGLDiceRoller(document.body, {dimensions:{x:500,y:500}});
+
