@@ -32,22 +32,12 @@ export default defineComponent({
 	},
 	data() {
 		return {
-			characters: {},
 			EnumSplat
 		};
 	},
-	mounted() {
-		if (localStorage && localStorage.characters) {
-			this.characters = JSON.parse(localStorage.characters);
-		}
-		// delete (this as any).characters["a"];
-
-	},
-	watch: {
-		characters: function(newVal, oldVal) {
-			// console.log(JSON.stringify(newVal));
-			localStorage.characters = JSON.stringify(newVal);
-			// console.log(localStorage.characters);
+	computed: {
+		characters() {
+			return this.$store.state.characters;
 		}
 	}
 });

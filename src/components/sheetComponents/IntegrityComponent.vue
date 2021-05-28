@@ -8,7 +8,7 @@
 			</div>
 		<h3 class="separator col-sm-12">{{ splat.integrityTraitName }}</h3>
 		<div class="sheet-dots" style="margin-top:-10px;">
-		<span v-for="n in items" :key="n" >
+			<span v-for="n in items" :key="n" >
 				<button class="sheet-dot" @click="$parent.setTrait('integrityTrait', n)" :class="{'sheet-dot-full': character.integrityTrait >= n}"></button>
 				<span v-if="integrityTrackType === 'verticalTouchstoneTrack'">
 					<!-- <input class="line" @input="doInput(n)" v-if="character.touchstones[n-1]" v-model="character.touchstones[n-1].name"> -->
@@ -30,8 +30,8 @@
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import { Ability } from "@/definitions/Character";
-import { EnumSplat } from "@/definitions/Splat";
+// import { Ability } from "@/definitions/Character";
+// import { EnumSplat } from "@/definitions/Splat";
 
 import HealthComponent from "./HealthComponent.vue";
 
@@ -111,5 +111,9 @@ export default defineComponent({
 .touchstone {
 	margin-bottom: 10px !important;
 	margin-top:10px;
+}
+
+input {
+	width: 80%;
 }
 </style>
