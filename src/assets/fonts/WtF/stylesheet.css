@@ -1,0 +1,27 @@
+@font-face {
+    font-family: 'Flat Earth Scribe';
+    src: url('FlatEarthScribe.woff2') format('woff2'),
+        url('FlatEarthScribe.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'ArnovaITC TT';
+    src: url('ArnovaITCTT.woff2') format('woff2'),
+        url('ArnovaITCTT.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Treefrog2';
+    src: url('Treefrog2.woff2') format('woff2'),
+        url('Treefrog2.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
