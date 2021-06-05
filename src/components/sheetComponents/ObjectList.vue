@@ -1,10 +1,11 @@
 <template>
 	<!-- <teleport :to="teleport" :disabled="!teleport"> -->
-		<div class="conditions">
-			<h3 class="separator col-sm-12">{{ name }}</h3>
+		<div class="list" :id="name.toLowerCase()+'-list'">
+			<h3 class="separator w-100">{{ name }}</h3>
 			<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
-			<div style="margin:0" v-for="(item, i) in visibleArr" :key="i" class="col-sm-12 row">
-				<div v-for="(attr) in attrs" :key="attr" class="col" :style="{ width: (100/attrs.length) + '%' }">
+			<div style="margin:0" v-for="(item, i) in visibleArr" :key="i" class="row w-100">
+				<div v-for="(attr) in attrs" :key="attr" :class="{[`${attr}-col`]: true}" class="col w-100">
+					
 					<i v-if="i === 0" class="subtitle" style="text-transform: capitalize;">{{ camelPad(attr) }}</i>
 					<!-- eslint-disable-next-line vue/no-mutating-props -->
 					<input @input="doInput(item, attr, i);" :type="(typeof item[attr])" :value="item[attr]" class="line col-12" style="max-width: 370px">
@@ -26,6 +27,10 @@ export default defineComponent({
 		"items": {
 			required: true,
 			type: Array
+		},
+		"itemFactory": {
+			required: false,
+			type: Function
 		},
 		"name": {
 			required: false,
@@ -66,18 +71,23 @@ export default defineComponent({
 		
 	},
 	computed: {
-		visibleArr(): Ability[] {
+		visibleArr() {
 			const arr: any[] = [].concat(this.items as any);
 
 			if (this.mutable) {
-				arr.push({});
+				arr.push(this.itemFactory ? new (this.itemFactory as any)() : {});
+				console.log(arr);
+
 			}
 
-			return arr as Ability[];
+			return arr;
 		},
 		attrs() {
 			// [].reduce();
-			return Object.keys((this as any).items.reduce((prev: any, val: any) => Object.assign({}, prev, val), {}));
+			return Object.keys((this as any).visibleArr
+				.reduce((prev: any, val: any) =>
+					Object.assign({}, prev, val), {})
+			);
 		}
 	},
 	watch: {
@@ -130,7 +140,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-	.conditions {
+	.list {
 		margin-bottom: 10px;
 	}
 </style>

@@ -1,3 +1,19 @@
+import { Ref, computed } from "vue";
+import g from "./i18n";
+
+const i18n = g.global;
+export const t = i18n.t.bind(i18n);
+const te = i18n.te.bind(i18n);
+
+
+export type RefType<T> = T | Ref<T>;
+
+
+
+export const td = (key: string, def?: string) => {
+	return computed(() => te(key) ? t(key) : def ? t(def) : ""); 
+};
+
 export function uniqByKeepFirst<I, K>(a: I[], key: (item: I) => K) {
 	const seen = new Set<K>();
 	return a.filter(item => {
@@ -6,10 +22,10 @@ export function uniqByKeepFirst<I, K>(a: I[], key: (item: I) => K) {
 	});
 }
 
-export function uniqByKeepLast<I, K>(a: I[], key: (item: I) => K) {
+export function uniqByKeepLast<I, K>(a: I[], key: (item: I, index?: number) => K) {
 	return [
 		...new Map(
-			a.map(x => [key(x), x])
+			a.map((x, i) => [key(x, i), x])
 		).values()
 	];
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { computed, Ref, unref } from "vue";
-import { toObject } from "../Util";
+import { RefType, toObject } from "../Util";
 import Character, { Ability, ATTRIBUTES, def, nameToKey, SKILLS, TraitMod, WerewolfCharacter } from "./Character";
 import { EnumSplat, SPLATS } from "./Splat";
 
@@ -14,7 +14,7 @@ interface Option {
 }
 
 export default class Merit implements Ability {
-	name: string;
+	name: RefType<string>;
 	level: number;
 
 	// character: Character;
@@ -54,6 +54,19 @@ class GiantMerit extends Merit {
 		];
 	}
 }
+
+class SmallFramedMerit extends Merit {
+	constructor(character: Character, ability: Ability) {
+		super(character, ability);
+	}
+
+	getTraitMods(): TraitMod[] {
+		return [
+			{trait: "size", mod: def(() => this.level >= 2 ? -1 : 0)}
+		];
+	}
+}
+
 
 class FavoredFormMerit extends Merit {
 
@@ -234,6 +247,65 @@ class FortifiedFormMerit extends Merit {
 	}
 }
 
+class LivingWeaponMerit extends Merit {
+
+	form!: string;
+	weapon!: string;
+
+	constructor(character: Character, ability: Ability) {
+		super(character, ability);
+	}
+
+	getTraitMods() {
+		return [
+			{trait: this.form + this.weapon + "damagemod", mod: this.level >= 4 ? 1 : 0},
+		];
+	}
+
+	getOptions() {
+		const formsObj: { [key: string]: string } = {};
+		Object.entries((SPLATS[EnumSplat.WEREWOLF] as any).forms).forEach(entry => {
+			formsObj[entry[0]] = (entry[1] as any).name;
+		});
+
+		delete formsObj["hishu"];
+
+		return [
+			{
+				name: "form",
+				list: formsObj
+			},
+			{
+				name: "weapon",
+				list: ["bite", "claws"]
+			}
+		];
+	}
+}
+
+
+class EmbodimentOfTheFirstbornMerit extends Merit {
+
+	attribute!: string;
+
+	constructor(character: Character, ability: Ability) {
+		super(character, ability);
+	}
+
+	getTraitMods() {
+		return [
+			{trait: this.attribute, mod: this.level >= 5 ? 1 : 0},
+		];
+	}
+
+	getOptions() {
+		return [{
+			name: "attribute",
+			list: ATTRIBUTES.flat()
+		}];
+	}
+}
+
 class InstinctiveDefenseMerit extends Merit {
 
 	constructor(character: Character, ability: Ability) {
@@ -250,7 +322,26 @@ class InstinctiveDefenseMerit extends Merit {
 	}
 }
 
-function createTraitMerit(trait: string, maxLevel = 3) {
+class DistillationOfFormMerit extends Merit {
+
+	constructor(character: Character, ability: Ability) {
+		super(character, ability);
+	}
+
+	getTraitMods(character: Character) {
+		const mod = def(() => character.power >= 3 && this.level >= 4 ? 1 : 0);
+
+		return [
+			{trait: "gaurusizemod"    , mod},
+			{trait: "gaurustrengthmod", mod},
+
+			{trait: "urshulsizemod"   , mod},
+			{trait: "urshultrengthmod", mod},
+		];
+	}
+}
+
+function createTraitMerit(trait: string, maxLevel = 3, minLevel = 1, bonusMax?: number) {
 	return class extends Merit {
 
 		constructor(character: Character, ability: Ability) {
@@ -259,19 +350,29 @@ function createTraitMerit(trait: string, maxLevel = 3) {
 	
 		getTraitMods() {
 			return [
-				{trait, mod: def(() => Math.min(this.level, ))},
+				{trait, mod: def(() => this.level >= minLevel ? Math.max(Math.min(this.level, maxLevel), bonusMax || maxLevel) : 0)},
 			];
 		}
 	};
 }
 
+
 export const MERITS: { [index: string]: new (character: Character, ability: Ability) => Merit } = {
 	giant: GiantMerit,
-	favored_form: FavoredFormMerit,
+	small_framed: SmallFramedMerit,
 	defensive_combat: DefensiveCombatMerit,
-	fortified_form: FortifiedFormMerit,
-	instinctive_defense: InstinctiveDefenseMerit,
 	fleet_of_foot: createTraitMerit("speed"),
 	fast_reflexes: createTraitMerit("initative"),
-	iron_stamina: createTraitMerit("woundPenalty")
+	iron_stamina: createTraitMerit("woundPenalty"),
+
+	// Werewolf
+	favored_form: FavoredFormMerit,
+	fortified_form: FortifiedFormMerit,
+	living_weapon: LivingWeaponMerit,
+	instinctive_defense: InstinctiveDefenseMerit,
+	embodiment_of_the_firstborn: EmbodimentOfTheFirstbornMerit,
+
+	// Werewolf - Ivory Claw
+	distillation_of_form: DistillationOfFormMerit,
+
 };

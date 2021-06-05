@@ -1,43 +1,53 @@
 @import "../vars.scss";
 
-$color-werewolf:    #985f4c;
-
 .charsheet-werewolf {
 	background-color: white;
 	// color: $color-werewolf;
+
+	#attr-cats {
+		font-family: 'Treefrog2';
+	}
+
+	h2 {
+		font-family: 'Flat Earth Scribe';
+		text-transform: uppercase;
+		font-size: 14pt;
+	}
+
+	h3 {
+		font-family: 'Treefrog2';
+		font-size: 15pt;
+	}
+
+	h4 {
+		font-family: 'Treefrog2';
+	}
+
+	.block, #werewolf-forms {
+		font-family: 'ArnovaITC TT';
+		font-size: 12pt;
+	}
+
+	.form-traits {
+		font-family: $default-font;
+	}
 
 	.separator {
 		color: $color-werewolf;
 	}
 
-	#infoBar {
+	#infoBar div {
 		color: $color-werewolf;
-	}
 
-	input {
-		color: black;
+		font-family: 'Treefrog2';
+
+		font-size: 13pt !important;
 	}
 
 	#attr-cats {
 		// text-transform: lowercase;
 
 		color: $color-werewolf;
-	}
-
-	.attr-proper {
-		// color: black;
-	}
-
-	.sheet-dot-full {
-		// background-color: black !important;
-	}
-
-	.separator {
-		text-transform: capitalize;
-	}
-
-	#skills span {
-		// color: black;
 	}
 
 	#werewolf-forms {

@@ -1,19 +1,42 @@
-$color-vampire:    #5c1914;
-$vamp-silver: #414040;
+@import "../vars.scss";
 
-
-
-.charsheet-vampire {
+.charsheet-mage {
 	background-color: white;
-	color: $color-vampire;
+	// color: $color-mage;
+
+	.separator {
+		font-family: 'Lilith';
+	}
+
+	#infoBar div {
+		font-family: 'Lilith';
+		font-size: 16pt;
+		font-weight: normal;
+	}
+
+	h2 {
+		font-size: 24pt;
+	}
+
+	h3 {
+		font-size: 15pt;
+	}
 
 	#attr-cats {
-		text-transform: lowercase;
+		font-family: 'Lilith';
+		font-size: 13pt;
+		font-weight: normal;
 
-		color: $vamp-silver;
+		color: $cat-text;
+	}
+
+	.block {
+		font-family: 'Goudy Old Style';
+		font-size: 12pt;
+		font-weight: bold;
 	}
 
 	.sheet-dot-full {
-		background-color: $color-vampire !important;
+		// background-color: $color-vampire !important;
 	}
 }

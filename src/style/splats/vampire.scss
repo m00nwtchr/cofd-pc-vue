@@ -1,8 +1,4 @@
-$color-vampire: #5c1914;
-$vamp-silver: #414040;
-
-$color-vampire: cyan;
-
+@import "../vars.scss";
 
 .charsheet-vampire {
 	background-color: white;
@@ -11,7 +7,7 @@ $color-vampire: cyan;
 	#attr-cats {
 		text-transform: lowercase;
 
-		color: $vamp-silver;
+		color: $cat-text;
 	}
 
 	.sheet-dot-full {
