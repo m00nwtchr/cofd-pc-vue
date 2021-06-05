@@ -1,3 +1,6 @@
+// $default-font: 'Helvetica';
+$default-font: 'Goudy Old Style';
+
 $primary: white !default;
 $accent: rgb(47, 58, 78) !default;
 
@@ -9,6 +12,7 @@ $accent: rgb(47, 58, 78) !default;
 
 $text: black !default;
 $text-light: white !default;
+$cat-text: #404040;
 
 $selected-shadow: 0px 0px 12px #2E79CE;
 
@@ -16,15 +20,17 @@ $selected-shadow: 0px 0px 12px #2E79CE;
 * Define game-line colors
 */
 $color-mortal:     #2A2D80;
-$color-vampire:    #B21800;
-$color-werewolf:   #E9813E;
-$color-mage:       #0000FF;
+
+$color-vampire:    #581A12;
+$color-werewolf:   #855A4A;
+$color-mage:       #004F6D;
+
 $color-promethean: #660099;
 $color-changeling: #006600;
 $color-geist:      #005394;
-$color-mummy:      #996600;
+// $color-mummy:      #996600;
 $color-demon:      #2A2D80;
 $color-beast:      #2A2D80;
 $color-hunter:     #2A2D80;
 $color-homebrew:   #2A2D80;
-$color-wod-demon:  #e95500;
+// $color-wod-demon:  #e95500;

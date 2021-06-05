@@ -42,7 +42,7 @@ export default defineComponent({
 		},	
 	},
 	methods: {
-		pokeHealth(n: number) {
+		pokeHealth(n: number, remAgg = true) {
 			const healthTrack: number[] = this.healthTrack as any;
 			const c: number =  healthTrack[n];
 
@@ -53,8 +53,10 @@ export default defineComponent({
 				n = n2;
 			}
 
-			healthTrack[n] = c+1;
-			if (healthTrack[n] > this.maxMarkValue) {
+			console.log(remAgg);
+
+			healthTrack[n] = c !== this.maxMarkValue ? c+1 : c;
+			if (remAgg && healthTrack[n] > this.maxMarkValue) {
 				healthTrack[n] = 0;
 			
 				if (this.healthTrack[n+1] !== 0) {
@@ -87,19 +89,25 @@ export default defineComponent({
 				for (let iii = this.healthTrack.length; iii < this.maxHealth; iii++) {
 					this.healthTrack.push(0);
 				}
+			} else if (this.healthTrack.length > this.maxHealth) {
+				const diff = this.healthTrack.length - this.maxHealth;
+				
+				let ind = this.healthTrack.lastIndexOf(this.healthTrack[0]);
+
+				if (ind === this.healthTrack.length-1) {
+					ind-=diff;
+				}
+
+				for (let i = 0; i < diff; i++) {
+					const val = this.healthTrack.pop();
+
+					if (val && val !== 0) {
+						this.pokeHealth(ind, false);
+					} 
+				}
+
 			}
-			// console.log(this.healthTrack.length);
-		},
-		// healthTrack() {
-		// 	this.healthTrack.forEach((el, i) => {
-		// 		if (el === 0) {
-		// 			if (this.healthTrack[i+1] !== 0) {
-		// 				this.healthTrack.splice(i,1);
-		// 				this.healthTrack.push(0);
-		// 			}
-		// 		}
-		// 	});
-		// }
+		}
 	}
 });
 

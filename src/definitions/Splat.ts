@@ -1,52 +1,56 @@
-import { computed } from "vue";
+import { RefType, td } from "../Util";
+import { computed, reactive, Ref } from "vue";
 import g from "../i18n";
-import Character, { Ability, ChangelingCharacter, MageCharacter, VampireCharacter, WerewolfCharacter, Armor } from "./Character";
+import Character, { Ability, ChangelingCharacter, MageCharacter, VampireCharacter, WerewolfCharacter, Armor, def } from "./Character";
 
 const i18n = g.global;
 const t = i18n.t.bind(i18n);
 const te = i18n.te.bind(i18n);
 
+
 //  IntegrityTrackType = string | {type: string; names?: string[]};
+
+
 
 export enum EnumSplat {
 	MORTAL, MAGE, VAMPIRE, WEREWOLF, CHANGELING
 }
 
-export const SPLATS: { [index: number]: Splat } = {};
+export const SPLATS: { [index: number]: Splat } = reactive({});
 
 export class Splat {
 
 	en: EnumSplat;
 	characterFactory: new (opts: any) => Character;
 
-	nameName: string;
+	nameName: RefType<string>;
 
-	virtueAnchorName: string;
-	viceAnchorName: string;
+	virtueAnchorName: RefType<string>;
+	viceAnchorName: RefType<string>;
 
-	subTypeName: string;
-	legacyName: string;
-	orgName: string;
+	subTypeName: RefType<string>;
+	legacyName: RefType<string>;
+	orgName: RefType<string>;
 
-	abilityName: string;
+	abilityName: RefType<string>;
 	abilities?: { [index: string]: string };
 	finiteAbilities: boolean;
 
-	powerTraitName: string;
-	integrityTraitName: string;
-	integrityTrackType: string | { type: string; names?: string[] } = "normal";
+	powerTraitName: RefType<string>;
+	integrityTraitName: RefType<string>;
+	integrityTrackType: string | { type: string; names?: RefType<string>[] } = "normal";
 
-	fuelTraitName: string;
+	fuelTraitName: RefType<string>;
 
 	alternateBeatName: ((str: string) => string) | undefined;
 	alternateBeatOptional: boolean;
 
-	virtueAnchors: string[];
-	viceAnchors: string[];
+	virtueAnchors: RefType<string>[];
+	viceAnchors: RefType<string>[];
 
 	subTypes: {
 		[index: string]: {
-			name: string;
+			name: RefType<string>;
 			abilities: string[];
 
 			skills?: string[];
@@ -60,7 +64,7 @@ export class Splat {
 	};
 	legacies: string[];
 	organizations: {
-		name: string;
+		name: RefType<string>;
 
 		skills?: string[];
 
@@ -77,17 +81,17 @@ export class Splat {
 		hasPowerTrait?: boolean;
 		hasFuelTrait?: boolean;
 
-		abilities?: { [index: string]: string };
+		abilities?: { [index: string]: RefType<string> };
 
-		integrityTrackType?: string | { type: string; names?: string[] };
+		integrityTrackType?: string | { type: string; names?: RefType<string>[] };
 		finiteAbilities?: boolean;
 		alternateBeatOptional?: boolean;
-		virtueAnchors?: string[];
-		viceAnchors?: string[];
+		virtueAnchors?: RefType<string>[];
+		viceAnchors?: RefType<string>[];
 
 		subTypes?: {
 			[index: string]: {
-				name: string;
+				name: RefType<string>;
 				abilities: string[];
 
 				skills?: string[];
@@ -101,7 +105,7 @@ export class Splat {
 		};
 		legacies?: string[];
 		organizations?: {
-			name: string;
+			name: RefType<string>;
 
 			skills?: string[];
 
@@ -125,14 +129,15 @@ export class Splat {
 
 		this.characterFactory = characterFactory || Character;
 
-		this.nameName = t(`splat.${name}.nameName`, t("character.name"));
+		// this.nameName = t(`splat.${name}.nameName`, t("character.name"));
+		this.nameName = td(`splat.${name}.nameName`, "character.name");
 
-		this.virtueAnchorName = t(`splat.${name}.virtueAnchor`, t("splat.virtueAnchor"));
-		this.viceAnchorName = t(`splat.${name}.viceAnchor`, t("splat.viceAnchor"));
+		this.virtueAnchorName = td(`splat.${name}.virtueAnchor`, "splat.virtueAnchor");
+		this.viceAnchorName = td(`splat.${name}.viceAnchor`, "splat.viceAnchor");
 
-		this.subTypeName = t(`splat.${name}.subType.name`, t("character.chronicle"));
-		this.legacyName = t(`splat.${name}.legacy`);
-		this.orgName = t(`splat.${name}.organization.name`);
+		this.subTypeName = td(`splat.${name}.subType.name`, "character.chronicle");
+		this.legacyName = td(`splat.${name}.legacy`);
+		this.orgName = td(`splat.${name}.organization.name`);
 
 		this.virtueAnchors = virtueAnchors || [
 			"Hopeful",
@@ -163,14 +168,14 @@ export class Splat {
 		this.legacies = legacies || [];
 		this.organizations = organizations || [];
 
-		this.powerTraitName = hasPowerTrait ? t(`splat.${name}.powerTrait`, "") : "";
-		this.integrityTraitName = t(`splat.${name}.integrityTrait`, t("splat.integrityTrait"));
+		this.powerTraitName = hasPowerTrait ? td(`splat.${name}.powerTrait`, "") : "";
+		this.integrityTraitName = td(`splat.${name}.integrityTrait`, "splat.integrityTrait");
 		this.integrityTrackType = integrityTrackType || "normal";
 
-		this.abilityName = t(`splat.${name}.ability.name`, "");
+		this.abilityName = td(`splat.${name}.ability.name`);
 		this.abilities = abilities;
 
-		this.fuelTraitName = hasFuelTrait ? t(`splat.${name}.fuelTrait`, "") : "";
+		this.fuelTraitName = hasFuelTrait ? td(`splat.${name}.fuelTrait`) : "";
 
 		this.alternateBeatName = te(`splat.${name}.alternateBeat`) ? (str) => t(`splat.${name}.alternateBeat`, { x: str }, { default: "" }) : undefined;
 		this.alternateBeatOptional = alternateBeatOptional === undefined ? true : alternateBeatOptional;
@@ -224,40 +229,40 @@ new Splat({
 	// legacyName: "Legacy",
 	// orgName: "Order",
 	abilities: {
-		death: t("splat.mage.ability.death"),
-		fate: t("splat.mage.ability.fate"),
-		forces: t("splat.mage.ability.forces"),
-		life: t("splat.mage.ability.life"),
-		matter: t("splat.mage.ability.matter"),
-		mind: t("splat.mage.ability.mind"),
-		prime: t("splat.mage.ability.prime"),
-		spirit: t("splat.mage.ability.spirit"),
-		space: t("splat.mage.ability.space"),
-		time: t("splat.mage.ability.time")
+		death: td("splat.mage.ability.death"),
+		fate: td("splat.mage.ability.fate"),
+		forces: td("splat.mage.ability.forces"),
+		life: td("splat.mage.ability.life"),
+		matter: td("splat.mage.ability.matter"),
+		mind: td("splat.mage.ability.mind"),
+		prime: td("splat.mage.ability.prime"),
+		spirit: td("splat.mage.ability.spirit"),
+		space: td("splat.mage.ability.space"),
+		time: td("splat.mage.ability.time")
 	},
 	subTypes: {
 		acanthus: {
-			name: t("splat.mage.subType.acanthus"),
+			name: td("splat.mage.subType.acanthus"),
 			abilities: ["time", "fate"],
 			inferiorArcanum: "forces"
 		},
 		mastigos: {
-			name: t("splat.mage.subType.mastigos"),
+			name: td("splat.mage.subType.mastigos"),
 			abilities: ["space", "mind"],
 			inferiorArcanum: "matter"
 		},
 		moros: {
-			name: t("splat.mage.subType.moros"),
+			name: td("splat.mage.subType.moros"),
 			abilities: ["matter", "death"],
 			inferiorArcanum: "spirit"
 		},
 		obrimos: {
-			name: t("splat.mage.subType.obrimos"),
+			name: td("splat.mage.subType.obrimos"),
 			abilities: ["forces", "prime"],
 			inferiorArcanum: "death"
 		},
 		thyrsus: {
-			name: t("splat.mage.subType.thyrsus"),
+			name: td("splat.mage.subType.thyrsus"),
 			abilities: ["life", "spirit"],
 			inferiorArcanum: "mind"
 		},
@@ -315,16 +320,16 @@ new Splat({
 	// legacyName: "Bloodline",
 	// orgName: "Covenant",
 	abilities: {
-		animalism: t("splat.vampire.ability.animalism"),
-		auspex: t("splat.vampire.ability.auspex"),
-		celerity: t("splat.vampire.ability.celerity"),
-		dominate: t("splat.vampire.ability.dominate"),
-		majesty: t("splat.vampire.ability.majesty"),
-		nightmare: t("splat.vampire.ability.nightmare"),
-		obfuscate: t("splat.vampire.ability.obfuscate"),
-		protean: t("splat.vampire.ability.protean"),
-		resilience: t("splat.vampire.ability.resilience"),
-		vigor: t("splat.vampire.ability.vigor")
+		animalism: td("splat.vampire.ability.animalism"),
+		auspex: td("splat.vampire.ability.auspex"),
+		celerity: td("splat.vampire.ability.celerity"),
+		dominate: td("splat.vampire.ability.dominate"),
+		majesty: td("splat.vampire.ability.majesty"),
+		nightmare: td("splat.vampire.ability.nightmare"),
+		obfuscate: td("splat.vampire.ability.obfuscate"),
+		protean: td("splat.vampire.ability.protean"),
+		resilience: td("splat.vampire.ability.resilience"),
+		vigor: td("splat.vampire.ability.vigor")
 
 	},
 	subTypes: {
@@ -364,19 +369,19 @@ const WEREWOLF = new Splat({
 		"fox",
 		"monster",
 		"soldier"
-	].map(el => t(`splat.werewolf.blood.${el}`)),
+	].map(el => td(`splat.werewolf.blood.${el}`)),
 	viceAnchors: [
 		"community_organizer", "cub", "guru", "hedonist", "lone_wolf", "wallflower"
-	].map(el => t(`splat.werewolf.bone.${el}`)),
+	].map(el => td(`splat.werewolf.bone.${el}`)),
 	// subTypeName: "Auspice",
 	// legacyName: "Lodge",
 	// orgName: "Tribe",
 	abilities: {
-		cunning: t("splat.werewolf.ability.cunning"),
-		glory: t("splat.werewolf.ability.glory"),
-		honor: t("splat.werewolf.ability.honor"),
-		purity: t("splat.werewolf.ability.purity"),
-		wisdom: t("splat.werewolf.ability.wisdom"),
+		cunning: td("splat.werewolf.ability.cunning"),
+		glory: td("splat.werewolf.ability.glory"),
+		honor: td("splat.werewolf.ability.honor"),
+		purity: td("splat.werewolf.ability.purity"),
+		wisdom: td("splat.werewolf.ability.wisdom"),
 	},
 	subTypes: {
 		cahalith: {
@@ -569,6 +574,9 @@ export interface Form extends FormMods {
 
 		perceptionMod: 2,
 
+		biteDamage: 0,
+		clawDamage: 0,
+
 		armorMod: {}
 	},
 	gauru: {
@@ -600,6 +608,9 @@ export interface Form extends FormMods {
 
 		perceptionMod: 3,
 
+		biteDamage: 2,
+		clawDamage: 2,
+
 		armorMod: {}
 	},
 	urshul: {
@@ -609,7 +620,7 @@ export interface Form extends FormMods {
 			"Teeth +2L/Claws +1L",
 			"Defense vs. Firearms",
 			"Moderate Lunacy",
-			"Weaken the Prey"
+			"Weaken the Prey",
 		],
 
 		intelligenceMod: 0,
@@ -628,6 +639,9 @@ export interface Form extends FormMods {
 		speedMod: 3,
 
 		perceptionMod: 3,
+
+		biteDamage: 2,
+		clawDamage: 1,
 
 		armorMod: {}
 	},
@@ -655,6 +669,8 @@ export interface Form extends FormMods {
 		speedMod: 3,
 
 		perceptionMod: 4,
+
+		biteDamage: 1,
 
 		armorMod: {}
 	}

@@ -13,7 +13,9 @@ import i18n from "./i18n";
 import "bootstrap/dist/css/bootstrap.css";
 // import "bootstrap-vue/dist/bootstrap-vue.css";
 
-import "./assets/fonts/NWoD/stylesheet.css";
+import "./assets/fonts/CofD/stylesheet.css";
+import "./assets/fonts/WtF/stylesheet.css";
+import "./assets/fonts/MtA/stylesheet.css";
 
 import "./style/style.scss";
 
@@ -372,10 +374,10 @@ const characters: { [index: string]: Character | any } = {
 				"name": "Totem",
 				"level": 1
 			},
-			"fortified_form_(gauru)": {
-				"name": "Fortified Form (Gauru)",
+			"fortified_form_(dalu)": {
+				"name": "Fortified Form (Dalu)",
 				"level": 0,
-				"form": "gauru"
+				"form": "dalu"
 			}
 		},
 		"healthTrack": [
@@ -402,17 +404,6 @@ const characters: { [index: string]: Character | any } = {
 		"alternateBeats": 0,
 		"alternateExperience": 0,
 		"currentForm": "hishu",
-		"baseFormMods": {
-			// "gauru": {
-			// 	dexterityMod: 0,
-			// 	manipulationMod: 0,
-			// 	perceptionMod: 0,
-			// 	sizeMod: 0,
-			// 	staminaMod:0,
-			// 	strengthMod:1,
-			// 	speedMod: 0,
-			// }
-		},
 		"name": "Amos Gray",
 		"splat": EnumSplat.WEREWOLF,
 		"player": "m00n",
@@ -420,7 +411,12 @@ const characters: { [index: string]: Character | any } = {
 		"concept": "",
 		"virtueAnchor": "Destroyer",
 		"viceAnchor": "Lone Wolf",
-		"subType": "Rahu",
+		"subType": "Rahuhuehue",
+		"moonGift1": {
+			"name": "Custom Gift",
+			"level": 4,
+			"key": "custom"
+		},
 		"organization": "Blood Talons",
 		"legacy": "",
 		"baseAttributes": {

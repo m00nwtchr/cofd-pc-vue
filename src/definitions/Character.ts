@@ -1,7 +1,8 @@
 // import deepmerge from "deepmerge";
+import { RefType, t, td } from "../Util";
 import { computed, ComputedRef, isRef, reactive, Ref, ref, toRefs, unref, watch, WritableComputedRef } from "vue";
 import Merit, { MERITS } from "./Merit";
-import { EnumSplat, Form, FormMods, SPLATS } from "./Splat";
+import { EnumSplat, Form, FormMods, Splat, SPLATS } from "./Splat";
 
 export const ATTRIBUTES = [
 	["intelligence", "wits", "resolve"],
@@ -43,7 +44,7 @@ export const SKILLS = [
 ];
 
 export interface Ability {
-	name: string;
+	name: RefType<string>;
 	level: number;
 }
 
@@ -70,7 +71,7 @@ export function getNum(val: string): number {
 }
 
 export function nameToKey(name: string) {
-	return name.trim().toLowerCase().replaceAll(" ", "_");//.replaceAll("(", "_").replaceAll(")", "_");
+	return name.trim().toLowerCase().replaceAll(" ", "_").replaceAll("-", "_");//.replaceAll("(", "_").replaceAll(")", "_");
 }
 
 export function keyToName(key: string) {
@@ -144,7 +145,7 @@ export default class Character {
 
 	splat!: EnumSplat;
 
-	subType!: string; // Clan/Auspice/Path
+	subType!: Ref<string>; // Clan/Auspice/Path
 
 	faction?: string; // Cabal/Coterie/Pack
 	organization!: string; // Order/Covenant/Tribe
@@ -160,13 +161,13 @@ export default class Character {
 	// abilityArr: Ability[] | Ref<Ability[]>;
 	abilities: { [index: string]: Ability };
 
-	merits: { [key in number | string]: Ability | Merit } = {};
+	merits: { [key: string]: Ability | Merit } = {};
 
 	// abilities: {[index: string]: Ability} = {};;
 	// merits: {[index: string]: Ability} = {};
 
 
-	healthTrack: number[] = [];
+	healthTrack: Ref<number[]> = ref([]);
 	woundPenalty: ComputedRef<number>;
 	maxHealth: ComputedRef<number>;
 
@@ -179,7 +180,7 @@ export default class Character {
 	fuel = 0;
 	// maxFuel = 10;
 
-	integrityTrait: Ref<number> = ref(7);
+	integrityTrait = 7;
 	integrityTrack?: number[];
 
 	touchstones: { name: string; type?: string }[] = [];
@@ -209,16 +210,16 @@ export default class Character {
 		strength: number;
 		size: number;
 	}[] = [
-			{
-				name: "",
-				damage: "",
-				range: "",
-				clip: "",
-				initative: 0,
-				strength: 0,
-				size: 0,
-			}
-		];
+		{
+			name: "",
+			damage: "",
+			range: "",
+			clip: "",
+			initative: 0,
+			strength: 0,
+			size: 0,
+		}
+	];
 
 	// initative?: number;
 
@@ -248,15 +249,16 @@ export default class Character {
 
 		{
 			const defaultAbl: { [index: string]: Ability } = {};
+			const tt = SPLATS[opts.splat].abilities || {};
 
-			Object.entries(SPLATS[opts.splat].abilities || {}).forEach((el) => {
-				defaultAbl[el[0]] = { name: el[1], level: 0 };
+			Object.keys(tt).forEach((key) => {
+				defaultAbl[key] = { name: computed(() => tt[key]), level: 0 };
 			});
 			Object.assign(this, opts);
 
-			this.integrityTrait = ref(this.integrityTrait);
+			// this.maxHealth
+			// this.integrityTrait = ref(this.integrityTrait);
 
-			this.merits = reactive(this.merits);
 
 			// const arr: string[] = [];
 
@@ -319,38 +321,37 @@ export default class Character {
 				if (!def) {
 					custom[key] = value;
 					delete ablTemp[key];
-				} else if (value.name != def.name) {
+				} else {
+					console.log(def);
 					value.name = def.name;
 				}
 			});
 
 			ablTemp = sortObj(ablTemp);
 
-			Object.entries(custom)
-				.forEach(entry => ablTemp[entry[0]] = entry[1]);
+			Object.keys(custom)
+				.forEach(key => ablTemp[key] = custom[key]);
 
 			this.abilities = reactive(ablTemp);
 		}
 
-		Object.values(this.merits).forEach(value => {
-			let key = nameToKey(value.name);
+		this.merits = reactive(this.merits);
+		this.baseAttributes = reactive(this.baseAttributes);
 
-			if (key.includes("(")) {
-				key = key.substr(0, key.indexOf("(") - 1);
-			}
+		this.subType = ref(this.subType);
+		this.healthTrack = ref(this.healthTrack as any);
 
-			const m = MERITS[key];
+		Object.keys(this.merits).forEach((key) => {
+			const value = this.merits[key];
+
+			const meritKey = key.includes("(") ? key.substr(0, key.indexOf("(") - 1) : key;
+
+			const m = MERITS[meritKey];
 
 			if (!(value as Merit).getOptions && m) {
-				const meritObj = new m(this, value);
-				// Object.assign(m, value);
-
-				this.merits[key] = meritObj;
+				this.merits[key] = new m(this, value);
 			}
 		});
-
-
-		this.baseAttributes = reactive(this.baseAttributes);
 
 		this.attributes = computed(() => {
 			return {
@@ -378,15 +379,15 @@ export default class Character {
 			}
 		});
 
-		this.woundPenalty = computed(() => {
-			return Math.min((this.healthTrack[this.healthTrack.length - 1] !== 0 ?
-				-3 : this.healthTrack[this.healthTrack.length - 2] !== 0 ?
-					-2 : this.healthTrack[this.healthTrack.length - 3] !== 0 ?
-						-1 : 0)+this.mod("woundPenalty"), 0);
-		});
-
 		this.maxHealth = computed(() => {
 			return this.attributes.value.stamina + this.size.value + this.mod("health");
+		});
+
+		this.woundPenalty = computed(() => {
+			return Math.min((this.healthTrack.value[this.maxHealth.value - 1] !== 0 ?
+				-3 : this.healthTrack.value[this.maxHealth.value - 2] !== 0 ?
+					-2 : this.healthTrack.value[this.maxHealth.value - 3] !== 0 ?
+						-1 : 0)+this.mod("woundPenalty"), 0);
 		});
 
 		this.speed = computed(() => {
@@ -412,6 +413,10 @@ export default class Character {
 		return [];
 	}
 
+	getSplat(): Splat {
+		return SPLATS[this.splat];
+	}
+
 	mod(traitName: string) {
 		const na = traitName.toLowerCase();
 
@@ -430,6 +435,24 @@ export default class Character {
 	}
 }
 
+export class Rote {
+	arcanum!: string;
+	level!: number;
+	spell!: string;
+	creator?: string;
+	roteSkill!: string;
+
+	constructor(opts: Rote) {
+		Object.assign(this, {
+			arcanum: "",
+			level: 0,
+			spell: "",
+			creator: "",
+			roteSkill: ""
+		}, opts);
+	}
+}
+
 export class MageCharacter extends Character {
 	activeSpells!: string[];
 	yantras!: string[];
@@ -437,13 +460,7 @@ export class MageCharacter extends Character {
 	praxes!: string[];
 	inuredSpells!: string[];
 
-	rotes!: {
-		arcanum: string;
-		level: number;
-		spell: string;
-		creator?: string;
-		roteSkill: string;
-	}[];
+	rotes!: Rote[];
 
 	constructor(opts: MageCharacter) {
 		super(opts as any);
@@ -480,6 +497,16 @@ export class WerewolfCharacter extends Character {
 
 	kuruthTriggers?: { passive: string; common: string; specific: string };
 
+	// moonGifts: [Ability | undefined, Ability | undefined];
+
+	moonGift1: ComputedRef<Ability>;
+	moonGift2: Ref<Ability>;
+
+	moonGifts: ComputedRef<{ [key: string]: Ability }>;
+
+	shadowGifts: string[];
+	wolfGifts: string[];
+
 	constructor(opts: WerewolfCharacter) {
 		super(opts);
 
@@ -489,15 +516,53 @@ export class WerewolfCharacter extends Character {
 			common: "",
 			specific: ""
 		}, this.kuruthTriggers);
+
+		// this.moonGifts = opts.moonGifts || [
+		// 	{name: "", level: 0},
+		// 	{name: "", level: 0}
+		// ];
+
+		// this.moonGifts = opts.moonGifts || {};
+
+		const auspice = computed(() => {
+			const key = Object.keys(this.getSplat().subTypes)
+				.find(el => el === nameToKey(this.subType.value)) || "";
+			return this.getSplat().subTypes[key];
+		});
+
+		this.moonGift1 = computed(() => {
+			if (auspice.value) {
+				const key = (auspice.value.moonGifts as string[])[0];
+				console.log(key);
+				return {
+					name: t("splat.werewolf.gift.moon."+key),
+					key,
+					level: this.abilities[auspice.value.abilities[0]].level
+				};
+			}
+			return opts.moonGift1 || {name: "", key: "", level:0};
+		});
+
+		this.moonGift2 = ref(opts.moonGift2 || {name: "", level: 0});
+		this.moonGifts = computed(() => {
+			return {
+				[(this.moonGift1 as any).value.key || nameToKey(unref(this.moonGift1.value.name))]: unref(this.moonGift1),
+				[(this.moonGift2 as any).value.key || nameToKey(unref(this.moonGift2.value.name))]: unref(this.moonGift2),
+			};
+		});
+		
+		this.shadowGifts = opts.shadowGifts || [];
+		this.wolfGifts = opts.wolfGifts || [];
 	}
 
 	getTraitMods() {
 		return super.getTraitMods().concat([
 			{
 				trait: "health", mod: def(() => {
-					if (this.subType.toLowerCase() === "rahu") {
-						const purity = def(() => this.abilities.purity.level, 0).value;
-						return purity >= 2 ? purity : 0;
+					const full = this.moonGifts.value.full;
+					if (full) {
+						// const purity = def(() => this.abilities.purity.level, 0).value;
+						return full.level >= 2 ? full.level : 0;
 					}
 					return 0;
 				})
@@ -522,13 +587,11 @@ export class WerewolfCharacter extends Character {
 	}
 
 	getForm(name: Ref<string> | string): WritableComputedRef<Form> {
-		const vue = (window as any).vue;
-
 		return computed({
 			get: () => {
 				const key = isRef(name) ? name.value : name;
 
-				const form = vue.splat.forms[key] || {
+				const form = (this.getSplat() as any).forms[key] || {
 					name: "",
 					desc: "",
 
@@ -596,7 +659,12 @@ export class WerewolfCharacter extends Character {
 					armorMod: {
 						general: (form.armorMod.general || 0) + (baseMod.armorMod.general || 0) + this.mod(key + "generalArmorMod"),
 						ballistic: (form.armorMod.ballistic || 0) + (baseMod.armorMod.ballistic || 0) + this.mod(key + "ballisticArmorMod")
-					}
+					},
+
+					// TODO
+					traits: form.traits.map((el: string, i: number) => {
+						return i === 0 && el.includes("+") ? "" : el;
+					})
 				});
 			},
 			set: (val) => {

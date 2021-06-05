@@ -1,4 +1,4 @@
-$color-mortal:    #7c7f88;
+@import "../vars.scss";
 $mortal-bg: #f1f4fe;
 
 // @import "../../assets/splat/mortal-header-bg.png";
@@ -27,7 +27,7 @@ $mortal-bg: #f1f4fe;
 	}
 
 	.block i {
-		font-family: Goudy;
+		// font-family: 'Goudy Old Style';
 		// font-weight: 300;
 		// font-weight: bold;
 		// font-

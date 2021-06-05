@@ -1,5 +1,6 @@
-@import "./splats/vampire.scss";
 @import "./splats/mortal.scss";
+
+@import "./splats/vampire.scss";
 @import "./splats/mage.scss";
 @import "./splats/werewolf.scss";
 
@@ -7,9 +8,20 @@ $material-design-icons-font-directory-path: 'material-design-icons-iconfont/dist
 @import 'material-design-icons-iconfont/src/material-design-icons';
 
 
-body {
+.default-font {
+	font-family: $default-font;
+}
+
+input {
+	color: black;
+	font-family: $default-font;
+}
+
+body,html,#app {
   color: $text;
   background-color: $primary !important;
+  font-family: $default-font;
+  overflow-x: hidden !important;
 }
 
 .line {
@@ -30,4 +42,8 @@ input.line {
 
 .selected {
   text-shadow: $selected-shadow;
+}
+
+.separator {
+	white-space: nowrap;
 }

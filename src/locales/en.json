@@ -156,6 +156,15 @@
         "purity": "Purity",
         "wisdom": "Wisdom"
       },
+      "gift": {
+        "moon": {
+          "crescent": "Crescent Moon's Gift",
+          "full": "Full Moon's Gift",
+          "gibbous": "Gibbous Moon's Gift",
+          "half": "Harmony Moon's Gift",
+          "new": "New Moon's Gift"
+        }
+      },
       "subType": {
         "name": "Auspice"
       },
