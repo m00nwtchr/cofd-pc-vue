@@ -5,8 +5,15 @@
 
 	<dice-roller></dice-roller>
 
-	<div class="fab">
-		<button @click="rollSelected()">Roll Selected</button>
+	<floating-action-menu :items="[
+		{
+			name: 'Roll Selected',
+			action: rollSelected
+		}
+	]">
+	</floating-action-menu>
+	<!-- <div>
+		<button class="fab" @click="rollSelected()">Roll Selected</button>
 		<modal-component
 			modalWidth="80%"
 			modalHeight="80%"
@@ -16,7 +23,7 @@
 		>
 			<spell-calculator :character="character" class="col-12" />
 		</modal-component>
-	</div>
+	</div> -->
 
 	<!-- <teleport v-if="character.splat !== EnumSplat.VAMPIRE" :to="`#${EnumSplat[character.splat].toLowerCase()}-conditions`"> -->
 	<!-- </teleport> -->
@@ -884,7 +891,8 @@ import Character, {
 	MageCharacter,
 	Rote,
 	WerewolfCharacter,
-	nameToKey
+	nameToKey,
+	SKILLS
 } from "../definitions/Character";
 
 import AbilityList from "../components/sheetComponents/AbilityList.vue";
@@ -893,7 +901,9 @@ import IntegrityComponent from "../components/sheetComponents/IntegrityComponent
 import ItemList from "../components/sheetComponents/ItemList.vue";
 import ObjectList from "../components/sheetComponents/ObjectList.vue";
 import DiceRollerComponent from "../components/sheetComponents/diceRoller/DiceRoller.vue";
+
 import ModalComponent from "../components/ModalComponent.vue";
+import FloatingActionMenu from "../components/FloatingActionMenu.vue";
 
 import SpellCalculator from "../components/sheetComponents/SpellCalculator.vue";
 
@@ -918,14 +928,15 @@ interface CharacterViewData {
 export default defineComponent({
 	name: "CharacterView",
 	components: {
-		AbilityList: AbilityList,
-		HealthComponent: HealthComponent,
-		IntegrityComponent: IntegrityComponent,
-		ItemList: ItemList,
-		ObjectList: ObjectList,
+		AbilityList,
+		HealthComponent,
+		IntegrityComponent,
+		ItemList,
+		ObjectList,
 		DiceRoller: DiceRollerComponent,
-		ModalComponent: ModalComponent,
-		SpellCalculator: SpellCalculator
+		ModalComponent,
+		SpellCalculator,
+		FloatingActionMenu
 		// "fab": fab
 	},
 	computed: {
@@ -1250,38 +1261,7 @@ export default defineComponent({
 			roller: new DiceRoller(),
 
 			ATTRIBUTES,
-			skills: [
-				[
-					"academics",
-					"computer",
-					"crafts",
-					"investigation",
-					"medicine",
-					"occult",
-					"politics",
-					"science"
-				],
-				[
-					"athletics",
-					"brawl",
-					"drive",
-					"firearms",
-					"larceny",
-					"stealth",
-					"survival",
-					"weaponry"
-				],
-				[
-					"animal_ken",
-					"empathy",
-					"expression",
-					"intimidation",
-					"persuasion",
-					"socialize",
-					"streetwise",
-					"subterfuge"
-				]
-			],
+			skills: SKILLS,
 			skillCats: { mental: -3, physical: -1, social: -1 } as {
 				[index: string]: number;
 			}
@@ -1552,14 +1532,6 @@ button.sheet-dot-small {
 	color: black;
 }
 
-.fab {
-	position: fixed;
-
-	right: 10px;
-	bottom: 10px;
-
-	z-index: 1;
-}
 
 #rotes {
 	text-align: center;
