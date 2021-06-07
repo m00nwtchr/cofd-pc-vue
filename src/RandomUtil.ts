@@ -79,7 +79,7 @@ class RandomOrgClient {
 		const respData = resp.data as JSONRPCResponse<T>;
 
 		if (respData.error) {
-			throw respData.error;
+			throw respData.error.message;
 		}
 		return respData.result;
 	}
@@ -140,9 +140,19 @@ class RandomOrgClient {
 }
 
 class WebCryptoRandom {
+
+	// private static _toFloat(int: number, precision = 16): number {
+	// 	const x = Math.pow(10, precision);
+	// 	return Math.round((int / 2 ** 32) * x) / x;
+	// }
+
+	private static _toFloat(int: number): number {
+		return (int / 2 ** 32);
+	}
+
 	public static randomFloat(): number {
 		const int = window.crypto.getRandomValues(new Uint32Array(1))[0];
-		return int / 2 ** 32;
+		return this._toFloat(int);
 	}
 
 	public static randomInt(min: number, max: number): number {
@@ -151,7 +161,8 @@ class WebCryptoRandom {
 	}
 
 	public static randomFloatArray(length: number): number[] {
-		return Array.from(window.crypto.getRandomValues(new Uint32Array(length)).map(int => int / 2 ** 32));
+		return Array.from(window.crypto.getRandomValues(new Uint32Array(length)))
+			.map(this._toFloat);
 	}
 
 	public static randomIntArray(length: number, min: number, max: number): number[] {
@@ -163,6 +174,7 @@ class WebCryptoRandom {
 export class Random {
 
 	useTrueRandom: boolean;
+	noPseudoFallback: boolean;
 	randomStoreSize: number;
 
 	randomStore: number[] = [];
@@ -170,6 +182,7 @@ export class Random {
 
 	constructor(opts: {
 		useTrueRandom?: boolean;
+		noPseudoFallback?: boolean;
 		randomStoreSize?: number;
 
 		randomOrg?: {
@@ -177,41 +190,68 @@ export class Random {
 			endpoint?: string;
 		};
 	} = {}) {
-		this.useTrueRandom = opts.useTrueRandom || true;
+		this.useTrueRandom    = opts.useTrueRandom    || true;
+		this.noPseudoFallback = opts.noPseudoFallback || true;
+
 		this.randomStoreSize = opts.randomStoreSize || 512;
 
 		if (this.useTrueRandom) {
 			if (opts.randomOrg) {
 				opts.randomOrg = opts.randomOrg || {};
 
-				this.randomOrgClient = new RandomOrgClient(opts.randomOrg.apiKey || opts.randomOrg.endpoint || RANDOM_ORG_KEY);
+				const key = opts.randomOrg.apiKey || opts.randomOrg.endpoint || RANDOM_ORG_KEY;
+
+				if (key) {
+					this.randomOrgClient = new RandomOrgClient(key);
+				}
 			}
 		}
 		// console.log(this);
 	}
 
-	ensureRnd(num = 0): Promise<Random> {
-		return new Promise((resolve, reject) => {
-			console.log(num, this.randomStore.length);
-			if (this.randomStore.length < (num || 1) && this.useTrueRandom) {
-				const len = this.randomStoreSize - this.randomStore.length;
-				console.log(len);
-				if (this.randomOrgClient) {
-					this.randomOrgClient.generateDecimalFractions(len, 2).then(arr => {
-						this.randomStore = this.randomStore.concat(arr);
-						resolve(this);
-					}).catch(err => {
-						this.randomStore = this.randomStore.concat(WebCryptoRandom.randomFloatArray(len));
-						resolve(this);
-					});
-				} else {
-					this.randomStore = this.randomStore.concat(WebCryptoRandom.randomFloatArray(len));
-					resolve(this);
-				}
+	private async _getFloats(n: number): Promise<number[]> {
+		// if (this.useTrueRandom) {
+			
+		try {
+			if (this.randomOrgClient) {
+				return await this.randomOrgClient.generateDecimalFractions(n, 2);
 			} else {
-				return resolve(this);
+				return WebCryptoRandom.randomFloatArray(n);
 			}
-		});
+		} catch (err) {
+			if (err) {
+				if (this.randomOrgClient) {
+					console.warn("[RANDOM.org]", err);
+
+					try {
+						return WebCryptoRandom.randomFloatArray(n);
+					} catch(e) {
+						console.error("Error: No valid source of true-RNG:");
+						console.error("[RANDOM.org]", err);
+						console.error("[WebCrypto]", e);	
+					}
+				} else {
+					console.error("Error: No valid source of true-RNG:", err);
+				}
+			}
+		}
+
+		// if (this.useTrueRandom)
+		// 	console.warn("Warning: Using non-true random in true random mode");
+		// // }
+
+		// return new Array(length).fill(0).map(Math.random);
+		return [];
+	}
+
+	async ensureRnd(num = 0): Promise<Random> {
+		if (this.randomStore.length < (num || 1) && this.useTrueRandom) {
+			const len = this.randomStoreSize - this.randomStore.length;
+
+			this.randomStore = this.randomStore.concat(await this._getFloats(len));
+		}
+
+		return this;
 	}
 
 	flush() {
@@ -219,10 +259,16 @@ export class Random {
 	}
 
 	randomFloat(): number {
-		const res = this.randomStore.length ? this.randomStore.pop() : (this.useTrueRandom ? null : Math.random());
+		const res = this.randomStore.length ? this.randomStore.pop() : null;
 		if (res === null) {
-			console.log(res);
-			throw "Error: Ran out of random data, make sure you call ensureRnd or allocate a bigger randomStoreSize!";
+			if (this.noPseudoFallback) {
+				console.log(res);
+				throw "Error: Ran out of random data, make sure you call ensureRnd or allocate a bigger randomStoreSize!";
+			} else {
+				if (this.useTrueRandom)
+					console.warn("Warning: Using pseudo-Random fallback in true random mode");
+				return Math.random();
+			}
 		}
 		return res as number;
 	}
