@@ -37,15 +37,15 @@ interface UsageResult<T> extends Result {
 }
 
 
-function validURL(str: string) {
-	const pattern = new RegExp("^(https?:\\/\\/)?" + // protocol
-		"((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-		"((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-		"(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-		"(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-		"(\\#[-a-z\\d_]*)?$", "i"); // fragment locator
-	return !!pattern.test(str);
-}
+export const isValidUrl = (url: string) => {
+	try {
+		new URL(url);
+	} catch (e) {
+		// console.error(e);
+		return false;
+	}
+	return true;
+};
 
 const RANDOM_ORG_URL = (ver: number) =>
 	`https://api.random.org/json-rpc/${ver}/invoke`;
@@ -58,7 +58,7 @@ class RandomOrgClient {
 	constructor(endpointUrl: string)
 	constructor(apiKey: string)
 	constructor(apiKeyOrEndpoint: string) {
-		if (validURL(apiKeyOrEndpoint)) {
+		if (isValidUrl(apiKeyOrEndpoint)) {
 			this.endpoint = apiKeyOrEndpoint;
 		} else {
 			this.apiKey = apiKeyOrEndpoint;
@@ -149,7 +149,7 @@ class WebCryptoRandom {
 		const range = max - min;
 		return Math.floor(this.randomFloat() * range + min);
 	}
-	
+
 	public static randomFloatArray(length: number): number[] {
 		return Array.from(window.crypto.getRandomValues(new Uint32Array(length)).map(int => int / 2 ** 32));
 	}
@@ -180,24 +180,32 @@ export class Random {
 		this.useTrueRandom = opts.useTrueRandom || true;
 		this.randomStoreSize = opts.randomStoreSize || 512;
 
-		if (this.useTrueRandom && opts.randomOrg && (opts.randomOrg.apiKey || opts.randomOrg.endpoint)) {
-			this.randomOrgClient = new RandomOrgClient((opts.randomOrg.apiKey || opts.randomOrg.endpoint) as string);
+		if (this.useTrueRandom) {
+			if (opts.randomOrg) {
+				opts.randomOrg = opts.randomOrg || {};
+
+				this.randomOrgClient = new RandomOrgClient(opts.randomOrg.apiKey || opts.randomOrg.endpoint || RANDOM_ORG_KEY);
+			}
 		}
+		// console.log(this);
 	}
 
-	ensureRnd(): Promise<Random> {
+	ensureRnd(num = 0): Promise<Random> {
 		return new Promise((resolve, reject) => {
-			if (!this.randomStore.length && this.useTrueRandom) {
+			console.log(num, this.randomStore.length);
+			if (this.randomStore.length < (num || 1) && this.useTrueRandom) {
+				const len = this.randomStoreSize - this.randomStore.length;
+				console.log(len);
 				if (this.randomOrgClient) {
-					this.randomOrgClient.generateDecimalFractions(this.randomStoreSize, 2).then(arr => {
-						this.randomStore = arr;
+					this.randomOrgClient.generateDecimalFractions(len, 2).then(arr => {
+						this.randomStore = this.randomStore.concat(arr);
 						resolve(this);
 					}).catch(err => {
-						this.randomStore = WebCryptoRandom.randomFloatArray(this.randomStoreSize);
+						this.randomStore = this.randomStore.concat(WebCryptoRandom.randomFloatArray(len));
 						resolve(this);
 					});
 				} else {
-					this.randomStore = WebCryptoRandom.randomFloatArray(this.randomStoreSize);
+					this.randomStore = this.randomStore.concat(WebCryptoRandom.randomFloatArray(len));
 					resolve(this);
 				}
 			} else {
@@ -211,11 +219,12 @@ export class Random {
 	}
 
 	randomFloat(): number {
-		const res = this.randomStore.length ? this.randomStore.pop() : Math.random();
-		if (!res && this.useTrueRandom) {
+		const res = this.randomStore.length ? this.randomStore.pop() : (this.useTrueRandom ? null : Math.random());
+		if (res === null) {
+			console.log(res);
 			throw "Error: Ran out of random data, make sure you call ensureRnd or allocate a bigger randomStoreSize!";
 		}
-		return res || (this.useTrueRandom ? NaN : Math.random());
+		return res as number;
 	}
 
 	randomInt(min: number, max: number) {

@@ -322,7 +322,6 @@ export default class Character {
 					custom[key] = value;
 					delete ablTemp[key];
 				} else {
-					console.log(def);
 					value.name = def.name;
 				}
 			});
