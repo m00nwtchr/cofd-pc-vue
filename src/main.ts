@@ -411,12 +411,7 @@ const characters: { [index: string]: Character | any } = {
 		"concept": "",
 		"virtueAnchor": "Destroyer",
 		"viceAnchor": "Lone Wolf",
-		"subType": "Rahuhuehue",
-		"moonGift1": {
-			"name": "Custom Gift",
-			"level": 4,
-			"key": "custom"
-		},
+		"subType": "Rahu",
 		"organization": "Blood Talons",
 		"legacy": "",
 		"baseAttributes": {

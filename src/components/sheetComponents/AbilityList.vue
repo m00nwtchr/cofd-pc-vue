@@ -15,7 +15,7 @@
 							<select v-if="option.list" v-model="ability[option.name]">
 								<option v-for="(val, key) in option.list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
 							</select>
-							<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" v-model="ability[option.name][i]">
+							<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" :v-model="ability[option.name][i]">
 								<option v-for="(val, key) in list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
 							</select>
 							<input  v-else :type="option.bool ? 'checkbox' : 'text'" v-model="ability[option.name]">
@@ -27,9 +27,15 @@
 
 			<div class="col-5 row" style="flex-wrap:nowrap">
 				<div class="sheet-dots">
-					<button class="sheet-dot" :class="{'sheet-dot-full':ability.level>=n}" @click="setDots(ability, n)" v-for="n in 5" :key="n"></button>
+					<button class="sheet-dot" :class="{
+						'sheet-dot-full': ability.level >=n,
+						'missing-dot':    dotRanges[key] && n <= dotRanges[key].min,
+						'dot-limit':      dotRanges[key] && n > dotRanges[key].max,
+					}" @click="setDots(ability, n)" v-for="n in 5" :key="n"></button>
 				</div>
 				<div class="options-toggle" v-if="ability.getOptions && ability.getOptions().length > 0">
+					<!-- {{ability.getOptions && ability.getOptions().length > 0}} -->
+
 					<button
 						class="dropdown-toggle material-icons"
 						@click="meritOptionDropDown(key)"
@@ -76,6 +82,11 @@ export default defineComponent({
 			required: false,
 			default: undefined,
 			type: Object
+		},
+		"dotRanges": {
+			required: false,
+			default: () => ({}),
+			type: Object
 		}
 	},
 	data() {
@@ -119,14 +130,12 @@ export default defineComponent({
 		}
 	},
 	computed: {
-		visible(): {[key: string]: Ability} {
+		visible(): {[key: string]: Ability | Merit} {
 			const abl = uniqByKeepLast(Object.entries(this.abilities), el=>el[1].name)
-				.map(el => {return {
+				.map(el => ({
 					[el[0]]: el[1]	
-				};})
-				.reduce((prevVal, val) => {
-					return Object.assign(prevVal, val);
-				}, {});
+				}))
+				.reduce((prevVal, val) => Object.assign(prevVal, val), {});
 
 			return Object.keys(abl).length >= (this.length || 999999) ? abl : {
 				...abl,
@@ -152,6 +161,7 @@ export default defineComponent({
 .sheet-dots {
 	padding: 0px;
 	white-space: nowrap;
+	width: fit-content;
 }
 .dot-limit {
 	background-color: grey;
@@ -161,6 +171,7 @@ export default defineComponent({
 }
 .options-toggle {
 	height: 24px;
+	width: fit-content;
 }
 .options-toggle span {
 	font-size: 24px !important;
