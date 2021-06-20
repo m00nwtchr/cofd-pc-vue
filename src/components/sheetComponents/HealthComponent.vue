@@ -47,15 +47,18 @@ export default defineComponent({
 			const c: number =  healthTrack[n];
 
 
-			const n2 = c === this.maxMarkValue ? healthTrack.lastIndexOf(c) : healthTrack.indexOf(c);
+			const n2 = c === this.maxMarkValue ? 
+				healthTrack.lastIndexOf(c) :
+				healthTrack.indexOf(c);
 
 			if (n !== n2) {
 				n = n2;
 			}
 
-			console.log(remAgg);
+			// healthTrack[n] = c !== this.maxMarkValue ? c+1 : c;
 
-			healthTrack[n] = c !== this.maxMarkValue ? c+1 : c;
+			healthTrack[n]++;
+
 			if (remAgg && healthTrack[n] > this.maxMarkValue) {
 				healthTrack[n] = 0;
 			
