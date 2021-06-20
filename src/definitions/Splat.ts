@@ -10,7 +10,27 @@ const te = i18n.te.bind(i18n);
 
 //  IntegrityTrackType = string | {type: string; names?: string[]};
 
+export interface Organization {
+	name: RefType<string>;
 
+	skills?: string[];
+	abilities?: string[];
+
+	gifts?: string[];
+}
+
+export interface SubType {
+	name: RefType<string>;
+	abilities: string[];
+
+	skills?: string[];
+	attributes?: string[];
+
+	inferiorArcanum?: string;
+
+	moonGifts?: string[];
+	gifts?: string[];
+}
 
 export enum EnumSplat {
 	MORTAL, MAGE, VAMPIRE, WEREWOLF, CHANGELING
@@ -33,7 +53,7 @@ export class Splat {
 	orgName: RefType<string>;
 
 	abilityName: RefType<string>;
-	abilities?: { [index: string]: string };
+	abilities?: { [index: string]: RefType<string> };
 	finiteAbilities: boolean;
 
 	powerTraitName: RefType<string>;
@@ -49,28 +69,12 @@ export class Splat {
 	viceAnchors: RefType<string>[];
 
 	subTypes: {
-		[index: string]: {
-			name: RefType<string>;
-			abilities: string[];
-
-			skills?: string[];
-			attributes?: string[];
-
-			inferiorArcanum?: string;
-
-			moonGifts?: string[];
-			gifts?: string[];
-		};
+		[index: string]: SubType;
 	};
 	legacies: string[];
 	organizations: {
-		name: RefType<string>;
-
-		skills?: string[];
-
-		renown?: string;
-		gifts?: string[];
-	}[];
+		[index: string]: Organization
+	}
 
 
 	constructor({ en, characterFactory, isSup, hasPowerTrait, hasFuelTrait, abilities, integrityTrackType, alternateBeatOptional, finiteAbilities, legacies, organizations, subTypes, viceAnchors, virtueAnchors }: {
@@ -90,28 +94,12 @@ export class Splat {
 		viceAnchors?: RefType<string>[];
 
 		subTypes?: {
-			[index: string]: {
-				name: RefType<string>;
-				abilities: string[];
-
-				skills?: string[];
-				attributes?: string[];
-
-				inferiorArcanum?: string;
-
-				moonGifts?: string[];
-				gifts?: string[];
-			};
+			[index: string]: SubType;
 		};
 		legacies?: string[];
 		organizations?: {
-			name: RefType<string>;
-
-			skills?: string[];
-
-			renown?: string;
-			gifts?: string[];
-		}[];
+			[index: string]: Organization;
+		};
 	}) {
 		this.en = en || EnumSplat.MORTAL;
 
@@ -267,38 +255,38 @@ new Splat({
 			inferiorArcanum: "mind"
 		},
 	},
-	organizations: [
-		{
-			name: t("splat.mage.organization.adamantine_arrow"),
+	organizations: {
+		adamantine_arrow: {
+			name: td("splat.mage.organization.adamantine_arrow"),
 
 			skills: ["athletics", "intimidation", "medicine"]
 		},
-		{
-			name: t("splat.mage.organization.guardians_of_the_veil"),
+		guardians_of_the_veil: {
+			name: td("splat.mage.organization.guardians_of_the_veil"),
 
 			skills: ["investigation", "stealth", "subterfuge"]
 		},
-		{
-			name: t("splat.mage.organization.mysterium"),
+		mysterium: {
+			name: td("splat.mage.organization.mysterium"),
 
 			skills: ["investigation", "occult", "survival"]
 		},
-		{
-			name: t("splat.mage.organization.silver_ladder"),
+		silver_ladder: {
+			name: td("splat.mage.organization.silver_ladder"),
 
 			skills: ["expression", "persuasion", "subterfuge"]
 		},
-		{
-			name: t("splat.mage.organization.free_council"),
+		free_council: {
+			name: td("splat.mage.organization.free_council"),
 
 			skills: ["crafts", "persuasion", "science"]
 		},
-		{
-			name: t("splat.mage.organization.seers_of_the_throne"),
+		seers_of_the_throne: {
+			name: td("splat.mage.organization.seers_of_the_throne"),
 
 			skills: ["investigation", "occult", "persuasion"]
 		},
-	],
+	},
 	legacies: [],
 	// powerTraitName: "Gnosis",
 	// integrityTraitName: "Wisdom",
@@ -330,23 +318,37 @@ new Splat({
 		protean: td("splat.vampire.ability.protean"),
 		resilience: td("splat.vampire.ability.resilience"),
 		vigor: td("splat.vampire.ability.vigor")
-
 	},
 	subTypes: {
-		davea: { name: "Davea", abilities: ["celerity", "majesty", "vigor"] },
-		gangrel: { name: "Gangrel", abilities: ["animalism", "protean", "resilience"] },
-		mekhet: { name: "Mekhet", abilities: ["celerity", "auspex", "obfuscate"] },
-		nosferatu: { name: "Nosferatu", abilities: ["obfuscate", "nightmare", "vigor"] },
-		ventrue: { name: "Ventrue", abilities: ["animalism", "dominate", "resilience"] },
+		daeva: {
+			name: td("splat.vampire.subType.daeva"),
+			abilities: ["celerity", "majesty", "vigor"]
+		},
+		gangrel: {
+			name: td("splat.vampire.subType.gangrel"),
+			abilities: ["animalism", "protean", "resilience"]
+		},
+		mekhet: {
+			name: td("splat.vampire.subType.mekhet"),
+			abilities: ["celerity", "auspex", "obfuscate"]
+		},
+		nosferatu: {
+			name: td("splat.vampire.subType.nosferatu"),
+			abilities: ["obfuscate", "nightmare", "vigor"]
+		},
+		ventrue: {
+			name: td("splat.vampire.subType.ventrue"),
+			abilities: ["animalism", "dominate", "resilience"]
+		},
 	},
-	organizations: [
-		{ name: "The Carthian Movement" },
-		{ name: "The Circle of the Crone" },
-		{ name: "The Invictus" },
-		{ name: "The Lancea et Sanctum" },
-		{ name: "The Ordo Dracul" },
-		{ name: "VII" },
-	],
+	organizations: {
+		carthian_movement: { name: td("splat.vampire.organization.carthian_movement") },
+		circle_of_the_crone: { name: td("splat.vampire.organization.circle_of_the_crone") },
+		invictus: { name: td("splat.vampire.organization.invictus") },
+		lancea_et_sanctum: { name: td("splat.vampire.organization.lancea_et_sanctum") },
+		ordo_dracul: { name: td("splat.vampire.organization.ordo_dracul") },
+		vii: { name: td("splat.vampire.organization.vii") },
+	},
 	// powerTraitName: "Blood Potency",
 	// integrityTraitName: "Humanity",
 	integrityTrackType: "verticalTouchstoneTrack",
@@ -385,79 +387,97 @@ const WEREWOLF = new Splat({
 	},
 	subTypes: {
 		cahalith: {
-			name: "Cahalith",
+			name: td("splat.werewolf.subType.cahalith"),
 			abilities: ["glory"],
 			moonGifts: ["gibbous"],
 			gifts: ["inspiration", "knowledge"],
 			skills: ["crafts", "expression", "persuasion"]
 		},
 		elodoth: {
-			name: "Elodoth",
+			name: td("splat.werewolf.subType.elodoth"),
 			abilities: ["honor"],
 			moonGifts: ["half"],
 			gifts: ["insight", "warding"],
 			skills: ["empathy", "investigation", "politics"]
 		},
 		irraka: {
-			name: "Irraka",
+			name: td("splat.werewolf.subType.irraka"),
 			abilities: ["cunning"],
 			moonGifts: ["new"],
 			gifts: ["evasion", "stealth"],
 			skills: ["larceny", "stealth", "subterfuge"]
 		},
 		itheur: {
-			name: "Itheur",
+			name: td("splat.werewolf.subType.itheur"),
 			abilities: ["wisdom"],
 			moonGifts: ["crescent"],
 			gifts: ["elemental", "shaping"],
 			skills: ["animal_ken", "medicine", "occult"]
 		},
 		rahu: {
-			name: "Rahu",
+			name: td("splat.werewolf.subType.rahu"),
 			abilities: ["purity"],
 			moonGifts: ["full"],
 			gifts: ["dominance", "strength"],
 			skills: ["brawl", "intimidation", "survival"]
 		},
 	},
-	organizations: [
-		{
-			name: "Blood Talons",
+	organizations: {
+		blood_talons: {
+			name: td("splat.werewolf.organization.blood_talons"),
 
-			renown: "glory",
+			abilities: ["glory"],
 			gifts: ["inspiration", "rage", "strength"]
 		},
-		{
-			name: "Bone Shadows",
+		bone_shadows: {
+			name: td("splat.werewolf.organization.bone_shadows"),
 
-			renown: "wisdom",
+			abilities: ["wisdom"],
 			gifts: ["death", "elements", "insight"]
 		},
-		{
-			name: "Hunters in Darkness",
+		hunters_in_darkness: {
+			name: td("splat.werewolf.organization.hunters_in_darkness"),
 
-			renown: "purity",
+			abilities: ["purity"],
 			gifts: ["nature", "stealth", "warding"]
 		},
-		{
-			name: "Iron Masters",
+		iron_masters: {
+			name: td("splat.werewolf.organization.iron_masters"),
 
-			renown: "cunning",
+			abilities: ["cunning"],
 			gifts: ["knowledge", "shaping", "technology"]
 		},
-		{
-			name: "Storm Lords",
+		storm_lords: {
+			name: td("splat.werewolf.organization.storm_lords"),
 
-			renown: "honor",
+			abilities: ["honor"],
 			gifts: ["evasion", "dominance", "weather"]
 		},
-		{
-			name: "Ghost Wolves",
+		ghost_wolves: {
+			name: td("splat.werewolf.organization.ghost_wolves"),
 
-			renown: "",
+			abilities: [],
 			gifts: []
 		},
-	],
+		fire_touched: {
+			name: td("splat.werewolf.organization.fire_touched"),
+
+			abilities: ["wisdom", "cunning", "glory"],
+			gifts: ["disease", "fervor", "insight", "inspiration"]
+		},
+		ivory_claws: {
+			name: td("splat.werewolf.organization.ivory_claws"),
+
+			abilities: ["purity", "honor", "glory"],
+			gifts: ["agony", "blood", "dominance", "warding"]
+		},
+		predator_kings: {
+			name: td("splat.werewolf.organization.predator_kings"),
+
+			abilities: ["glory", "purity", "wisdom"],
+			gifts: ["hunger", "nature", "rage", "strength"]
+		},
+	},
 	// powerTraitName: "Primal Urge",
 	// integrityTraitName: "Harmony",
 	integrityTrackType: { type: "dualTouchstone", names: ["Flesh", "Spirit"] },
@@ -480,8 +500,9 @@ new Splat({
 	},
 	subTypes: {
 	},
-	organizations: [
-	],
+	organizations: {
+
+	},
 	// powerTraitName: "Primal Urge",
 	// integrityTraitName: "Harmony",
 	integrityTrackType: "healthTrack",
@@ -518,9 +539,12 @@ export interface Form extends FormMods {
 	name: string;
 	desc: string;
 	traits: string[];
+
+	[index: string]: any;
 }
 
-(WEREWOLF as any).forms = {
+
+export const WEREWOLF_FORMS = {
 	hishu: {
 		name: "Hishu",
 		desc: t("splat.werewolf.form.human"),
@@ -675,3 +699,5 @@ export interface Form extends FormMods {
 		armorMod: {}
 	}
 } as { [index: string]: Form };
+
+// (WEREWOLF as any).forms = WEREWOLF_FORMS;

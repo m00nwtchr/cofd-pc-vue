@@ -43,69 +43,90 @@
 					{{ splat && splat.nameName }}:
 					<input v-model="character.name" /><br />
 					<span v-if="character.splat === EnumSplat.MORTAL">
-						{{ $t("character.age") }}:
+						<label for="age">{{ $t("character.age") }}:</label>
 						<input
 							v-model.number="character.age"
 							type="number"
+							id="age"
 						/><br />
-						{{ $t("character.player") }}:
-						<input v-model="character.player" /><br />
+						<label for="player">{{ $t("character.player") }}:</label>
+						<input v-model="character.player" id="player" />
 					</span>
 					<span v-else>
-						{{ $t("character.player") }}:
-						<input v-model="character.player" /><br />
-						{{ $t("character.chronicle") }}:
-						<input v-model="character.chronicle" /><br />
+						<label for="player">{{ $t("character.player") }}:</label>
+						<input v-model="character.player" id="player" /><br />
+						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
+						<input v-model="character.chronicle" id="chronicle" />
 					</span>
 				</div>
 				<div class="block col-sm-4">
-					{{ splat && splat.virtueAnchorName }}:
+					<label for="virtueAnchor">{{ splat && splat.virtueAnchorName }}:</label>
 					<input
 						v-model="character.virtueAnchor"
 						list="virtueAnchors"
+						id="virtueAnchor"
 					/><br />
-					{{ splat && splat.viceAnchorName }}:
+					<label for="viceAnchor">{{ splat && splat.viceAnchorName }}:</label>
 					<input
 						v-model="character.viceAnchor"
 						list="viceAnchors"
+						id="viceAnchor"
 					/><br />
-					{{ $t("character.concept") }}:
-					<input v-model="character.concept" /><br />
+					<label for="concept">{{ $t("character.concept") }}:</label>
+					<input v-model="character.concept" id="concept" />
 				</div>
 				<div class="block col-sm-4">
 					<span v-if="character.splat === EnumSplat.MORTAL">
-						{{ splat && splat.subTypeName }}:
-						<input v-model="character.chronicle" /><br />
-						{{ splat && splat.legacyName }}:
-						<input v-model="character.faction" /><br />
+						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
+						<input v-model="character.chronicle" id="chronicle" /><br>
+						<label for="faction">{{ splat && splat.legacyName }}:</label>
+						<input v-model="character.faction" id="faction" /><br>
+						<label for="group-name">{{ splat && splat.orgName }}:</label>
+						<input v-model="character.organization" id="group-name" /><br>
 					</span>
 					<span v-else>
-						{{ splat && splat.subTypeName }}:
-						<input
+						<label for="subType">{{ splat && splat.subTypeName }}:</label>
+						<!-- <input
 							v-model="character.subType"
 							list="subTypes"
-						/><br />
-						{{ splat && splat.legacyName }}:
-						<input v-model="character.legacy" /><br />
-					</span>
-
-					{{ splat && splat.orgName }}:
-					<input
-						v-model="character.organization"
-						list="organizations"
-					/><br />
-
-					<datalist id="organizations">
-						<option
-							v-for="org in splat.organizations"
-							:key="org.name"
+						/><br /> -->
+						<select
+							v-model="character.subType"
+							id="subType"
 						>
-							{{ org.name }}
+							<option v-for="(el, key) in splat.subTypes" :key="key" :value="key">
+								{{ el.name }}
+							</option>
+							<option></option>
+						</select><br>
+						<label for="legacy">{{ splat && splat.legacyName }}:</label>
+						<input v-model="character.legacy" id="legacy" /><br />
+					
+						<label for="organization">{{ splat && splat.orgName }}:</label>
+					<select
+						v-model="character.organization"
+						id="organization"
+					>
+						<option v-for="(el, key) in splat.organizations" :key="key" :value="key">
+							{{ el.name }}
+						</option>
+						<option></option>
+					</select>
+					</span>
+				</div>
+
+				<datalist id="organizations">
+						<option
+							v-for="(el, key) in splat.organizations"
+							:key="key"
+							:value="key"
+						>
+							{{ el.name }}
 						</option>
 					</datalist>
 
 					<datalist id="subTypes">
-						<option v-for="el in splat.subTypes" :key="el.name">
+						<option v-for="(el, key) in splat.subTypes" :key="key" :value="key">
 							{{ el.name }}
 						</option>
 					</datalist>
@@ -115,7 +136,7 @@
 							v-for="el in splat.virtueAnchors"
 							:key="el"
 							:value="el"
-						/>
+						></option>
 					</datalist>
 
 					<datalist id="viceAnchors">
@@ -123,9 +144,8 @@
 							v-for="el in splat.viceAnchors"
 							:key="el"
 							:value="el"
-						/>
+						></option>
 					</datalist>
-				</div>
 			</div>
 			<div class="separator col-12">
 				<h2>{{ $t("character.attributes") }}</h2>
@@ -206,20 +226,27 @@
 						>
 							Rote<br />Skill
 						</div>
+						
 						<span
 							style="text-transform: capitalize"
 							v-for="skill in cat"
 							:key="skill"
 						>
+						
 							<!-- <button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button> -->
 							<button
 								v-if="character.splat === EnumSplat.MAGE"
 								class="sheet-box"
 								:class="{
-									'sheet-dot-full': organization.skills.includes(
+									'sheet-dot-full': character.roteSkills.includes(
 										skill
 									)
 								}"
+
+								@click="character.roteSkills.includes(skill) ? 
+									character.roteSkills.splice(character.roteSkills.indexOf(skill)) :
+									character.roteSkills.push(skill)
+								"
 							></button>
 							<span
 								:class="{
@@ -288,6 +315,7 @@
 								:datalist="splat.abilities"
 								id="ability"
 								class="block"
+								:dotRanges="dotRanges"
 							/>
 
 							<ability-list
@@ -295,6 +323,7 @@
 								abilityName="Merits"
 								id="merits"
 								class="block"
+								:dotRanges="dotRanges"
 							/>
 
 							<!-- <div id="werewolf-conditions"> </div> -->
@@ -326,8 +355,8 @@
 									{{
 										character.armor
 											? character.armor.general +
-											  "/" +
-											  character.armor.ballistic
+												"/" +
+											character.armor.ballistic
 											: ""
 									}}<br />
 									{{ $t("character.trait.initative") }}:
@@ -687,6 +716,8 @@
 						style="text-align: left; width: 100%"
 						class="col-sm"
 					>
+						
+
 						<h4
 							@click="character.currentForm = form.name.toLowerCase()"
 							:class="{
@@ -846,6 +877,7 @@
 									abilityName="Moon Gifts"
 									:optionsMutable="true"
 									:length="2"
+									:horizontal="true"
 								/>
 						</div>
 						<div class="row col-sm-12">
@@ -866,7 +898,15 @@
 								/>
 							</div>
 						</div>
-
+						<div class="row col-sm-12">
+							<h4 class="separator">Rites</h4>
+							<item-list
+								class="col-12"
+								:items="character.rites"
+								:mutable="true"
+								:cols="2"
+							/>
+						</div>
 					</div>
 
 				</div>
@@ -944,22 +984,13 @@ export default defineComponent({
 			return this.$route.params.id as string;
 		},
 		splat(): Splat {
-			// console.log(EnumSplat[this.character.splat]);
-			return SPLATS[this.character.splat];
+			return this.character.splatObj;
 		},
 		subType() {
-			return (this as any).splat.subTypes[
-				(this as any).character.subType.toLowerCase()
-			];
+			return this.character.subTypeObj;
 		},
 		organization() {
-			return (
-				(this as any).splat.organizations.filter(
-					(el: any) =>
-						el.name.toLowerCase() ===
-						this.character.organization.toLowerCase()
-				)[0] || { skills: [] }
-			);
+			return this.character.organizationObj;
 		},
 		attrMax() {
 			// console.log(this.splat);
@@ -995,12 +1026,12 @@ export default defineComponent({
 					? (this as any).attributes.stamina
 					: 0
 				: character.power >= 5
-				? character.power >= 9
-					? character.power === 10
-						? 75
-						: 50
-					: 10 + (character.power - 4) * 5
-				: 10 + character.power - 1;
+					? character.power >= 9
+						? character.power === 10
+							? 75
+							: 50
+						: 10 + (character.power - 4) * 5
+					: 10 + character.power - 1;
 		},
 		perception() {
 			return (
@@ -1021,6 +1052,28 @@ export default defineComponent({
 			return this.character instanceof WerewolfCharacter
 				? this.character.currentFormObj().value
 				: ({} as Form);
+		},
+		dotRanges() {
+			let obj = {};
+			if (this.character.splat === EnumSplat.MAGE) {
+				Object.keys(this.splat.abilities).forEach(el => {
+					obj[el] = {
+						max: 4
+					};
+				});
+
+				obj[this.subType.inferiorArcanum] = {
+					max: 2
+				};
+
+				(this.subType.abilities || []).forEach(el => {
+					obj[el] = {
+						min: 1
+					};
+				});
+			}
+
+			return obj;
 		}
 	},
 	methods: {
@@ -1092,21 +1145,20 @@ export default defineComponent({
 					const obj = (opts.attr
 						? attributes
 						: opts.skill
-						? skills
-						: opts.ability
-						? abilities[name]
-							? abilities
-							: merits
-						: this.character) as any;
+							? skills
+							: opts.ability
+								? abilities[name]
+									? abilities
+									: merits
+								: this.character) as any;
 
-					const res =
-						(opts.ability ? obj[name].level : obj[name]) || 0;
+					const res = (opts.ability ? (obj[name] || {}).level : obj[name]) || 0;
 					return (
 						res +
 						(res === 0 && opts.skill
 							? Object.values(this.skillCats)[
 									opts.skillCat as any
-							  ]
+							]
 							: 0)
 					);
 				}) as any;
@@ -1240,33 +1292,39 @@ export default defineComponent({
 		},
 		formatNum(num: number): string {
 			return num !== 0 ? `(${num > 0 ? "+" : ""}${num})` : "";
-		}
+		},
+
 	},
-	data() {
-		return {
-			characters: (null as unknown) as Characters,
-			character: (null as unknown) as Character,
-			sizeMinusForm: null as any,
+	data: () => ({
+		characters: (null as unknown) as Characters,
+		character: (null as unknown) as Character,
+		sizeMinusForm: null as any,
 
-			dotsOverFive: false,
-			specialtyDropSelect: null as string | null,
+		dotsOverFive: false,
+		specialtyDropSelect: null as string | null,
 
-			selectedTraits: {} as { [index: string]: Ref<number> },
+		selectedTraits: {} as { [index: string]: Ref<number> },
 
-			EnumSplat,
-			ref,
-			Rote,
+		EnumSplat,
+		ref,
+		Rote,
 
-			// random: new Random(),
-			roller: new DiceRoller(),
+		// random: new Random(),
+		roller: new DiceRoller(),
 
-			ATTRIBUTES,
-			skills: SKILLS,
-			skillCats: { mental: -3, physical: -1, social: -1 } as {
-				[index: string]: number;
-			}
-		};
-	},
+		ATTRIBUTES,
+		skills: SKILLS,
+		skillCats: { mental: -3, physical: -1, social: -1 } as {
+			[index: string]: number;
+		},
+
+		// dotRanges: {
+		// 	cunning: {
+		// 		max: 3,
+		// 		min: 1
+		// 	}
+		// }
+	}),
 	beforeMount() {
 		(window as any).vue = this;
 		this.characters = this.$store.state.characters as any;
@@ -1372,6 +1430,10 @@ header {
 		margin-bottom: 5px;
 		// shadow
 	}
+}
+
+select {
+	// width: 100%;
 }
 
 input {
@@ -1518,6 +1580,7 @@ button.sheet-dot-small {
 
 #minorTraits {
 	font-size: 14.2pt;
+	white-space: nowrap;
 }
 
 .subtitle {
@@ -1554,9 +1617,9 @@ button.sheet-dot-small {
 #werewolf-forms {
 	padding-left: 30px;
 	// background-image: url('../assets/images/werewolf-forms.webp');
- 	background-repeat: no-repeat;
-  	background-origin: content-box;
-  	background-size: contain;
+	background-repeat: no-repeat;
+	background-origin: content-box;
+	background-size: contain;
 	background-position: center;
 }
 .dropdown-toggle {

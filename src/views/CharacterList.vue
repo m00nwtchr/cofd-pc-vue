@@ -10,7 +10,13 @@
 					<span class="name">{{el.name}}</span><br>
 					<span style="text-transform: capitalize;" class="desc">
 						<span v-if="el.concept">{{ el.concept }}<br></span>
-						{{ `${$t(`splat.${EnumSplat[el.splat].toLowerCase()}.name`,EnumSplat[el.splat].toLowerCase())}, ${el.organization ||""} ${el.legacy ||""} ${el.subType ||""}` }}
+						{{
+							$t(`splat.${nameToKey(EnumSplat[el.splat])}.name`,EnumSplat[el.splat])
+						}}, {{
+							$t(`splat.${nameToKey(EnumSplat[el.splat])}.organization.${el.organization}`,el.organization)
+							}} {{el.legacy ||""}} {{
+								el.subType ? $t(`splat.${nameToKey(EnumSplat[el.splat])}.subType.${el.subType}`,el.subType) : ""
+							}}
 					</span>
 				</div>
 			
@@ -24,6 +30,8 @@
 import { defineComponent } from "vue";
 import { EnumSplat } from "../definitions/Splat";
 
+import { nameToKey } from "../definitions/Character";
+
 console.log(EnumSplat);
 
 export default defineComponent({
@@ -32,13 +40,16 @@ export default defineComponent({
 	},
 	data() {
 		return {
-			EnumSplat
+			EnumSplat,
 		};
 	},
 	computed: {
 		characters() {
 			return this.$store.state.characters;
 		}
+	},
+	methods: {
+		nameToKey
 	}
 });
 </script>
