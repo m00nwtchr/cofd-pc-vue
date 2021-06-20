@@ -1,8 +1,9 @@
 // import deepmerge from "deepmerge";
 import { RefType, t, td } from "../Util";
-import { computed, ComputedRef, isRef, reactive, Ref, ref, toRefs, unref, watch, WritableComputedRef } from "vue";
+import { computed, ComputedRef, isReadonly, isRef, reactive, Ref, ref, toRaw, toRefs, unref, watch, WritableComputedRef } from "vue";
 import Merit, { MERITS } from "./Merit";
-import { EnumSplat, Form, FormMods, Splat, SPLATS } from "./Splat";
+import { EnumSplat, Form, FormMods, Organization, Splat, SPLATS, SubType, WEREWOLF_FORMS } from "./Splat";
+import { key } from "localforage";
 
 export const ATTRIBUTES = [
 	["intelligence", "wits", "resolve"],
@@ -44,6 +45,7 @@ export const SKILLS = [
 ];
 
 export interface Ability {
+	key?: string;
 	name: RefType<string>;
 	level: number;
 }
@@ -144,11 +146,18 @@ export default class Character {
 	concept?: string;
 
 	splat!: EnumSplat;
+	splatObj!: Splat;
 
 	subType!: Ref<string>; // Clan/Auspice/Path
+	subTypeObj!: ComputedRef<SubType | undefined>; // Clan/Auspice/Path
 
 	faction?: string; // Cabal/Coterie/Pack
-	organization!: string; // Order/Covenant/Tribe
+
+	organization!: Ref<string>; // Order/Covenant/Tribe
+	organizationObj!: ComputedRef<Organization | undefined>;
+
+
+
 
 	legacy?: string; // Legacy/Bloodline/Lodge
 
@@ -180,7 +189,7 @@ export default class Character {
 	fuel = 0;
 	// maxFuel = 10;
 
-	integrityTrait = 7;
+	integrityTrait: RefType<number> = 7;
 	integrityTrack?: number[];
 
 	touchstones: { name: string; type?: string }[] = [];
@@ -243,13 +252,15 @@ export default class Character {
 	}
 
 	constructor(opts: Character) {
-		if (SPLATS[opts.splat].integrityTrackType === "healthTrack") {
+		this.splatObj = SPLATS[opts.splat];
+
+		if (this.splatObj.integrityTrackType === "healthTrack") {
 			this.integrityTrack = [];
 		}
 
 		{
 			const defaultAbl: { [index: string]: Ability } = {};
-			const tt = SPLATS[opts.splat].abilities || {};
+			const tt = this.splatObj.abilities || {};
 
 			Object.keys(tt).forEach((key) => {
 				defaultAbl[key] = { name: computed(() => tt[key]), level: 0 };
@@ -337,7 +348,9 @@ export default class Character {
 		this.merits = reactive(this.merits);
 		this.baseAttributes = reactive(this.baseAttributes);
 
-		this.subType = ref(this.subType);
+		this.subType = ref(this.subType || "");
+		this.organization = ref(this.organization || "");
+
 		this.healthTrack = ref(this.healthTrack as any);
 
 		Object.keys(this.merits).forEach((key) => {
@@ -351,6 +364,19 @@ export default class Character {
 				this.merits[key] = new m(this, value);
 			}
 		});
+
+		this.subTypeObj = computed(() => {
+			return Object.values(this.splatObj.subTypes).find(el => 
+				nameToKey(unref(el.name)) === nameToKey(unref(this.subType))
+			);
+		});
+
+		this.organizationObj = computed(() => {
+			return (Object.entries(this.splatObj.organizations)
+				.find(el =>
+					el[0] === unref(this.organization)) || [])[1];
+		});
+
 
 		this.attributes = computed(() => {
 			return {
@@ -394,7 +420,7 @@ export default class Character {
 		});
 
 		this.defenseCalcMax = computed(() => {
-			return this.mod("defenseCalcMax") as boolean;
+			return !!this.mod("defenseCalcMax");
 		});
 		this.defense = computed(() => {
 			return (this.defenseCalcMax ? Math.max : Math.min)(this.attributes.value.dexterity, this.attributes.value.wits) + def(() => this.skills.athletics).value + this.mod("defense");
@@ -412,11 +438,7 @@ export default class Character {
 		return [];
 	}
 
-	getSplat(): Splat {
-		return SPLATS[this.splat];
-	}
-
-	mod(traitName: string) {
+	mod(traitName: string): number {
 		const na = traitName.toLowerCase();
 
 		return unref(this.traitMods)
@@ -426,9 +448,18 @@ export default class Character {
 	}
 
 	getData() {
-		const obj = Object.assign({}, this) as any;
+		const raw = toRaw(this) as any;
+		const obj = {...this} as any;
 
 		delete obj.traitMods;
+		delete obj.splatObj;
+		delete obj.size;
+
+		Object.keys(obj).forEach(key => {
+			if (isRef(raw[key]) && isReadonly(raw[key])) {
+				delete obj[key];
+			}
+		});
 
 		return obj;
 	}
@@ -459,18 +490,44 @@ export class MageCharacter extends Character {
 	praxes!: string[];
 	inuredSpells!: string[];
 
+	baseRoteSkills!: Ref<string[]>;
+	roteSkills!: ComputedRef<string[]>;
+
 	rotes!: Rote[];
 
 	constructor(opts: MageCharacter) {
 		super(opts as any);
 
-		this.activeSpells = [];
-		this.yantras = [];
-		this.magicalTools = [];
-		this.praxes = [];
-		this.inuredSpells = [];
+		this.activeSpells = opts.activeSpells || [];
+		this.yantras = opts.yantras || [];
+		this.magicalTools = opts.magicalTools || [];
+		this.praxes = opts.praxes || [];
+		this.inuredSpells = opts.inuredSpells || [];
 
-		this.rotes = [];
+		this.baseRoteSkills = ref(opts.baseRoteSkills || []);
+
+		this.roteSkills = computed({
+			get: () => {
+				// const order = SPLATS[EnumSplat.MAGE].organizations[unref(this.organization)];
+				const order = this.organizationObj.value;
+
+				console.log(SPLATS[EnumSplat.MAGE].organizations);
+
+				if (order) {
+					return order.skills || [];
+				}
+				return unref(this.baseRoteSkills);
+			},
+			set: (val) => {
+				const order = this.organizationObj.value;
+
+				if (!order) {
+					this.baseRoteSkills.value = val;
+				}
+			}
+		});
+
+		this.rotes = opts.rotes || [];
 	}
 }
 
@@ -506,6 +563,8 @@ export class WerewolfCharacter extends Character {
 	shadowGifts: string[];
 	wolfGifts: string[];
 
+	rites: string[];
+
 	constructor(opts: WerewolfCharacter) {
 		super(opts);
 
@@ -523,35 +582,37 @@ export class WerewolfCharacter extends Character {
 
 		// this.moonGifts = opts.moonGifts || {};
 
-		const auspice = computed(() => {
-			const key = Object.keys(this.getSplat().subTypes)
-				.find(el => el === nameToKey(this.subType.value)) || "";
-			return this.getSplat().subTypes[key];
-		});
+		// const auspice = computed(() => {
+		// 	const key = Object.keys(this.splatObj.subTypes)
+		// 		.find(el => el === nameToKey(this.subType.value)) || "";
+		// 	return this.splatObj.subTypes[key];
+		// });
 
 		this.moonGift1 = computed(() => {
-			if (auspice.value) {
-				const key = (auspice.value.moonGifts as string[])[0];
+			if (this.subTypeObj.value) {
+				const key = (this.subTypeObj.value.moonGifts as string[])[0];
+				const renown = this.subTypeObj.value.abilities[0];
 				console.log(key);
 				return {
 					name: t("splat.werewolf.gift.moon."+key),
 					key,
-					level: this.abilities[auspice.value.abilities[0]].level
-				};
+					level: this.abilities[renown].level
+				} as Ability;
 			}
-			return opts.moonGift1 || {name: "", key: "", level:0};
+			return unref(opts.moonGift1) || {name: "", key: "", level:0} as Ability;
 		});
 
 		this.moonGift2 = ref(opts.moonGift2 || {name: "", level: 0});
 		this.moonGifts = computed(() => {
 			return {
-				[(this.moonGift1 as any).value.key || nameToKey(unref(this.moonGift1.value.name))]: unref(this.moonGift1),
-				[(this.moonGift2 as any).value.key || nameToKey(unref(this.moonGift2.value.name))]: unref(this.moonGift2),
+				[this.moonGift1.value.key || nameToKey(unref(this.moonGift1.value.name))]: unref(this.moonGift1),
+				[this.moonGift2.value.key || nameToKey(unref(this.moonGift2.value.name))]: unref(this.moonGift2),
 			};
 		});
 		
 		this.shadowGifts = opts.shadowGifts || [];
 		this.wolfGifts = opts.wolfGifts || [];
+		this.rites = opts.rites || [];
 	}
 
 	getTraitMods() {
@@ -590,7 +651,7 @@ export class WerewolfCharacter extends Character {
 			get: () => {
 				const key = isRef(name) ? name.value : name;
 
-				const form = (this.getSplat() as any).forms[key] || {
+				const form = WEREWOLF_FORMS[key] || {
 					name: "",
 					desc: "",
 
@@ -652,7 +713,7 @@ export class WerewolfCharacter extends Character {
 					speedMod: form.speedMod + baseMod.speedMod + this.mod(key + "SpeedMod"),
 					perceptionMod: form.perceptionMod + baseMod.perceptionMod + this.mod(key + "PerceptionMod"),
 
-					defenseCalcMax: this.mod(key + "DefenseCalcMax") as boolean,
+					defenseCalcMax: !!this.mod(key + "DefenseCalcMax") as boolean,
 					defenseMod: this.mod(key + "DefenseMod"),
 
 					armorMod: {
@@ -669,7 +730,7 @@ export class WerewolfCharacter extends Character {
 			set: (val) => {
 				const key = isRef(name) ? name.value : name;
 
-				const form = vue.splat.forms[key] || {
+				const form = WEREWOLF_FORMS[key] || {
 					name: "",
 					desc: "",
 
@@ -713,12 +774,11 @@ export class WerewolfCharacter extends Character {
 		});
 	}
 
-	getForms() {
-		const vue = (window as any).vue;
+	getForms(): { [key: string]: Form } {
 		const forms: { [key: string]: Form } = {};
 
-		Object.keys(vue.splat.forms)
-			.forEach(el => forms[el] = this.getForm(el) as any);
+		Object.keys(WEREWOLF_FORMS)
+			.forEach(el => forms[el] = this.getForm(el) as unknown as Form);
 
 		return reactive(forms);
 	}

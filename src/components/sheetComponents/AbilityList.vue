@@ -1,55 +1,61 @@
 <template>
 	<div>
-		<h3 class="separator col-sm-12">{{ abilityName }}</h3>
+		<h3 v-if="abilityName" class="separator col-sm-12">{{ abilityName }}</h3>
 		<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
-		<div style="margin:0" v-for="(ability, key) in visible" :key="ability" class="block row col-sm-12">
-			<span class="line col-7" :class="{'selected': $parent.selectedTraits[key]}" @click="$parent.selectTrait(key,{ability:true})">
-				<input v-if="optionsMutable && !ability.key" @change="doInput(ability, key)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
-				<span v-else>{{ ability.name }}</span>
-				
-				<br>
-				<div v-if="ability.getOptions && meritOptionDropSelect === key">
-					<div>
-						<span v-for="option in ability.getOptions()" :key="option">
-							{{ option.name }}: 
-							<select v-if="option.list" v-model="ability[option.name]">
-								<option v-for="(val, key) in option.list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
-							</select>
-							<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" :v-model="ability[option.name][i]">
-								<option v-for="(val, key) in list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
-							</select>
-							<input  v-else :type="option.bool ? 'checkbox' : 'text'" v-model="ability[option.name]">
-							<br>
-						</span>
+		
+		<div :class="{'row': horizontal}">
+			<div style="margin:0" v-for="(ability, key) in visible" :key="ability" class="block row" :class="{
+				'col-sm-12': !horizontal,
+				['col-sm-'+Math.floor(12/Object.keys(visible).length)]: horizontal
+			}">
+				<span class="line col-7" :class="{'selected': $parent.selectedTraits[key]}" @click="$parent.selectTrait(key,{ability:true})">
+					<input v-if="optionsMutable && !ability.key" @change="doInput(ability, key)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
+					<span v-else>{{ ability.name }}</span>
+					
+					<br>
+					<div v-if="ability.getOptions && meritOptionDropSelect === key">
+						<div>
+							<span v-for="option in ability.getOptions()" :key="option">
+								{{ option.name }}:
+								<select v-if="option.list" v-model="ability[option.name]">
+									<option v-for="(val, key) in option.list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
+								</select>
+								<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" :v-model="ability[option.name][i]">
+									<option v-for="(val, key) in list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
+								</select>
+								<input  v-else :type="option.bool ? 'checkbox' : 'text'" v-model="ability[option.name]">
+								<br>
+							</span>
+						</div>
+					</div>
+				</span>
+
+				<div class="col-5 row" style="flex-wrap:nowrap">
+					<div class="sheet-dots">
+						<button class="sheet-dot" :class="{
+							'sheet-dot-full': ability.level >=n,
+							'missing-dot':    dotRanges[key] && n <= dotRanges[key].min,
+							'dot-limit':      dotRanges[key] && n > dotRanges[key].max,
+						}" @click="setDots(ability, n)" v-for="n in 5" :key="n"></button>
+					</div>
+					<div class="options-toggle" v-if="ability.getOptions && ability.getOptions().length > 0">
+						<!-- {{ability.getOptions && ability.getOptions().length > 0}} -->
+
+						<button
+							class="dropdown-toggle material-icons"
+							@click="meritOptionDropDown(key)"
+							>
+								<span v-if="meritOptionDropSelect === key">arrow_drop_down</span>
+								<span v-else>arrow_right</span>
+						</button>
 					</div>
 				</div>
-			</span>
-
-			<div class="col-5 row" style="flex-wrap:nowrap">
-				<div class="sheet-dots">
-					<button class="sheet-dot" :class="{
-						'sheet-dot-full': ability.level >=n,
-						'missing-dot':    dotRanges[key] && n <= dotRanges[key].min,
-						'dot-limit':      dotRanges[key] && n > dotRanges[key].max,
-					}" @click="setDots(ability, n)" v-for="n in 5" :key="n"></button>
-				</div>
-				<div class="options-toggle" v-if="ability.getOptions && ability.getOptions().length > 0">
-					<!-- {{ability.getOptions && ability.getOptions().length > 0}} -->
-
-					<button
-						class="dropdown-toggle material-icons"
-						@click="meritOptionDropDown(key)"
-						>
-							<span v-if="meritOptionDropSelect === key">arrow_drop_down</span>
-							<span v-else>arrow_right</span>
-					</button>
-				</div>
 			</div>
+			
+			<datalist v-if="datalistFilter" :id="abilityName+'List'">
+				<option v-for="el in datalistFilter" :key="el">{{ el }}</option>
+			</datalist>
 		</div>
-		
-		<datalist v-if="datalistFilter" :id="abilityName+'List'">
-			<option v-for="el in datalistFilter" :key="el">{{ el }}</option>
-		</datalist>
 	</div>
 </template>
 
@@ -87,6 +93,10 @@ export default defineComponent({
 			required: false,
 			default: () => ({}),
 			type: Object
+		},
+		"horizontal": {
+			type: Boolean,
+			default: () => false
 		}
 	},
 	data() {
