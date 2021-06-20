@@ -2,7 +2,7 @@
 import { computed, Ref, unref } from "vue";
 import { RefType, toObject } from "../Util";
 import Character, { Ability, ATTRIBUTES, def, nameToKey, SKILLS, TraitMod, WerewolfCharacter } from "./Character";
-import { EnumSplat, SPLATS } from "./Splat";
+import { EnumSplat, SPLATS, WEREWOLF_FORMS } from "./Splat";
 
 type LType = { [key: string]: string } | string[];
 
@@ -98,7 +98,7 @@ class FavoredFormMerit extends Merit {
 
 	getOptions() {
 		const formsObj: { [key: string]: string } = {};
-		Object.entries((SPLATS[EnumSplat.WEREWOLF] as any).forms).forEach(entry => {
+		Object.entries(WEREWOLF_FORMS).forEach(entry => {
 			formsObj[entry[0]] = (entry[1] as any).name;
 		});
 
@@ -112,7 +112,7 @@ class FavoredFormMerit extends Merit {
 		];
 
 		if (this.form) {
-			const formObj = (SPLATS[EnumSplat.WEREWOLF] as any).forms[this.form];
+			const formObj = WEREWOLF_FORMS[this.form];
 
 			const formAttrs: string[] = ATTRIBUTES.flat();
 
@@ -230,7 +230,7 @@ class FortifiedFormMerit extends Merit {
 
 	getOptions() {
 		const formsObj: { [key: string]: string } = {};
-		Object.entries((SPLATS[EnumSplat.WEREWOLF] as any).forms).forEach(entry => {
+		Object.entries(WEREWOLF_FORMS).forEach(entry => {
 			formsObj[entry[0]] = (entry[1] as any).name;
 		});
 
