@@ -147,7 +147,7 @@ export default defineComponent({
 				}))
 				.reduce((prevVal, val) => Object.assign(prevVal, val), {});
 
-			return Object.keys(abl).length >= (this.length || 999999) ? abl : {
+			return Object.keys(abl).length >= (this.length || Number.MAX_SAFE_INTEGER) ? abl : {
 				...abl,
 				...(this.optionsMutable ? {
 					"NEW": {name: "", level: 0}

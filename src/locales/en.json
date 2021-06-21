@@ -113,7 +113,13 @@
 				"mysterium": "Mysterium",
 				"silver_ladder": "Silver Ladder",
 				"free_council": "Free Council",
+
 				"seers_of_the_throne": "Seers of the Throne",
+
+				"hegemony": "Hegemony",
+				"panopticon": "Panopticon",
+				"paternoster": "Paternoster",
+				"praetorian": "Praetorian"
 			}
 		},
 		"vampire": {

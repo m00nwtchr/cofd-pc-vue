@@ -286,6 +286,26 @@ new Splat({
 
 			skills: ["investigation", "occult", "persuasion"]
 		},
+		hegemony: {
+			name: td("splat.mage.organization.hegemony"),
+
+			skills: ["politics", "persuasion", "empathy"]
+		},
+		panopticon: {
+			name: td("splat.mage.organization.panopticon"),
+
+			skills: ["investigation", "stealth", "subterfuge"]
+		},
+		paternoster: {
+			name: td("splat.mage.organization.paternoster"),
+
+			skills: ["academics", "occult", "expression"]
+		},
+		praetorian: {
+			name: td("splat.mage.organization.praetorian"),
+
+			skills: ["athletics", "larceny", "intimidation"]
+		},
 	},
 	legacies: [],
 	// powerTraitName: "Gnosis",
@@ -379,11 +399,11 @@ const WEREWOLF = new Splat({
 	// legacyName: "Lodge",
 	// orgName: "Tribe",
 	abilities: {
-		cunning: td("splat.werewolf.ability.cunning"),
+		purity: td("splat.werewolf.ability.purity"),
 		glory: td("splat.werewolf.ability.glory"),
 		honor: td("splat.werewolf.ability.honor"),
-		purity: td("splat.werewolf.ability.purity"),
 		wisdom: td("splat.werewolf.ability.wisdom"),
+		cunning: td("splat.werewolf.ability.cunning"),
 	},
 	subTypes: {
 		cahalith: {

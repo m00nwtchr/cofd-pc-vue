@@ -327,15 +327,24 @@
 							/>
 
 							<!-- <div id="werewolf-conditions"> </div> -->
-							<item-list
+							<!-- <item-list
 								v-if="character.splat === EnumSplat.WEREWOLF"
 								class="col-12"
 								name="Conditions"
 								:items="character.conditions"
 								:mutable="true"
-							/>
+							/> -->
+							<br v-if="character.splat === EnumSplat.WEREWOLF">
+
+							<span v-if="character.splat === EnumSplat.WEREWOLF">
+								<h3 class="separator col-sm-12">Hunter's Aspect</h3>
+								<input class="line w-100" type="text" v-model="character.huntersAspect">
+							</span>
+
 
 							<div id="minorTraits" class="block col col-12">
+								<br v-if="character.splat === EnumSplat.WEREWOLF">
+
 								<span
 									v-if="
 										character.splat !== EnumSplat.WEREWOLF
@@ -574,7 +583,7 @@
 							<div
 								class="col-12"
 								v-if="character.splat === EnumSplat.WEREWOLF"
-								style="color: black"
+								style="color: black; white-space: nowrap; text-align: left;"
 								id="kuruth-triggers"
 							>
 								<h3 class="separator col-sm-12">
@@ -582,19 +591,19 @@
 								</h3>
 								<!-- <div class="row col-12"> -->
 								<!-- <div style="color:black;" class="col-12"> -->
-								Passive: <br />
+								Passive:
 								<input
 									class="line"
 									style="width: 70%"
 									v-model="character.kuruthTriggers.passive"
 								/><br />
-								Common: <br />
+								Common:
 								<input
 									class="line"
 									style="width: 70%"
 									v-model="character.kuruthTriggers.common"
 								/><br />
-								Specific: <br />
+								Specific:
 								<input
 									class="line"
 									style="width: 70%"
@@ -604,11 +613,30 @@
 								<!-- </div> -->
 							</div>
 
+							<br>
+
 							<item-list
-								v-if="character.splat !== EnumSplat.WEREWOLF"
 								class="col-12"
 								name="Conditions"
 								:items="character.conditions"
+								:mutable="true"
+							/>
+							<br>
+
+							<item-list
+								class="col-12"
+								name="Aspirations"
+								:items="character.aspirations"
+								:mutable="true"
+							/>
+
+							<br v-if="character.splat === EnumSplat.MAGE">
+
+							<item-list
+								v-if="character.splat === EnumSplat.MAGE"
+								class="col-12"
+								name="Obsessions"
+								:items="character.obsessions"
 								:mutable="true"
 							/>
 						</div>
@@ -668,7 +696,35 @@
 				</div>
 
 				<div class="col-sm-8">
-					<object-list :items="character.rotes" :itemFactory="Rote" name="Rotes"></object-list>
+					<object-list 
+						:items="character.rotes" 
+						:itemFactory="Rote" 
+						name="Rotes"
+					></object-list>
+					<item-list
+						name="Nimbus"
+						class="w-100"
+						:items="character.nimbus"
+						:mutable="true"	
+					></item-list>
+					<div class="w-100 row">
+						<!-- <div class="col-6"> -->
+							<item-list
+								name="Arcana Attainments"
+								class="col-6"
+								:items="character.arcanaAttainments"
+								:mutable="true"
+							/>
+						<!-- </div> -->
+						<!-- <div class="col-6"> -->
+							<item-list
+								name="Legacy Attainments"
+								class="col-6"
+								:items="character.legacyAttainments"
+								:mutable="true"
+							/>
+						<!-- </div> -->
+					</div>
 					<!-- <div id="rotes" class="row col-sm-12">
 								<h4 class="separator col-sm-12" style="margin-bottom: 15px">Rotes</h4>
 									<div class="col-2" >
@@ -912,6 +968,9 @@
 				</div>
 			</div>
 
+			<div id="vampire-traits" v-if="character.splat === EnumSplat.VAMPIRE" class="row col-12">
+				E
+			</div>
 
 		</div>
 							<!-- <object-list :items="character.weapons" name=""></object-list> -->
