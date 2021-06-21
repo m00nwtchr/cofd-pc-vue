@@ -133,6 +133,16 @@ export interface TraitMod {
 	func?: (traitName: string) => Ref<number> | number;
 }
 
+export interface Weapon {
+	name: string;
+	damage: string;
+	range: string;
+	clip: string;
+	initative: number;
+	strength: number;
+	size: number;
+}
+
 export default class Character {
 	name!: string;
 	age?: number;
@@ -196,6 +206,8 @@ export default class Character {
 
 	conditions: string[] = [];
 
+	aspirations: string[] = [];
+
 	baseSize = 5;
 	size: ComputedRef<number>;
 
@@ -210,15 +222,7 @@ export default class Character {
 		ballistic: 0
 	};
 
-	weapons: {
-		name: string;
-		damage: string;
-		range: string;
-		clip: string;
-		initative: number;
-		strength: number;
-		size: number;
-	}[] = [
+	weapons: Weapon[] = [
 		{
 			name: "",
 			damage: "",
@@ -337,7 +341,7 @@ export default class Character {
 				}
 			});
 
-			ablTemp = sortObj(ablTemp);
+			// ablTemp = sortObj(ablTemp);
 
 			Object.keys(custom)
 				.forEach(key => ablTemp[key] = custom[key]);
@@ -484,11 +488,18 @@ export class Rote {
 }
 
 export class MageCharacter extends Character {
+	obsessions: string[];
+	
 	activeSpells!: string[];
 	yantras!: string[];
 	magicalTools!: string[];
 	praxes!: string[];
 	inuredSpells!: string[];
+
+	nimbus: string[];
+
+	arcanaAttainments!: string[];
+	legacyAttainments!: string[];
 
 	baseRoteSkills!: Ref<string[]>;
 	roteSkills!: ComputedRef<string[]>;
@@ -498,13 +509,20 @@ export class MageCharacter extends Character {
 	constructor(opts: MageCharacter) {
 		super(opts as any);
 
+		this.obsessions = opts.obsessions || [];
+
 		this.activeSpells = opts.activeSpells || [];
 		this.yantras = opts.yantras || [];
 		this.magicalTools = opts.magicalTools || [];
 		this.praxes = opts.praxes || [];
 		this.inuredSpells = opts.inuredSpells || [];
 
+		this.arcanaAttainments = opts.arcanaAttainments || [];
+		this.legacyAttainments = opts.legacyAttainments || [];
+
 		this.baseRoteSkills = ref(opts.baseRoteSkills || []);
+
+		this.nimbus = opts.nimbus || [];
 
 		this.roteSkills = computed({
 			get: () => {
@@ -531,9 +549,23 @@ export class MageCharacter extends Character {
 	}
 }
 
+export interface Devotion {
+	name: string;
+	cost: string;
+	disciplines: string[];
+	dicePool: string;
+	book: string;
+	pageNr: number;
+}
+
 export class VampireCharacter extends Character {
+
+	devotions: Devotion[];
+
 	constructor(opts: VampireCharacter) {
 		super(opts as any);
+
+		this.devotions = opts.devotions || [];
 	}
 
 	getTraitMods() {
@@ -552,6 +584,8 @@ export class WerewolfCharacter extends Character {
 	baseFormMods!: { [key: string]: FormMods };
 
 	kuruthTriggers?: { passive: string; common: string; specific: string };
+
+	huntersAspect: string;
 
 	// moonGifts: [Ability | undefined, Ability | undefined];
 
@@ -574,6 +608,8 @@ export class WerewolfCharacter extends Character {
 			common: "",
 			specific: ""
 		}, this.kuruthTriggers);
+
+		this.huntersAspect = opts.huntersAspect || "";
 
 		// this.moonGifts = opts.moonGifts || [
 		// 	{name: "", level: 0},
