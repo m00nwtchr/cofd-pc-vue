@@ -8,7 +8,7 @@
 				'col-sm-12': !horizontal,
 				['col-sm-'+Math.floor(12/Object.keys(visible).length)]: horizontal
 			}">
-				<span class="line col-7" :class="{'selected': $parent.selectedTraits[key]}" @click="$parent.selectTrait(key,{ability:true})">
+				<span class="line col-7" :class="{'selected': $store.state.selectedTraits[key]}" @click="$parent.selectTrait(key,{ability:true})">
 					<input v-if="optionsMutable && !ability.key" @change="doInput(ability, key)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
 					<span v-else>{{ ability.name }}</span>
 					

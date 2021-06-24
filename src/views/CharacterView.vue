@@ -34,7 +34,7 @@
 	>
 		<!-- <fab /> -->
 
-		{{ selectedTraits }}
+		{{ $store.state.selectedTraits }}
 		<div id="page-1">
 			<div id="infoBar" class="bar row">
 				<!-- <datalist> </datalist> -->
@@ -172,7 +172,7 @@
 							:key="attr"
 						>
 							<span
-								:class="{ selected: selectedTraits[attr] }"
+								:class="{ selected: $store.state.selectedTraits[attr] }"
 								@click="selectTrait(attr, { attr: true })"
 								>{{ $t(`character.attribute.${attr}`) }}</span
 							>
@@ -202,104 +202,7 @@
 				</div>
 			</div>
 			<div class="row" style="margin-top:15px">
-				<div id="skills" class="col col-sm-4">
-					<h2 class="separator col-sm-12" style="margin-bottom: 20px">
-						{{ $t("character.skills") }}
-					</h2>
-					<div
-						v-for="(cat, i) in skills"
-						:key="cat"
-						class="block col col-12"
-					>
-						<h3 class="separator">
-							{{
-								$t(`character.cat.${Object.keys(skillCats)[i]}`)
-							}}
-						</h3>
-						<i class="col-12 subtitle"
-							>({{ Object.values(skillCats)[i] }} Unskilled)</i
-						><br />
-
-						<div
-							style="font-style: italic; font-size: 10px; line-height: 10px"
-							v-if="character.splat === EnumSplat.MAGE"
-						>
-							Rote<br />Skill
-						</div>
-						
-						<span
-							style="text-transform: capitalize"
-							v-for="skill in cat"
-							:key="skill"
-						>
-						
-							<!-- <button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button> -->
-							<button
-								v-if="character.splat === EnumSplat.MAGE"
-								class="sheet-box"
-								:class="{
-									'sheet-dot-full': character.roteSkills.includes(
-										skill
-									)
-								}"
-
-								@click="character.roteSkills.includes(skill) ? 
-									character.roteSkills.splice(character.roteSkills.indexOf(skill)) :
-									character.roteSkills.push(skill)
-								"
-							></button>
-							<span
-								:class="{
-									selected: selectedTraits[skill],
-									specialties:
-										character.specialties[skill] &&
-										character.specialties[skill].length > 0
-								}"
-								@click="
-									selectTrait(skill, {
-										skill: true,
-										skillCat: i
-									})
-								"
-							>
-								{{ $t(`character.skill.${skill}`) }}
-							</span>
-
-							<button
-								class="dropdown-toggle material-icons"
-								@click="specialtyDropDown(skill)"
-							>
-								<span v-if="specialtyDropSelect === skill"
-									>arrow_drop_down</span
-								>
-								<span v-else>arrow_right</span>
-							</button>
-
-							<div class="sheet-dots">
-								<button
-									@click="setSkill(skill, n)"
-									v-for="n in dotAttrMax"
-									:key="n"
-									class="sheet-dot"
-									:class="{
-										'sheet-dot-full':
-											character.skills[skill] >= n,
-										'sheet-dot-small': dotAttrMax > 5
-									}"
-								></button>
-							</div>
-							<br />
-
-							<item-list
-								v-if="specialtyDropSelect === skill"
-								class="col-12"
-								:items="character.specialties[skill]"
-								:mutable="true"
-							/>
-						</span>
-					</div>
-					<br />
-				</div>
+				<skill-sidebar @selectSkill="selectTrait" :character="character" class="col col-sm-4"></skill-sidebar>
 
 				<div id="traits" class="col-sm-8">
 					<h2 class="separator col-sm-12" style="margin-bottom: 20px">
@@ -517,7 +420,7 @@
 							>
 								<h3
 									:class="{
-										selected: selectedTraits['power']
+										selected: $store.state.selectedTraits['power']
 									}"
 									@click="selectTrait('power', {})"
 									class="separator col-sm-12"
@@ -555,7 +458,8 @@
 									class="sheet-boxes"
 									style="margin-top: -10px"
 								>
-									<span v-for="n in maxFuel" :key="n">
+									{{character.maxFuel}}
+									<span v-for="n in character.maxFuel" :key="n">
 										<button
 											class="sheet-box"
 											@click="setTrait('fuel', n)"
@@ -982,6 +886,7 @@
 import { computed, defineComponent, reactive, ref, Ref, toRefs, unref } from "vue";
 
 import { Splat, SPLATS, EnumSplat, Form } from "../definitions/Splat";
+
 import Character, {
 	Ability,
 	ATTRIBUTES,
@@ -1000,6 +905,8 @@ import IntegrityComponent from "../components/sheetComponents/IntegrityComponent
 import ItemList from "../components/sheetComponents/ItemList.vue";
 import ObjectList from "../components/sheetComponents/ObjectList.vue";
 import DiceRollerComponent from "../components/sheetComponents/diceRoller/DiceRoller.vue";
+
+import SkillSidebar from "../components/sheetComponents/SkillSidebar.vue";
 
 import ModalComponent from "../components/ModalComponent.vue";
 import FloatingActionMenu from "../components/FloatingActionMenu.vue";
@@ -1035,7 +942,9 @@ export default defineComponent({
 		DiceRoller: DiceRollerComponent,
 		ModalComponent,
 		SpellCalculator,
-		FloatingActionMenu
+		FloatingActionMenu,
+
+		SkillSidebar
 		// "fab": fab
 	},
 	computed: {
@@ -1077,20 +986,6 @@ export default defineComponent({
 				(this as any).character.attributes.dexterity +
 				(this as any).character.attributes.composure
 			);
-		},
-		maxFuel() {
-			const character: Character = this.character as any;
-			return character.power === 0
-				? (this as any).character.splat === EnumSplat.VAMPIRE
-					? (this as any).attributes.stamina
-					: 0
-				: character.power >= 5
-					? character.power >= 9
-						? character.power === 10
-							? 75
-							: 50
-						: 10 + (character.power - 4) * 5
-					: 10 + character.power - 1;
 		},
 		perception() {
 			return (
@@ -1171,7 +1066,7 @@ export default defineComponent({
 			return results;
 		},
 		async rollSelected(opts: any) {
-			const vals = Object.values(this.selectedTraits) as any[];
+			const vals = Object.values(this.$store.state.selectedTraits) as any[];
 			if (vals.length === 0) return 0;
 
 			const dice = vals.reduce((prev, val) => prev + val);
@@ -1189,39 +1084,52 @@ export default defineComponent({
 				ability?: boolean;
 			}
 		) {
-			if (this.selectedTraits[name] !== undefined) {
-				delete this.selectedTraits[name];
+			let state = this.$store.state;
+
+
+			if (state.selectedTraits[name] !== undefined) {
+				this.$store.commit("UNSELECT_TRAIT", name);
 			} else if (name) {
-				if (Object.keys(this.selectedTraits).length === 3) {
-					this.selectedTraits = {};
+				if (Object.keys(state.selectedTraits).length === 3) {
+					this.$store.commit("UPDATE_SELECTED", {});
 				}
+				
+				this.$store.commit({
+					type: "SELECT_TRAIT",
+					name,
+					value: 0
+				});
 
-				this.selectedTraits[name] = computed(() => {
-					const attributes = this.character.attributes;
-					const skills = this.character.skills;
-					const abilities = this.character.abilities;
-					const merits = this.character.merits;
-					const obj = (opts.attr
-						? attributes
-						: opts.skill
-							? skills
-							: opts.ability
-								? abilities[name]
-									? abilities
-									: merits
-								: this.character) as any;
-
-					const res = (opts.ability ? (obj[name] || {}).level : obj[name]) || 0;
-					return (
-						res +
-						(res === 0 && opts.skill
-							? Object.values(this.skillCats)[
-									opts.skillCat as any
-							]
-							: 0)
-					);
-				}) as any;
 			}
+
+			console.log(state);
+
+			// 	this.selectedTraits[name] = computed(() => {
+			// 		const attributes = this.character.attributes;
+			// 		const skills = this.character.skills;
+			// 		const abilities = this.character.abilities;
+			// 		const merits = this.character.merits;
+			// 		const obj = (opts.attr
+			// 			? attributes
+			// 			: opts.skill
+			// 				? skills
+			// 				: opts.ability
+			// 					? abilities[name]
+			// 						? abilities
+			// 						: merits
+			// 					: this.character) as any;
+
+			// 		const res = (opts.ability ? (obj[name] || {}).level : obj[name]) || 0;
+			// 		return (
+			// 			res +
+			// 			(res === 0 && opts.skill
+			// 				? Object.values(this.skillCats)[
+			// 						opts.skillCat as any
+			// 				]
+			// 				: 0)
+			// 		);
+			// 	}) as any;
+			// }
 		},
 		setAttr(attr: string, val: number) {
 			const character: Character = (this as any).character;
@@ -1233,17 +1141,6 @@ export default defineComponent({
 				(character.attributes as any)[attr] === val && val !== 1
 					? val - 1
 					: val;
-		},
-		setSkill(attr: string, val: number) {
-			const character: Character = (this as any).character;
-
-			if (!character.skills) character.skills = {};
-
-			// console.log(character.skills);
-
-			character.skills[attr] =
-				character.skills[attr] === val ? val - 1 : val;
-			// console.log(character.skills);
 		},
 		setTrait(
 			trait: string,
@@ -1331,24 +1228,6 @@ export default defineComponent({
 				? this.character.getForm(name).value
 				: ({} as Form);
 		},
-		specialtyDropDown(skill: string) {
-			if (this.specialtyDropSelect === skill) {
-				if (
-					this.character.specialties[skill] &&
-					this.character.specialties[skill].length === 0
-				) {
-					delete this.character.specialties[skill];
-				}
-
-				this.specialtyDropSelect = null;
-			} else {
-				if (!this.character.specialties[skill]) {
-					this.character.specialties[skill] = [];
-				}
-
-				this.specialtyDropSelect = skill;
-			}
-		},
 		formatNum(num: number): string {
 			return num !== 0 ? `(${num > 0 ? "+" : ""}${num})` : "";
 		},
@@ -1360,9 +1239,6 @@ export default defineComponent({
 		sizeMinusForm: null as any,
 
 		dotsOverFive: false,
-		specialtyDropSelect: null as string | null,
-
-		selectedTraits: {} as { [index: string]: Ref<number> },
 
 		EnumSplat,
 		ref,
