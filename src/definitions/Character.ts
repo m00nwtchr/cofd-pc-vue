@@ -194,10 +194,10 @@ export default class Character {
 	spentWillpowerDots = 0;
 	// maxWillpower?: number;
 
-	power = 1; // Gnosis/Primal Urge/Blood Potency
+	power = ref(1); // Gnosis/Primal Urge/Blood Potency
 
 	fuel = 0;
-	// maxFuel = 10;
+	maxFuel: ComputedRef<number>;
 
 	integrityTrait: RefType<number> = 7;
 	integrityTrack?: number[];
@@ -325,7 +325,7 @@ export default class Character {
 			// 	{ deep: true }
 			// );
 
-			let ablTemp = Object.assign({}, defaultAbl, (this as any).abilities);
+			const ablTemp = Object.assign({}, defaultAbl, (this as any).abilities);
 
 			const custom: any = {};
 
@@ -349,8 +349,20 @@ export default class Character {
 			this.abilities = reactive(ablTemp);
 		}
 
+		this.power = ref(this.power || 1);
+
 		this.merits = reactive(this.merits);
-		this.baseAttributes = reactive(this.baseAttributes);
+		this.baseAttributes = reactive(this.baseAttributes || {
+			intelligence: 1,
+			wits: 1,
+			resolve: 1,
+			strength: 1,
+			dexterity: 1,
+			stamina: 1,
+			presence: 1,
+			manipulation: 1,
+			composure: 1
+		});
 
 		this.subType = ref(this.subType || "");
 		this.organization = ref(this.organization || "");
@@ -370,7 +382,7 @@ export default class Character {
 		});
 
 		this.subTypeObj = computed(() => {
-			return Object.values(this.splatObj.subTypes).find(el => 
+			return Object.values(this.splatObj.subTypes).find(el =>
 				nameToKey(unref(el.name)) === nameToKey(unref(this.subType))
 			);
 		});
@@ -380,7 +392,6 @@ export default class Character {
 				.find(el =>
 					el[0] === unref(this.organization)) || [])[1];
 		});
-
 
 		this.attributes = computed(() => {
 			return {
@@ -416,7 +427,7 @@ export default class Character {
 			return Math.min((this.healthTrack.value[this.maxHealth.value - 1] !== 0 ?
 				-3 : this.healthTrack.value[this.maxHealth.value - 2] !== 0 ?
 					-2 : this.healthTrack.value[this.maxHealth.value - 3] !== 0 ?
-						-1 : 0)+this.mod("woundPenalty"), 0);
+						-1 : 0) + this.mod("woundPenalty"), 0);
 		});
 
 		this.speed = computed(() => {
@@ -436,6 +447,17 @@ export default class Character {
 				ballistic: this.baseArmor.ballistic + this.mod("ballisticArmor")
 			};
 		});
+
+		this.maxFuel = computed(() => {
+			const power = unref(this.power);
+			return power >= 5 ?
+				power >= 9 ?
+					power === 10 ?
+						75 :
+						50
+					: 10 + (power - 4) * 5
+				: 10 + power - 1;
+		});
 	}
 
 	getTraitMods(): TraitMod[] {
@@ -453,7 +475,7 @@ export default class Character {
 
 	getData() {
 		const raw = toRaw(this) as any;
-		const obj = {...this} as any;
+		const obj = { ...this } as any;
 
 		delete obj.traitMods;
 		delete obj.splatObj;
@@ -489,7 +511,7 @@ export class Rote {
 
 export class MageCharacter extends Character {
 	obsessions: string[];
-	
+
 	activeSpells!: string[];
 	yantras!: string[];
 	magicalTools!: string[];
@@ -566,6 +588,10 @@ export class VampireCharacter extends Character {
 		super(opts as any);
 
 		this.devotions = opts.devotions || [];
+
+		const maxFuel = this.maxFuel;
+
+		this.maxFuel = computed(() => this.power.value === 0 ? this.attributes.value.stamina : unref(maxFuel));
 	}
 
 	getTraitMods() {
@@ -624,28 +650,34 @@ export class WerewolfCharacter extends Character {
 		// 	return this.splatObj.subTypes[key];
 		// });
 
+		const woundPenalty = this.woundPenalty;
+
+		this.woundPenalty = computed(() => {
+			return unref(this.currentForm) === "gauru" ? 0 : unref(woundPenalty);
+		});
+
 		this.moonGift1 = computed(() => {
 			if (this.subTypeObj.value) {
 				const key = (this.subTypeObj.value.moonGifts as string[])[0];
 				const renown = this.subTypeObj.value.abilities[0];
-				console.log(key);
+
 				return {
-					name: t("splat.werewolf.gift.moon."+key),
+					name: t("splat.werewolf.gift.moon." + key),
 					key,
 					level: this.abilities[renown].level
 				} as Ability;
 			}
-			return unref(opts.moonGift1) || {name: "", key: "", level:0} as Ability;
+			return unref(opts.moonGift1) || { name: "", key: "", level: 0 } as Ability;
 		});
 
-		this.moonGift2 = ref(opts.moonGift2 || {name: "", level: 0});
+		this.moonGift2 = ref(opts.moonGift2 || { name: "", level: 0 });
 		this.moonGifts = computed(() => {
 			return {
 				[this.moonGift1.value.key || nameToKey(unref(this.moonGift1.value.name))]: unref(this.moonGift1),
 				[this.moonGift2.value.key || nameToKey(unref(this.moonGift2.value.name))]: unref(this.moonGift2),
 			};
 		});
-		
+
 		this.shadowGifts = opts.shadowGifts || [];
 		this.wolfGifts = opts.wolfGifts || [];
 		this.rites = opts.rites || [];
@@ -825,6 +857,66 @@ export class ChangelingCharacter extends Character {
 		super(opts as any);
 
 		this.integrityTrait = computed(() => this.attributes.value.wits + this.attributes.value.composure);
+	}
+}
+
+export interface EphemeralAttributes extends Attributes {
+	power: number;
+	finesse: number;
+	resistance: number;
+}
+
+export class EphemeralCharacter extends Character {
+
+	baseAttributes: EphemeralAttributes;
+	attributes: ComputedRef<EphemeralAttributes>;
+
+	numina: string[];
+
+	ban: string;
+	bane: string;
+
+	constructor(opts: EphemeralCharacter) {
+		super(opts as any);
+
+		// this.power = opts.power || 0;
+		// this.finesse = opts.finesse || 0;
+		// this.resistance = opts.finesse || 0;
+
+		this.numina = opts.numina || [];
+
+		this.ban = opts.ban || "";
+		this.bane = opts.bane || "";
+
+		this.maxFuel = computed(() => this.power.value === 5 ? 50 : 5 + (5 * this.power.value));
+		this.baseAttributes = reactive(opts.baseAttributes || {
+			power: 1,
+			finesse: 1,
+			resistance: 1
+		});
+
+		this.attributes = computed(() => {
+			const power = this.baseAttributes.power + this.mod("power");
+			const finesse = this.baseAttributes.finesse + this.mod("finesse");
+			const resistance = this.baseAttributes.resistance + this.mod("resistance");
+			return {
+				power,
+				finesse,
+				resistance,
+
+				intelligence: power,
+				strength: power,
+				presence: power,
+
+				wits: finesse,
+				dexterity: finesse,
+				manipulation: finesse,
+
+				resolve: resistance,
+				stamina: resistance,
+				composure: resistance
+			};
+		});
 	}
 }
 
