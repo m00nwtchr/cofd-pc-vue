@@ -33,16 +33,21 @@
 		}"
 	>
 		<!-- <fab /> -->
+		{
+		<span v-for="val in Object.entries($store.state.selectedTraits)">
+			{{ val[0] }}: {{ val[1]() }},
+		</span>
+		}
 
-		{{ $store.state.selectedTraits }}
+		<!-- {{  }} -->
 		<div id="page-1">
 			<div id="infoBar" class="bar row">
 				<!-- <datalist> </datalist> -->
 
 				<div class="block col-sm-4">
-					{{ splat && splat.nameName }}:
+					{{ $t(character.splat.nameName) }}:
 					<input v-model="character.name" /><br />
-					<span v-if="character.splat === EnumSplat.MORTAL">
+					<span v-if="character.splat.enum === EnumSplat.MORTAL">
 						<label for="age">{{ $t("character.age") }}:</label>
 						<input
 							v-model.number="character.age"
@@ -60,13 +65,13 @@
 					</span>
 				</div>
 				<div class="block col-sm-4">
-					<label for="virtueAnchor">{{ splat && splat.virtueAnchorName }}:</label>
+					<label for="virtueAnchor">{{ $t(character.splat.virtueAnchorName) }}:</label>
 					<input
 						v-model="character.virtueAnchor"
 						list="virtueAnchors"
 						id="virtueAnchor"
 					/><br />
-					<label for="viceAnchor">{{ splat && splat.viceAnchorName }}:</label>
+					<label for="viceAnchor">{{ $t(character.splat.viceAnchorName) }}:</label>
 					<input
 						v-model="character.viceAnchor"
 						list="viceAnchors"
@@ -76,16 +81,16 @@
 					<input v-model="character.concept" id="concept" />
 				</div>
 				<div class="block col-sm-4">
-					<span v-if="character.splat === EnumSplat.MORTAL">
+					<span v-if="character.splat.enum === EnumSplat.MORTAL">
 						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
 						<input v-model="character.chronicle" id="chronicle" /><br>
-						<label for="faction">{{ splat && splat.legacyName }}:</label>
+						<label for="faction">{{ $t(character.splat.legacyName) }}:</label>
 						<input v-model="character.faction" id="faction" /><br>
-						<label for="group-name">{{ splat && splat.orgName }}:</label>
+						<label for="group-name">{{ $t(character.splat.orgName) }}:</label>
 						<input v-model="character.organization" id="group-name" /><br>
 					</span>
 					<span v-else>
-						<label for="subType">{{ splat && splat.subTypeName }}:</label>
+						<label for="subType">{{ $t(character.splat.subTypeName) }}:</label>
 						<!-- <input
 							v-model="character.subType"
 							list="subTypes"
@@ -94,15 +99,15 @@
 							v-model="character.subType"
 							id="subType"
 						>
-							<option v-for="(el, key) in splat.subTypes" :key="key" :value="key">
+							<option v-for="(el, key) in character.splat.subTypes" :key="key" :value="key">
 								{{ el.name }}
 							</option>
 							<option></option>
 						</select><br>
-						<label for="legacy">{{ splat && splat.legacyName }}:</label>
+						<label for="legacy">{{ $t(character.splat.legacyName) }}:</label>
 						<input v-model="character.legacy" id="legacy" /><br />
 					
-						<label for="organization">{{ splat && splat.orgName }}:</label>
+						<label for="organization">{{ $t(character.splat.orgName) }}:</label>
 					<select
 						v-model="character.organization"
 						id="organization"
@@ -173,7 +178,7 @@
 						>
 							<span
 								:class="{ selected: $store.state.selectedTraits[attr] }"
-								@click="selectTrait(attr, { attr: true })"
+								@click="selectTrait(attr, character.attributes)"
 								>{{ $t(`character.attribute.${attr}`) }}</span
 							>
 							<input
@@ -221,13 +226,12 @@
 								:dotRanges="dotRanges"
 							/> -->
 
-							<!-- <ability-list
+							<ability-list
 								:abilities="character.merits"
 								abilityName="Merits"
 								id="merits"
 								class="block"
-								:dotRanges="dotRanges"
-							/> -->
+							/>
 
 							<!-- <div id="werewolf-conditions"> </div> -->
 							<!-- <item-list
@@ -422,7 +426,7 @@
 									:class="{
 										selected: $store.state.selectedTraits['power']
 									}"
-									@click="selectTrait('power', {})"
+									@click="selectTrait('power', character)"
 									class="separator col-sm-12"
 								>
 									{{ splat.powerTraitName }}
@@ -1055,7 +1059,7 @@ export default defineComponent({
 			const vals = Object.values(this.$store.state.selectedTraits) as any[];
 			if (vals.length === 0) return 0;
 
-			const dice = vals.reduce((prev, val) => prev + val);
+			const dice = vals.reduce((prev, val) => prev + val());
 
 			const result = await this.roller.roll(dice, opts);
 
@@ -1063,15 +1067,9 @@ export default defineComponent({
 		},
 		selectTrait(
 			name: string,
-			opts: {
-				attr?: boolean;
-				skill?: boolean;
-				skillCat: string;
-				ability?: boolean;
-			}
+			obj: any
 		) {
 			let state = this.$store.state;
-
 
 			if (state.selectedTraits[name] !== undefined) {
 				this.$store.commit("UNSELECT_TRAIT", name);
@@ -1083,39 +1081,9 @@ export default defineComponent({
 				this.$store.commit({
 					type: "SELECT_TRAIT",
 					name,
-					value: 0
+					value: () => obj[name]
 				});
-
 			}
-
-			console.log(state);
-
-			// 	this.selectedTraits[name] = computed(() => {
-			// 		const attributes = this.character.attributes;
-			// 		const skills = this.character.skills;
-			// 		const abilities = this.character.abilities;
-			// 		const merits = this.character.merits;
-			// 		const obj = (opts.attr
-			// 			? attributes
-			// 			: opts.skill
-			// 				? skills
-			// 				: opts.ability
-			// 					? abilities[name]
-			// 						? abilities
-			// 						: merits
-			// 					: this.character) as any;
-
-			// 		const res = (opts.ability ? (obj[name] || {}).level : obj[name]) || 0;
-			// 		return (
-			// 			res +
-			// 			(res === 0 && opts.skill
-			// 				? Object.values(this.skillCats)[
-			// 						opts.skillCat as any
-			// 				]
-			// 				: 0)
-			// 		);
-			// 	}) as any;
-			// }
 		},
 		setAttr(attr: string, val: number) {
 			const character: Character = (this as any).character;
