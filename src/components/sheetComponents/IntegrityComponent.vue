@@ -1,12 +1,12 @@
 <template>
-	<health-component style="margin-bottom: 15px" v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.integrityTrait" :healthTrack="character.integrityTrack" :name="splat.integrityTraitName" />
+	<health-component style="margin-bottom: 15px" v-if="integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.integrityTrait" :healthTrack="character.integrityTrack" :name="character.splat.integrityTraitName" />
 	<div style="margin-bottom: 15px" v-else>
 		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
 			<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[0] }} Touchstone</h3>
 			<!-- eslint-disable-next-line vue/no-mutating-props -->
 			<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name">
 			</div>
-		<h3 class="separator col-sm-12">{{ splat.integrityTraitName }}</h3>
+		<h3 class="separator col-sm-12">{{ character.splat.integrityTraitName }}</h3>
 		<div class="sheet-dots" style="margin-top:-10px;">
 			<span v-for="n in items" :key="n" >
 				<button class="sheet-dot" @click="$parent.setTrait('integrityTrait', n)" :class="{'sheet-dot-full': character.integrityTrait >= n}"></button>
@@ -20,7 +20,7 @@
 			</span>
 		</div>
 		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-			<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[1] }} Touchstone</h3>
+			<h3 class="separator col-sm-12">{{ integrityTrackType.names[1] }} Touchstone</h3>
 			<!-- eslint-disable-next-line vue/no-mutating-props -->
 			<input class="line" @input="doInput(2)" v-model="touchstonesTemp[1].name">
 		</div>
@@ -45,11 +45,7 @@ export default defineComponent({
 		"character": {
 			required: true,
 			type: Object
-		},
-		"splat": {
-			required: true,
-			type: Object
-		}	
+		}
 	},
 	data() {
 		return {
@@ -86,7 +82,7 @@ export default defineComponent({
 			return arr;
 		},
 		integrityTrackType(): string {
-			return typeof this.splat.integrityTrackType === "string" ? this.splat.integrityTrackType : this.splat.integrityTrackType.type;
+			return typeof this.character.splat.integrityTrackType === "string" ? this.character.splat.integrityTrackType : this.character.splat.integrityTrackType.type;
 		}
 	},
 	watch: {

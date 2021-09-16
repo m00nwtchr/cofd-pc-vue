@@ -14,7 +14,7 @@
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import { Ability } from "@/definitions/Character";
+import { Ability } from "@/definitions/NewCharacter";
 import { defineComponent } from "vue";
 export default defineComponent({
 	name: "HealthComponent",
