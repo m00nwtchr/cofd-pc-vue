@@ -10,8 +10,7 @@
 			name: 'Roll Selected',
 			action: rollSelected
 		}
-	]">
-	</floating-action-menu>
+	]"></floating-action-menu>
 	<!-- <div>
 		<button class="fab" @click="rollSelected()">Roll Selected</button>
 		<modal-component
@@ -23,22 +22,21 @@
 		>
 			<spell-calculator :character="character" class="col-12" />
 		</modal-component>
-	</div> -->
+	</div>-->
 
 	<!-- <teleport v-if="character.splat !== EnumSplat.VAMPIRE" :to="`#${EnumSplat[character.splat].toLowerCase()}-conditions`"> -->
 	<!-- </teleport> -->
-	<div id="charsheet"
+	<div
+		id="charsheet"
 		:class="{
 			[`charsheet-${EnumSplat[character.splat.enum].toLowerCase()}`]: true
 		}"
 	>
 		<!-- <fab /> -->
 		{
-		<span v-for="val in Object.entries(store.state.selectedTraits)">
-			{{ val[0] }}: {{ val[1]() }},
-		</span>
-		}
+		<span v-for="val in Object.entries(store.state.selectedTraits)">{{ val[0] }}: {{ val[1]() }},</span>
 
+		}
 		<!-- {{  }} -->
 		<div id="page-1">
 			<div id="infoBar" class="bar row">
@@ -46,141 +44,115 @@
 
 				<div class="block col-sm-4">
 					{{ $t(character.splat.nameName) }}:
-					<input v-model="character.name" /><br />
+					<input v-model="character.name" />
+					<br />
 					<span v-if="character.splat.enum === EnumSplat.MORTAL">
 						<label for="age">{{ $t("character.age") }}:</label>
-						<input
-							v-model.number="character.age"
-							type="number"
-							id="age"
-						/><br />
+						<input v-model.number="character.age" type="number" id="age" />
+						<br />
 						<label for="player">{{ $t("character.player") }}:</label>
 						<input v-model="character.player" id="player" />
 					</span>
 					<span v-else>
 						<label for="player">{{ $t("character.player") }}:</label>
-						<input v-model="character.player" id="player" /><br />
+						<input v-model="character.player" id="player" />
+						<br />
 						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
 						<input v-model="character.chronicle" id="chronicle" />
 					</span>
 				</div>
 				<div class="block col-sm-4">
 					<label for="virtueAnchor">{{ $t(character.splat.virtueAnchorName) }}:</label>
-					<input
-						v-model="character.virtueAnchor"
-						list="virtueAnchors"
-						id="virtueAnchor"
-					/><br />
+					<input v-model="character.virtueAnchor" list="virtueAnchors" id="virtueAnchor" />
+					<br />
 					<label for="viceAnchor">{{ $t(character.splat.viceAnchorName) }}:</label>
-					<input
-						v-model="character.viceAnchor"
-						list="viceAnchors"
-						id="viceAnchor"
-					/><br />
+					<input v-model="character.viceAnchor" list="viceAnchors" id="viceAnchor" />
+					<br />
 					<label for="concept">{{ $t("character.concept") }}:</label>
 					<input v-model="character.concept" id="concept" />
 				</div>
 				<div class="block col-sm-4">
 					<span v-if="character.splat.enum === EnumSplat.MORTAL">
 						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
-						<input v-model="character.chronicle" id="chronicle" /><br>
+						<input v-model="character.chronicle" id="chronicle" />
+						<br />
 						<label for="faction">{{ $t(character.splat.legacyName) }}:</label>
-						<input v-model="character.faction" id="faction" /><br>
+						<input v-model="character.faction" id="faction" />
+						<br />
 						<label for="group-name">{{ $t(character.splat.orgName) }}:</label>
-						<input v-model="character.organization" id="group-name" /><br>
+						<input v-model="character.organization" id="group-name" />
+						<br />
 					</span>
 					<span v-else>
 						<label for="subType">{{ $t(character.splat.subTypeName) }}:</label>
 						<!-- <input
 							v-model="character.subType"
 							list="subTypes"
-						/><br /> -->
-						<select
-							v-model="character.subType"
-							id="subType"
-						>
-							<option v-for="(el, key) in character.splat.subTypes" :key="key" :value="key">
-								{{ $t(el.name) }}
-							</option>
+						/><br />-->
+						<select v-model="character.subType" id="subType">
+							<option
+								v-for="(el, key) in character.splat.subTypes"
+								:key="key"
+								:value="key"
+							>{{ $t(el.name) }}</option>
 							<option></option>
-						</select><br>
+						</select>
+						<br />
 						<label for="legacy">{{ $t(character.splat.legacyName) }}:</label>
-						<input v-model="character.legacy" id="legacy" /><br />
-					
+						<input v-model="character.legacy" id="legacy" />
+						<br />
+
 						<label for="organization">{{ $t(character.splat.orgName) }}:</label>
-					<select
-						v-model="character.organization"
-						id="organization"
-					>
-						<option v-for="(el, key) in character.splat.organizations" :key="key" :value="key">
-							{{ $t(el.name) }}
-						</option>
-						<option></option>
-					</select>
+						<select v-model="character.organization" id="organization">
+							<option
+								v-for="(el, key) in character.splat.organizations"
+								:key="key"
+								:value="key"
+							>{{ $t(el.name) }}</option>
+							<option></option>
+						</select>
 					</span>
 				</div>
 
 				<datalist id="organizations">
-						<option
-							v-for="(el, key) in character.splat.organizations"
-							:key="key"
-							:value="key"
-						>
-							{{ $t(el.name) }}
-						</option>
-					</datalist>
+					<option
+						v-for="(el, key) in character.splat.organizations"
+						:key="key"
+						:value="key"
+					>{{ $t(el.name) }}</option>
+				</datalist>
 
-					<datalist id="subTypes">
-						<option v-for="(el, key) in character.splat.subTypes" :key="key" :value="key">
-							{{ $t(el.name) }}
-						</option>
-					</datalist>
+				<datalist id="subTypes">
+					<option v-for="(el, key) in character.splat.subTypes" :key="key" :value="key">{{ $t(el.name) }}</option>
+				</datalist>
 
-					<datalist id="virtueAnchors">
-						<option
-							v-for="el in character.splat.virtueAnchors"
-							:key="el"
-							:value="$t(el)"
-						></option>
-					</datalist>
+				<datalist id="virtueAnchors">
+					<option v-for="el in character.splat.virtueAnchors" :key="el" :value="$t(el)"></option>
+				</datalist>
 
-					<datalist id="viceAnchors">
-						<option
-							v-for="el in character.splat.viceAnchors"
-							:key="el"
-							:value="$t(el)"
-						></option>
-					</datalist>
+				<datalist id="viceAnchors">
+					<option v-for="el in character.splat.viceAnchors" :key="el" :value="$t(el)"></option>
+				</datalist>
 			</div>
 			<div class="separator col-12">
 				<h2>{{ $t("character.attributes") }}</h2>
 			</div>
 			<div id="attrBar" class="bar row">
-				<div
-					id="attr-cats"
-					style="text-align: right"
-					class="block col-sm-2"
-				>
-					{{ $t("character.attribute.power") }}<br />
-					{{ $t("character.attribute.finesse") }}<br />
-					{{ $t("character.attribute.resistance") }}<br />
+				<div id="attr-cats" style="text-align: right" class="block col-sm-2">
+					{{ $t("character.attribute.power") }}
+					<br />
+					{{ $t("character.attribute.finesse") }}
+					<br />
+					{{ $t("character.attribute.resistance") }}
+					<br />
 				</div>
 				<div class="attr-proper row col-sm-10">
-					<div
-						v-for="(attrCat,i) in ATTRIBUTES"
-						:key="i"
-						class="block col-sm-4"
-					>
-						<span
-							style="text-transform: capitalize"
-							v-for="attr in attrCat"
-							:key="attr"
-						>
+					<div v-for="(attrCat,i) in ATTRIBUTES" :key="i" class="block col-sm-4">
+						<span style="text-transform: capitalize" v-for="attr in attrCat" :key="attr">
 							<span
 								:class="{ selected: store.state.selectedTraits[attr] }"
 								@click="selectTrait(attr, character.attributes)"
-								>{{ $t(`character.attribute.${attr}`) }}</span
-							>
+							>{{ $t(`character.attribute.${attr}`) }}</span>
 							<input
 								v-if="!dotsOverFive && attrMax > 5"
 								v-model.number="baseAttributes[attr]"
@@ -210,9 +182,7 @@
 				<skill-sidebar @selectSkill="selectTrait" :character="character" class="col col-sm-4"></skill-sidebar>
 
 				<div id="traits" class="col-sm-8">
-					<h2 class="separator col-sm-12" style="margin-bottom: 20px">
-						{{ $t("character.other_traits") }}
-					</h2>
+					<h2 class="separator col-sm-12" style="margin-bottom: 20px">{{ $t("character.other_traits") }}</h2>
 					<div class="row">
 						<div class="col col-sm-7">
 							<ability-list
@@ -224,7 +194,6 @@
 								id="ability"
 								class="block"
 							/>
-
 
 							<ability-list
 								v-if="(character instanceof MortalCharacter)"
@@ -241,47 +210,44 @@
 								name="Conditions"
 								:items="character.conditions"
 								:mutable="true"
-							/> -->
-							<br v-if="character.splat.enum === EnumSplat.WEREWOLF">
+							/>-->
+							<br v-if="character.splat.enum === EnumSplat.WEREWOLF" />
 
 							<span v-if="character.splat.enum === EnumSplat.WEREWOLF">
 								<h3 class="separator col-sm-12">Hunter's Aspect</h3>
-								<input class="line w-100" type="text" v-model="character.huntersAspect">
+								<input class="line w-100" type="text" v-model="character.huntersAspect" />
 							</span>
 
-
 							<div id="minorTraits" class="block col col-12">
-								<br v-if="character.splat.enum === EnumSplat.WEREWOLF">
+								<br v-if="character.splat.enum === EnumSplat.WEREWOLF" />
 
-								<span
-									v-if="
-										character.splat.enum !== EnumSplat.WEREWOLF
-									"
-								>
+								<span v-if="
+									character.splat.enum !== EnumSplat.WEREWOLF
+								">
 									{{ $t("character.trait.size") }}:
-									<input
-										v-model.number="character.size"
-										type="number"
-									/><br />
+									<input v-model.number="character.size" type="number" />
+									<br />
 									{{ $t("character.trait.speed") }}:
-									{{ character.speed }}<br />
+									{{ character.speed }}
+									<br />
 									{{ $t("character.trait.defense") }}:
-									{{ character.defense }}<br />
+									{{ character.defense }}
+									<br />
 									<!-- {{ $t("character.trait.armor") }}: <input v-model="character.armor" /><br> -->
 									{{ $t("character.trait.armor") }}:
 									{{
 										character.armor
 											? character.armor.general +
-												"/" +
+											"/" +
 											character.armor.ballistic
 											: ""
-									}}<br />
+									}}
+									<br />
 									{{ $t("character.trait.initative") }}:
-									{{ character.initative }}<br />
+									{{ character.initative }}
+									<br />
 								</span>
-								<span style="float: left; margin-right: 5px"
-									>{{ $t("character.trait.beats") }}:</span
-								>
+								<span style="float: left; margin-right: 5px">{{ $t("character.trait.beats") }}:</span>
 								<div style="float: left; margin-right: 10px">
 									<span v-for="n in 5" :key="n">
 										<button
@@ -300,29 +266,30 @@
 								<input
 									v-model.number="character.experience"
 									type="number"
-								/><br />
+								/>
+								<br />
 								<div
 									v-if="
-											character.splat.alternateBeatName &&
-											!character.splat.alternateBeatOptional
+										character.splat.alternateBeatName &&
+										!character.splat.alternateBeatOptional
 									"
 								>
-									<span style="float: left"
-										>{{
+									<span style="float: left">
+										{{
 											character.splat.alternateBeatName(
 												$t("character.trait.beats")
 											)
-										}}:</span
-									>
+										}}:
+									</span>
 									<div style="float: left">
 										<span v-for="n in 5" :key="n">
 											<button
 												class="sheet-box"
 												@click="
-													setTrait(
-														'alternateBeats',
-														n
-													)
+												setTrait(
+													'alternateBeats',
+													n
+												)
 												"
 												:class="{
 													'sheet-dot-full':
@@ -344,7 +311,8 @@
 											character.alternateExperience
 										"
 										type="number"
-									/><br />
+									/>
+									<br />
 								</div>
 							</div>
 						</div>
@@ -362,29 +330,20 @@
 								<!-- <i class="subtitle" style="margin-bottom: 5px" v-if="character.splat === EnumSplat.WEREWOLF">(EEE)</i> -->
 							</health-component>
 
-							<div
-								id="willpower"
-								class="col-12"
-								style="margin-bottom: 15px"
-							>
-								<h3 class="separator col-sm-12">
-									{{ $t("character.trait.willpower") }}
-								</h3>
-								<div
-									class="sheet-dots"
-									style="margin-top: -10px"
-								>
+							<div id="willpower" class="col-12" style="margin-bottom: 15px">
+								<h3 class="separator col-sm-12">{{ $t("character.trait.willpower") }}</h3>
+								<div class="sheet-dots" style="margin-top: -10px">
 									<button
-										v-for="n in character.maxWillpower+character.spentWillpowerDots"
+										v-for="n in character.maxWillpower + character.spentWillpowerDots"
 										:key="n"
 										@click="
-											setTrait(
-												'spentWillpowerDots',
-												character.maxWillpower +character.spentWillpowerDots - n,
-												{
-													off: -1
-												}
-											)
+										setTrait(
+											'spentWillpowerDots',
+											character.maxWillpower + character.spentWillpowerDots - n,
+											{
+												off: -1
+											}
+										)
 										"
 										class="sheet-dot"
 										:class="{
@@ -423,19 +382,14 @@
 									}"
 									@click="selectTrait('power', character)"
 									class="separator col-sm-12"
-								>
-									{{ $t(character.splat.powerTraitName) }}
-								</h3>
-								<div
-									class="sheet-dots"
-									style="margin-top: -10px"
-								>
+								>{{ $t(character.splat.powerTraitName) }}</h3>
+								<div class="sheet-dots" style="margin-top: -10px">
 									<button
 										v-for="n in 10"
 										:key="n"
 										class="sheet-dot"
 										@click="
-											setTrait('power', n, { min: 1 })
+										setTrait('power', n, { min: 1 })
 										"
 										:class="{
 											'sheet-dot-full':
@@ -450,13 +404,8 @@
 								id="fuelTrait"
 								style="margin-bottom: 15px"
 							>
-								<h3 class="separator col-sm-12">
-									{{ $t(character.splat.fuelTraitName) }}
-								</h3>
-								<div
-									class="sheet-boxes"
-									style="margin-top: -10px"
-								>
+								<h3 class="separator col-sm-12">{{ $t(character.splat.fuelTraitName) }}</h3>
+								<div class="sheet-boxes" style="margin-top: -10px">
 									<!-- {{character.maxFuel}} -->
 									<span v-for="n in character.maxFuel" :key="n">
 										<button
@@ -488,49 +437,35 @@
 								style="color: black; white-space: nowrap; text-align: left;"
 								id="kuruth-triggers"
 							>
-								<h3 class="separator col-sm-12">
-									Kuruth Triggers
-								</h3>
+								<h3 class="separator col-sm-12">Kuruth Triggers</h3>
 								<!-- <div class="row col-12"> -->
 								<!-- <div style="color:black;" class="col-12"> -->
 								Passive:
-								<input
-									class="line"
-									style="width: 70%"
-									v-model="character.kuruthTriggers.passive"
-								/><br />
-								Common:
-								<input
-									class="line"
-									style="width: 70%"
-									v-model="character.kuruthTriggers.common"
-								/><br />
-								Specific:
-								<input
-									class="line"
-									style="width: 70%"
-									v-model="character.kuruthTriggers.specific"
-								/>
+								<input class="line" style="width: 70%" v-model="character.kuruthTriggers.passive" />
+								<br />Common:
+								<input class="line" style="width: 70%" v-model="character.kuruthTriggers.common" />
+								<br />Specific:
+								<input class="line" style="width: 70%" v-model="character.kuruthTriggers.specific" />
 								<!-- </div> -->
 								<!-- </div> -->
 							</div>
 
-							<br>
+							<br />
 
 							<!-- <item-list
 								class="col-12"
 								name="Conditions"
 								:items="character.conditions"
 								:mutable="true"
-							/> -->
-							<br>
+							/>-->
+							<br />
 
 							<!-- <item-list
 								class="col-12"
 								name="Aspirations"
 								:items="character.aspirations"
 								:mutable="true"
-							/> -->
+							/>-->
 
 							<!-- <br v-if="character.splat.enum === EnumSplat.MAGE"> -->
 
@@ -540,7 +475,7 @@
 								name="Obsessions"
 								:items="character.obsessions"
 								:mutable="true"
-							/> -->
+							/>-->
 						</div>
 					</div>
 				</div>
@@ -562,7 +497,7 @@
 							:key="n"
 							v-model="character.activeSpells[n - 1]"
 						/>
-					</div> -->
+					</div>-->
 					<!-- <item-list
 						id="yantras"
 						class="col-12"
@@ -594,7 +529,7 @@
 						:items="character.inuredSpells"
 						:mutable="true"
 						style="margin-bottom: 15px"
-					/> -->
+					/>-->
 				</div>
 
 				<div class="col-sm-8">
@@ -608,23 +543,23 @@
 						class="w-100"
 						:items="character.nimbus"
 						:mutable="true"	
-					></item-list> -->
+					></item-list>-->
 					<div class="w-100 row">
 						<!-- <div class="col-6"> -->
-							<!-- <item-list
+						<!-- <item-list
 								name="Arcana Attainments"
 								class="col-6"
 								:items="character.arcanaAttainments"
 								:mutable="true"
-							/> -->
+						/>-->
 						<!-- </div> -->
 						<!-- <div class="col-6"> -->
-							<!-- <item-list
+						<!-- <item-list
 								name="Legacy Attainments"
 								class="col-6"
 								:items="character.legacyAttainments"
 								:mutable="true"
-							/> -->
+						/>-->
 						<!-- </div> -->
 					</div>
 					<!-- <div id="rotes" class="row col-sm-12">
@@ -661,7 +596,7 @@
 										<input style="text-transform: capitalize;" class="line" v-model="rote.roteSkill">
 									</div>
 								</div>
-							</div> -->
+					</div>-->
 					<br />
 				</div>
 			</div>
@@ -674,8 +609,6 @@
 						style="text-align: left; width: 100%"
 						class="col-sm"
 					>
-						
-
 						<h4
 							@click="character.currentForm = form.name.toLowerCase()"
 							:class="{
@@ -684,9 +617,7 @@
 									form.name.toLowerCase()
 							}"
 							class="separator col-sm-12"
-						>
-							{{ form.name }}
-						</h4>
+						>{{ form.name }}</h4>
 						<i class="subtitle">({{ form.desc }})</i>
 
 						<div>
@@ -702,105 +633,135 @@
 								)"
 								:key="attr"
 							>
-								{{ $t("character.attribute." + attr)
-								}}<!--
-								-->{{ formatNum(form[attr + "Mod"]) }}:
+								{{
+									$t("character.attribute." + attr)
+								}}
+								<!--
+								-->
+								{{ formatNum(form[attr + "Mod"]) }}:
 								<span class="default-font">
 									{{
 										character.attributes[attr] -
 											currentForm[attr + "Mod"] +
 											form[attr + "Mod"]
-									}} </span
-								><br />
+									}}
+								</span>
+								<br />
 							</span>
 
 							<br />
-
-							{{ $t("character.trait.size")
-							}}<!--
-							-->{{ formatNum(form.sizeMod) }}:
+							{{
+								$t("character.trait.size")
+							}}
+							<!--
+							-->
+							{{ formatNum(form.sizeMod) }}:
 							<input
 								v-if="form.name === 'Hishu'"
 								v-model.number="sizeMinusForm"
 								type="number"
 							/>
-							<span class="default-font" v-else>{{
-								character.size - currentForm.sizeMod + form.sizeMod
-							}}</span
-							><br />
-
-							{{ $t("character.trait.defense")
-							}}<!--
-							-->{{ formatNum(formDefenseMod(form)) }}:
-							<span class="default-font">
-								{{ formDefense(form) }} </span
-							><br />
-
-							{{ $t("character.trait.initative")
-							}}<!--
-							-->{{
+							<span class="default-font" v-else>
+								{{
+									character.size - currentForm.sizeMod + form.sizeMod
+								}}
+							</span>
+							<br />
+							{{
+								$t("character.trait.defense")
+							}}
+							<!--
+							-->
+							{{ formatNum(formDefenseMod(form)) }}:
+							<span class="default-font">{{ formDefense(form) }}</span>
+							<br />
+							{{
+								$t("character.trait.initative")
+							}}
+							<!--
+							-->
+							{{
 								formatNum(
 									form.dexterityMod +
-										form.composureMod -
-										getForm("hishu").dexterityMod -
-										getForm("hishu").composureMod
+									form.composureMod -
+									getForm("hishu").dexterityMod -
+									getForm("hishu").composureMod
 								)
 							}}:
-							<span class="default-font">
+							<span
+								class="default-font"
+							>
 								{{
 									character.initative -
 										currentForm.dexterityMod -
 										currentForm.composureMod +
 										form.dexterityMod +
 										form.composureMod
-								}} </span
-							><br />
+								}}
+							</span>
+							<br />
 
 							<!-- Armor: <input v-model="character.armor" /><br> -->
-							{{ $t("character.trait.speed")
-							}}<!--
-							-->{{ formatNum(form.speedMod + form.strengthMod + form.dexterityMod) }}:
-							<span class="default-font">{{
-								character.speed -
-									currentForm.strengthMod -
-									currentForm.dexterityMod -
-									currentForm.speedMod +
-									form.strengthMod +
-									form.dexterityMod +
-									form.speedMod
-							}}</span
-							><br />
-
+							{{
+								$t("character.trait.speed")
+							}}
+							<!--
+							-->
+							{{ formatNum(form.speedMod + form.strengthMod + form.dexterityMod) }}:
+							<span
+								class="default-font"
+							>
+								{{
+									character.speed -
+										currentForm.strengthMod -
+										currentForm.dexterityMod -
+										currentForm.speedMod +
+										form.strengthMod +
+										form.dexterityMod +
+										form.speedMod
+								}}
+							</span>
+							<br />
 							{{ $t("character.trait.armor") }}:
 							<span class="default-font">
 								{{
 									`${character.armor.general -
 										currentForm.armorMod.general +
 										form.armorMod.general}/${character.armor
-										.ballistic -
+											.ballistic -
 										currentForm.armorMod.ballistic +
 										form.armorMod.ballistic}`
-								}} </span
-							><br />
-
-							{{ $t("character.trait.perception")
-							}}<!--
-							-->{{ formatNum(form.perceptionMod + form.witsMod + form.composureMod) }}:
-							<span class="default-font">{{
-								perception -
-									currentForm.perceptionMod +
-									form.perceptionMod
-							}}</span>
+								}}
+							</span>
+							<br />
+							{{
+								$t("character.trait.perception")
+							}}
+							<!--
+							-->
+							{{ formatNum(form.perceptionMod + form.witsMod + form.composureMod) }}:
+							<span
+								class="default-font"
+							>
+								{{
+									perception -
+										currentForm.perceptionMod +
+										form.perceptionMod
+								}}
+							</span>
 							<br />
 
 							<span v-if="form.name === 'Gauru'">
 								Kuruth Limit:
-								<span class="default-font">{{
-									character.attributes.stamina -
-										currentForm.staminaMod +
-										character.power
-								}}</span> </span
-							><br />
+								<span class="default-font">
+									{{
+										character.attributes.stamina -
+											currentForm.staminaMod +
+											character.power
+									}}
+								</span>
+							</span>
+							<br />
 
 							<div style="line-height: 15px" class="form-traits">
 								<span v-for="(trait, i) in form.traits" :key="i">
@@ -818,10 +779,9 @@
 					</div>
 					<div class="col-sm-8">
 						<h2 class="separator col-sm-12" style="margin-bottom: 20px;">Gifts and Rites</h2>
-						
-						
+
 						<!-- <h4 class="separator col-sm-12">Moon Gifts</h4> -->
-						
+
 						<div class="row" style="margin-bottom: 10px">
 							<!-- <div class="col-6" v-for="(gift, i) in character.moonGifts" :key="i">
 								<ability-list
@@ -829,54 +789,37 @@
 									:optionsMutable="i !== 0 || !Object.keys(character.getSplat().subTypes).includes(nameToKey(character.subType))"
 									:length="1"
 								/>
-							</div> -->
-								<ability-list class="col-12"
-									:abilities="character.moonGifts"
-									abilityName="Moon Gifts"
-									:optionsMutable="true"
-									:length="2"
-									:horizontal="true"
-								/>
+							</div>-->
+							<ability-list
+								class="col-12"
+								:abilities="character.moonGifts"
+								abilityName="Moon Gifts"
+								:optionsMutable="true"
+								:length="2"
+								:horizontal="true"
+							/>
 						</div>
 						<div class="row col-sm-12">
 							<div class="col-sm-6">
 								<h4 class="separator">Shadow Gifts</h4>
-								<item-list
-								class="col-12"
-								:items="character.shadowGifts"
-								:mutable="true"
-								/>
+								<item-list class="col-12" :items="character.shadowGifts" :mutable="true" />
 							</div>
 							<div class="col-sm-6">
 								<h4 class="separator">Wolf Gifts</h4>
-								<item-list
-								class="col-12"
-								:items="character.wolfGifts"
-								:mutable="true"
-								/>
+								<item-list class="col-12" :items="character.wolfGifts" :mutable="true" />
 							</div>
 						</div>
 						<div class="row col-sm-12">
 							<h4 class="separator">Rites</h4>
-							<item-list
-								class="col-12"
-								:items="character.rites"
-								:mutable="true"
-								:cols="2"
-							/>
+							<item-list class="col-12" :items="character.rites" :mutable="true" :cols="2" />
 						</div>
 					</div>
-
 				</div>
 			</div>
 
-			<div id="vampire-traits" v-if="(character instanceof VampireCharacter)" class="row col-12">
-				
-			</div>
-
+			<div id="vampire-traits" v-if="(character instanceof VampireCharacter)" class="row col-12"></div>
 		</div>
-							<!-- <object-list :items="character.weapons" name=""></object-list> -->
-
+		<!-- <object-list :items="character.weapons" name=""></object-list> -->
 	</div>
 </template>
 
@@ -885,7 +828,7 @@ import { computed, defineComponent, reactive, ref, Ref, toRefs, unref } from "vu
 
 import { useStore } from "../store";
 
-import { 
+import {
 	Character,
 	MortalCharacter,
 	SupernaturalCharacter,
@@ -1079,7 +1022,7 @@ export default defineComponent({
 				if (Object.keys(state.selectedTraits).length === 3) {
 					this.store.commit("UPDATE_SELECTED", {});
 				}
-				
+
 				this.store.commit({
 					type: "SELECT_TRAIT",
 					name,
@@ -1196,7 +1139,7 @@ export default defineComponent({
 
 		dotsOverFive: false,
 
-		
+
 		// Rote,
 
 		// random: new Random(),
@@ -1490,11 +1433,10 @@ button.sheet-dot-small {
 	text-align: center;
 
 	font-size: 8pt;
-	font-family: 'Goudy';
+	font-family: "Goudy";
 
 	color: black;
 }
-
 
 #rotes {
 	text-align: center;
