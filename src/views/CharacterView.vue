@@ -29,12 +29,12 @@
 	<!-- </teleport> -->
 	<div id="charsheet"
 		:class="{
-			[`charsheet-${character.splat.string.toLowerCase()}`]: true
+			[`charsheet-${EnumSplat[character.splat.enum].toLowerCase()}`]: true
 		}"
 	>
 		<!-- <fab /> -->
 		{
-		<span v-for="val in Object.entries($store.state.selectedTraits)">
+		<span v-for="val in Object.entries(store.state.selectedTraits)">
 			{{ val[0] }}: {{ val[1]() }},
 		</span>
 		}
@@ -100,7 +100,7 @@
 							id="subType"
 						>
 							<option v-for="(el, key) in character.splat.subTypes" :key="key" :value="key">
-								{{ el.name }}
+								{{ $t(el.name) }}
 							</option>
 							<option></option>
 						</select><br>
@@ -112,8 +112,8 @@
 						v-model="character.organization"
 						id="organization"
 					>
-						<option v-for="(el, key) in splat.organizations" :key="key" :value="key">
-							{{ el.name }}
+						<option v-for="(el, key) in character.splat.organizations" :key="key" :value="key">
+							{{ $t(el.name) }}
 						</option>
 						<option></option>
 					</select>
@@ -122,33 +122,33 @@
 
 				<datalist id="organizations">
 						<option
-							v-for="(el, key) in splat.organizations"
+							v-for="(el, key) in character.splat.organizations"
 							:key="key"
 							:value="key"
 						>
-							{{ el.name }}
+							{{ $t(el.name) }}
 						</option>
 					</datalist>
 
 					<datalist id="subTypes">
-						<option v-for="(el, key) in splat.subTypes" :key="key" :value="key">
-							{{ el.name }}
+						<option v-for="(el, key) in character.splat.subTypes" :key="key" :value="key">
+							{{ $t(el.name) }}
 						</option>
 					</datalist>
 
 					<datalist id="virtueAnchors">
 						<option
-							v-for="el in splat.virtueAnchors"
+							v-for="el in character.splat.virtueAnchors"
 							:key="el"
-							:value="el"
+							:value="$t(el)"
 						></option>
 					</datalist>
 
 					<datalist id="viceAnchors">
 						<option
-							v-for="el in splat.viceAnchors"
+							v-for="el in character.splat.viceAnchors"
 							:key="el"
-							:value="el"
+							:value="$t(el)"
 						></option>
 					</datalist>
 			</div>
@@ -167,8 +167,8 @@
 				</div>
 				<div class="attr-proper row col-sm-10">
 					<div
-						v-for="attrCat in ATTRIBUTES"
-						:key="attrCat"
+						v-for="(attrCat,i) in ATTRIBUTES"
+						:key="i"
 						class="block col-sm-4"
 					>
 						<span
@@ -177,13 +177,13 @@
 							:key="attr"
 						>
 							<span
-								:class="{ selected: $store.state.selectedTraits[attr] }"
+								:class="{ selected: store.state.selectedTraits[attr] }"
 								@click="selectTrait(attr, character.attributes)"
 								>{{ $t(`character.attribute.${attr}`) }}</span
 							>
 							<input
 								v-if="!dotsOverFive && attrMax > 5"
-								v-model.number="character.baseAttributes[attr]"
+								v-model.number="baseAttributes[attr]"
 								type="number"
 								style="width: 35px"
 								class="attr-input"
@@ -196,7 +196,7 @@
 									:class="{
 										'sheet-dot': true,
 										'sheet-dot-full':
-											character.attributes[attr] >= n,
+											baseAttributes[attr] >= n,
 										'sheet-dot-small': dotAttrMax > 5
 									}"
 								></button>
@@ -215,18 +215,19 @@
 					</h2>
 					<div class="row">
 						<div class="col col-sm-7">
-							<!-- <ability-list
-								v-if="splat && splat.abilityName"
+							<ability-list
+								v-if="(character instanceof SupernaturalCharacter)"
 								:abilities="character.abilities"
-								:optionsMutable="!splat.finiteAbilities"
-								:abilityName="splat.abilityName"
-								:datalist="splat.abilities"
+								:optionsMutable="!character.splat.finiteAbilities"
+								:abilityName="$t(character.splat.abilityName)"
+								:datalist="character.splat.abilities"
 								id="ability"
 								class="block"
-								:dotRanges="dotRanges"
-							/> -->
+							/>
+
 
 							<ability-list
+								v-if="(character instanceof MortalCharacter)"
 								:abilities="character.merits"
 								abilityName="Merits"
 								id="merits"
@@ -241,20 +242,20 @@
 								:items="character.conditions"
 								:mutable="true"
 							/> -->
-							<br v-if="character.splat === EnumSplat.WEREWOLF">
+							<br v-if="character.splat.enum === EnumSplat.WEREWOLF">
 
-							<span v-if="character.splat === EnumSplat.WEREWOLF">
+							<span v-if="character.splat.enum === EnumSplat.WEREWOLF">
 								<h3 class="separator col-sm-12">Hunter's Aspect</h3>
 								<input class="line w-100" type="text" v-model="character.huntersAspect">
 							</span>
 
 
 							<div id="minorTraits" class="block col col-12">
-								<br v-if="character.splat === EnumSplat.WEREWOLF">
+								<br v-if="character.splat.enum === EnumSplat.WEREWOLF">
 
 								<span
 									v-if="
-										character.splat !== EnumSplat.WEREWOLF
+										character.splat.enum !== EnumSplat.WEREWOLF
 									"
 								>
 									{{ $t("character.trait.size") }}:
@@ -302,14 +303,13 @@
 								/><br />
 								<div
 									v-if="
-										splat &&
-											splat.alternateBeatName &&
-											!splat.alternateBeatOptional
+											character.splat.alternateBeatName &&
+											!character.splat.alternateBeatOptional
 									"
 								>
 									<span style="float: left"
 										>{{
-											splat.alternateBeatName(
+											character.splat.alternateBeatName(
 												$t("character.trait.beats")
 											)
 										}}:</span
@@ -335,7 +335,7 @@
 									<span style="clear: both"></span>
 									<br />
 									{{
-										splat.alternateBeatName(
+										character.splat.alternateBeatName(
 											$t("character.trait.experience")
 										)
 									}}:
@@ -357,6 +357,7 @@
 								:woundPenalty="character.woundPenalty"
 								:healthTrack="character.healthTrack"
 								:name="$t('character.trait.health')"
+								@update="(track) => character.healthTrack = track"
 							>
 								<!-- <i class="subtitle" style="margin-bottom: 5px" v-if="character.splat === EnumSplat.WEREWOLF">(EEE)</i> -->
 							</health-component>
@@ -374,12 +375,12 @@
 									style="margin-top: -10px"
 								>
 									<button
-										v-for="n in character.maxWillpower"
+										v-for="n in character.maxWillpower+character.spentWillpowerDots"
 										:key="n"
 										@click="
 											setTrait(
 												'spentWillpowerDots',
-												character.maxWillpower - n,
+												character.maxWillpower +character.spentWillpowerDots - n,
 												{
 													off: -1
 												}
@@ -388,24 +389,18 @@
 										class="sheet-dot"
 										:class="{
 											'sheet-dot-full':
-												character.maxWillpower -
-													character.spentWillpowerDots >=
+												character.maxWillpower >=
 												n
 										}"
 									></button>
 								</div>
 								<div
 									class="sheet-boxes"
-									:style="{
-										'margin-left':
-											character.spentWillpowerDots * -15 +
-											'px'
-									}"
+									:style="{ marginLeft: (character.spentWillpowerDots * -15) + 'px' }"
 									style="margin-top: -7px"
 								>
 									<button
-										v-for="n in character.maxWillpower -
-											character.spentWillpowerDots"
+										v-for="n in character.maxWillpower"
 										:key="n"
 										class="sheet-box"
 										@click="setTrait('willpower', n)"
@@ -417,19 +412,19 @@
 								</div>
 							</div>
 							<div
-								v-if="splat && splat.powerTraitName"
+								v-if="character instanceof SupernaturalCharacter"
 								class="col-12"
 								id="powerTrait"
 								style="margin-bottom: 15px"
 							>
 								<h3
 									:class="{
-										selected: $store.state.selectedTraits['power']
+										selected: store.state.selectedTraits['power']
 									}"
 									@click="selectTrait('power', character)"
 									class="separator col-sm-12"
 								>
-									{{ splat.powerTraitName }}
+									{{ $t(character.splat.powerTraitName) }}
 								</h3>
 								<div
 									class="sheet-dots"
@@ -450,19 +445,19 @@
 								</div>
 							</div>
 							<div
-								v-if="splat && splat.fuelTraitName"
+								v-if="(character instanceof SupernaturalCharacter)"
 								class="col-12"
 								id="fuelTrait"
 								style="margin-bottom: 15px"
 							>
 								<h3 class="separator col-sm-12">
-									{{ splat.fuelTraitName }}
+									{{ $t(character.splat.fuelTraitName) }}
 								</h3>
 								<div
 									class="sheet-boxes"
 									style="margin-top: -10px"
 								>
-									{{character.maxFuel}}
+									<!-- {{character.maxFuel}} -->
 									<span v-for="n in character.maxFuel" :key="n">
 										<button
 											class="sheet-box"
@@ -489,7 +484,7 @@
 
 							<div
 								class="col-12"
-								v-if="character.splat === EnumSplat.WEREWOLF"
+								v-if="character.splat.enum === EnumSplat.WEREWOLF"
 								style="color: black; white-space: nowrap; text-align: left;"
 								id="kuruth-triggers"
 							>
@@ -537,15 +532,15 @@
 								:mutable="true"
 							/> -->
 
-							<br v-if="character.splat === EnumSplat.MAGE">
+							<!-- <br v-if="character.splat.enum === EnumSplat.MAGE"> -->
 
-							<item-list
-								v-if="character.splat === EnumSplat.MAGE"
+							<!-- <item-list
+								v-if="(character instanceof MageCharacter)"
 								class="col-12"
 								name="Obsessions"
 								:items="character.obsessions"
 								:mutable="true"
-							/>
+							/> -->
 						</div>
 					</div>
 				</div>
@@ -553,9 +548,9 @@
 		</div>
 
 		<div id="page-2">
-			<div id="mage-traits" v-if="character.splat === EnumSplat.MAGE" class="row col-12">
+			<div id="mage-traits" v-if="(character instanceof MageCharacter)" class="row col-12">
 				<div class="col-sm-4">
-					<div
+					<!-- <div
 						class="col-12"
 						id="activeSpells"
 						style="margin-bottom: 15px"
@@ -567,8 +562,8 @@
 							:key="n"
 							v-model="character.activeSpells[n - 1]"
 						/>
-					</div>
-					<item-list
+					</div> -->
+					<!-- <item-list
 						id="yantras"
 						class="col-12"
 						name="yantras"
@@ -599,11 +594,11 @@
 						:items="character.inuredSpells"
 						:mutable="true"
 						style="margin-bottom: 15px"
-					/>
+					/> -->
 				</div>
 
 				<div class="col-sm-8">
-					<object-list 
+					<!-- <object-list 
 						:items="character.rotes" 
 						:itemFactory="Rote" 
 						name="Rotes"
@@ -613,23 +608,23 @@
 						class="w-100"
 						:items="character.nimbus"
 						:mutable="true"	
-					></item-list>
+					></item-list> -->
 					<div class="w-100 row">
 						<!-- <div class="col-6"> -->
-							<item-list
+							<!-- <item-list
 								name="Arcana Attainments"
 								class="col-6"
 								:items="character.arcanaAttainments"
 								:mutable="true"
-							/>
+							/> -->
 						<!-- </div> -->
 						<!-- <div class="col-6"> -->
-							<item-list
+							<!-- <item-list
 								name="Legacy Attainments"
 								class="col-6"
 								:items="character.legacyAttainments"
 								:mutable="true"
-							/>
+							/> -->
 						<!-- </div> -->
 					</div>
 					<!-- <div id="rotes" class="row col-sm-12">
@@ -671,7 +666,7 @@
 				</div>
 			</div>
 
-			<div class="werewolf-traits" v-if="character.splat === EnumSplat.WEREWOLF">
+			<div class="werewolf-traits" v-if="character.splat.enum === EnumSplat.WEREWOLF">
 				<div id="werewolf-forms" class="row w-100">
 					<div
 						v-for="form in character.getForms()"
@@ -875,8 +870,8 @@
 				</div>
 			</div>
 
-			<div id="vampire-traits" v-if="character.splat === EnumSplat.VAMPIRE" class="row col-12">
-				E
+			<div id="vampire-traits" v-if="(character instanceof VampireCharacter)" class="row col-12">
+				
 			</div>
 
 		</div>
@@ -888,17 +883,23 @@
 <script lang="ts">
 import { computed, defineComponent, reactive, ref, Ref, toRefs, unref } from "vue";
 
-import { Splat, SPLATS, EnumSplat, Form } from "../definitions/Splat";
+import { useStore } from "../store";
 
 import { 
 	Character,
 	MortalCharacter,
+	SupernaturalCharacter,
+	VampireCharacter,
 	Ability,
 	ATTRIBUTES,
 	Attributes,
 	MageCharacter,
-	SKILLS
-} from "../definitions/NewCharacter";
+	SKILLS,
+	SPLATS,
+	Splat,
+	EnumSplat,
+	createCharacter,
+} from "../definitions";
 
 import AbilityList from "../components/sheetComponents/AbilityList.vue";
 import HealthComponent from "../components/sheetComponents/HealthComponent.vue";
@@ -952,18 +953,19 @@ export default defineComponent({
 		id(): string {
 			return this.$route.params.id as string;
 		},
-		splat(): Splat {
-			return {} as Splat;
-			// return this.character.splatObj;
+		baseAttributes: {
+			get() {
+				return this.character.data.get("attributes") as Attributes;
+			},
+			set(val: Attributes) {
+				this.character.data.set("attributes", val);
+			}
 		},
-		subType() {
-			return {};
-			// return this.character.subTypeObj;
-		},
-		organization() {
-			return {};
-			// return this.character.organizationObj;
-		},
+
+
+
+
+
 		attrMax() {
 			// console.log(this.splat);
 			// return (this as any).character.power > 5
@@ -1056,10 +1058,10 @@ export default defineComponent({
 			return results;
 		},
 		async rollSelected(opts: any) {
-			const vals = Object.values(this.$store.state.selectedTraits) as any[];
+			const vals = Object.values(this.store.state.selectedTraits).map(el => el());
 			if (vals.length === 0) return 0;
 
-			const dice = vals.reduce((prev, val) => prev + val());
+			const dice = vals.reduce((prev, val) => prev + val);
 
 			const result = await this.roller.roll(dice, opts);
 
@@ -1069,16 +1071,16 @@ export default defineComponent({
 			name: string,
 			obj: any
 		) {
-			let state = this.$store.state;
+			let state = this.store.state;
 
 			if (state.selectedTraits[name] !== undefined) {
-				this.$store.commit("UNSELECT_TRAIT", name);
+				this.store.commit("UNSELECT_TRAIT", name);
 			} else if (name) {
 				if (Object.keys(state.selectedTraits).length === 3) {
-					this.$store.commit("UPDATE_SELECTED", {});
+					this.store.commit("UPDATE_SELECTED", {});
 				}
 				
-				this.$store.commit({
+				this.store.commit({
 					type: "SELECT_TRAIT",
 					name,
 					value: () => obj[name]
@@ -1096,7 +1098,7 @@ export default defineComponent({
 		setTrait(
 			trait: string,
 			val: number,
-			opts: { off?: number; min?: number }
+			opts?: { off?: number; min?: number }
 		) {
 			const character: any = (this as any).character;
 
@@ -1138,23 +1140,23 @@ export default defineComponent({
 			// 	}
 			// }
 		},
-		formDefense(form: Form) {
-			return (
-				(form.defenseCalcMax ? Math.max : Math.min)(
-					this.character.attributes.dexterity -
-						this.currentForm.dexterityMod +
-						form.dexterityMod,
-					this.character.attributes.wits -
-						this.currentForm.witsMod +
-						form.witsMod
-				) +
-				(this.character.skills.athletics || 0) +
-				(this.character.mod("defense") -
-					(this.currentForm.defenseMod || 0) +
-					(form.defenseMod || 0))
-			);
-			// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
-		},
+		// formDefense(form: Form) {
+		// 	return (
+		// 		(form.defenseCalcMax ? Math.max : Math.min)(
+		// 			this.character.attributes.dexterity -
+		// 				this.currentForm.dexterityMod +
+		// 				form.dexterityMod,
+		// 			this.character.attributes.wits -
+		// 				this.currentForm.witsMod +
+		// 				form.witsMod
+		// 		) +
+		// 		(this.character.skills.athletics || 0) +
+		// 		(this.character.mod("defense") -
+		// 			(this.currentForm.defenseMod || 0) +
+		// 			(form.defenseMod || 0))
+		// 	);
+		// 	// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
+		// },
 		formDefenseMod(form: Form) {
 			// const hishu = this.getForm('hishu');
 			// let sub = 0;
@@ -1188,19 +1190,18 @@ export default defineComponent({
 	data: () => ({
 		characters: (null as unknown) as Characters,
 		character: (null as unknown) as Character,
-		sizeMinusForm: null as any,
+		// sizeMinusForm: null as any,
+
+		store: useStore(),
 
 		dotsOverFive: false,
 
-		EnumSplat,
-		ref,
+		
 		// Rote,
 
 		// random: new Random(),
 		roller: new DiceRoller(),
 
-		ATTRIBUTES,
-		skills: SKILLS,
 		skillCats: { mental: -3, physical: -1, social: -1 } as {
 			[index: string]: number;
 		},
@@ -1211,12 +1212,22 @@ export default defineComponent({
 		// 		min: 1
 		// 	}
 		// }
+
+		EnumSplat,
+		ATTRIBUTES,
+		skills: SKILLS,
+		MortalCharacter,
+		MageCharacter,
+		VampireCharacter,
+		SupernaturalCharacter
 	}),
 	beforeMount() {
 		(window as any).vue = this;
-		this.characters = this.$store.state.characters as any;
+		this.characters = this.store.state.characters as any;
 
-		this.character = new MortalCharacter(this.characters[this.id]);
+		// this.character = new MortalCharacter(this.characters[this.id]);
+
+		this.character = createCharacter(this.characters[this.id]);
 
 		// this.character = this.characters[this.id];
 		// this.character = createCharacter(
@@ -1273,7 +1284,7 @@ export default defineComponent({
 
 	// 			// const newObj = deep(newVal);
 	// 			// localStorage.characters = JSON.stringify(newVal);
-	// 			(this as any).$store.commit("UPDATE_CHARACTERS", newObj);
+	// 			(this as any).store.commit("UPDATE_CHARACTERS", newObj);
 	// 		},
 	// 		deep: true
 	// 	}
