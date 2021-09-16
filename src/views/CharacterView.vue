@@ -29,7 +29,7 @@
 	<!-- </teleport> -->
 	<div id="charsheet"
 		:class="{
-			[`charsheet-${(EnumSplat && EnumSplat[character.splat]).toLowerCase()}`]: true
+			[`charsheet-${character.splat.string.toLowerCase()}`]: true
 		}"
 	>
 		<!-- <fab /> -->
@@ -191,7 +191,7 @@
 									:class="{
 										'sheet-dot': true,
 										'sheet-dot-full':
-											character.baseAttributes[attr] >= n,
+											character.attributes[attr] >= n,
 										'sheet-dot-small': dotAttrMax > 5
 									}"
 								></button>
@@ -210,7 +210,7 @@
 					</h2>
 					<div class="row">
 						<div class="col col-sm-7">
-							<ability-list
+							<!-- <ability-list
 								v-if="splat && splat.abilityName"
 								:abilities="character.abilities"
 								:optionsMutable="!splat.finiteAbilities"
@@ -219,15 +219,15 @@
 								id="ability"
 								class="block"
 								:dotRanges="dotRanges"
-							/>
+							/> -->
 
-							<ability-list
+							<!-- <ability-list
 								:abilities="character.merits"
 								abilityName="Merits"
 								id="merits"
 								class="block"
 								:dotRanges="dotRanges"
-							/>
+							/> -->
 
 							<!-- <div id="werewolf-conditions"> </div> -->
 							<!-- <item-list
@@ -272,7 +272,7 @@
 											: ""
 									}}<br />
 									{{ $t("character.trait.initative") }}:
-									{{ initative }}<br />
+									{{ character.initative }}<br />
 								</span>
 								<span style="float: left; margin-right: 5px"
 									>{{ $t("character.trait.beats") }}:</span
@@ -370,12 +370,12 @@
 									style="margin-top: -10px"
 								>
 									<button
-										v-for="n in maxWillpower"
+										v-for="n in character.maxWillpower"
 										:key="n"
 										@click="
 											setTrait(
 												'spentWillpowerDots',
-												maxWillpower - n,
+												character.maxWillpower - n,
 												{
 													off: -1
 												}
@@ -384,7 +384,7 @@
 										class="sheet-dot"
 										:class="{
 											'sheet-dot-full':
-												maxWillpower -
+												character.maxWillpower -
 													character.spentWillpowerDots >=
 												n
 										}"
@@ -400,7 +400,7 @@
 									style="margin-top: -7px"
 								>
 									<button
-										v-for="n in maxWillpower -
+										v-for="n in character.maxWillpower -
 											character.spentWillpowerDots"
 										:key="n"
 										class="sheet-box"
@@ -476,9 +476,8 @@
 							<!-- <span class="col-12" v-if="splat && splat.integrityTraitName"> -->
 							<!-- <health-component    v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.maxClarity" :healthTrack="character.clarityTrack" :name="splat.integrityTraitName" class="col-12" id="integrityTrait" /> -->
 							<integrity-component
-								v-if="splat && splat.integrityTraitName"
+								v-if="character.splat.integrityTraitName"
 								:character="character"
-								:splat="splat"
 								class="col-12"
 								id="integrityTrait"
 							/>
@@ -519,20 +518,20 @@
 
 							<br>
 
-							<item-list
+							<!-- <item-list
 								class="col-12"
 								name="Conditions"
 								:items="character.conditions"
 								:mutable="true"
-							/>
+							/> -->
 							<br>
 
-							<item-list
+							<!-- <item-list
 								class="col-12"
 								name="Aspirations"
 								:items="character.aspirations"
 								:mutable="true"
-							/>
+							/> -->
 
 							<br v-if="character.splat === EnumSplat.MAGE">
 
@@ -750,7 +749,7 @@
 							}}:
 							<span class="default-font">
 								{{
-									initative -
+									character.initative -
 										currentForm.dexterityMod -
 										currentForm.composureMod +
 										form.dexterityMod +
@@ -887,17 +886,15 @@ import { computed, defineComponent, reactive, ref, Ref, toRefs, unref } from "vu
 
 import { Splat, SPLATS, EnumSplat, Form } from "../definitions/Splat";
 
-import Character, {
+import { 
+	Character,
+	MortalCharacter,
 	Ability,
 	ATTRIBUTES,
 	Attributes,
-	createCharacter,
 	MageCharacter,
-	Rote,
-	WerewolfCharacter,
-	nameToKey,
 	SKILLS
-} from "../definitions/Character";
+} from "../definitions/NewCharacter";
 
 import AbilityList from "../components/sheetComponents/AbilityList.vue";
 import HealthComponent from "../components/sheetComponents/HealthComponent.vue";
@@ -916,7 +913,7 @@ import SpellCalculator from "../components/sheetComponents/SpellCalculator.vue";
 import { DiceRoller } from "../DiceRoller";
 import { Characters } from "@/store";
 
-import _ from "lodash";
+// import _ from "lodash";
 
 // <div class="sheet-dots">
 // 	<button @click="setAttr('intelligence', n)" v-for="n in attrMax" :key="n" class="sheet-dot"></button>
@@ -952,19 +949,23 @@ export default defineComponent({
 			return this.$route.params.id as string;
 		},
 		splat(): Splat {
-			return this.character.splatObj;
+			return {} as Splat;
+			// return this.character.splatObj;
 		},
 		subType() {
-			return this.character.subTypeObj;
+			return {};
+			// return this.character.subTypeObj;
 		},
 		organization() {
-			return this.character.organizationObj;
+			return {};
+			// return this.character.organizationObj;
 		},
 		attrMax() {
 			// console.log(this.splat);
-			return (this as any).character.power > 5
-				? ((this as any).character as Character).power
-				: 5;
+			// return (this as any).character.power > 5
+			// 	? ((this as any).character as Character).power
+			// 	: 5;
+			return 5;
 		},
 		dotAttrMax() {
 			return Math.min(
@@ -972,28 +973,13 @@ export default defineComponent({
 				(this as any).dotsOverFive ? 10 : 5
 			);
 		},
-		maxWillpower() {
-			return (
-				(this as any).character.attributes.resolve +
-				(this as any).character.attributes.composure
-			);
-		},
-		// defense() {
-		// 	return Math.min((this as any).character.attributes.dexterity, (this as any).character.attributes.wits) + ((this as any).character.skills.athletics || 0);
+		// perception() {
+		// 	return (
+		// 		(this as any).character.attributes.resolve +
+		// 		(this as any).character.attributes.composure +
+		// 		((this as any).currentForm.perceptionMod || 0)
+		// 	);
 		// },
-		initative() {
-			return (
-				(this as any).character.attributes.dexterity +
-				(this as any).character.attributes.composure
-			);
-		},
-		perception() {
-			return (
-				(this as any).character.attributes.resolve +
-				(this as any).character.attributes.composure +
-				((this as any).currentForm.perceptionMod || 0)
-			);
-		},
 		// abilities(): {[index: string]: Ability} {
 		// 	const character: Character = this.character;
 		// 	const obj: {[index: string]: Ability} = {};
@@ -1002,37 +988,37 @@ export default defineComponent({
 		// 	// });
 		// 	return obj;
 		// },
-		currentForm(): Form {
-			return this.character instanceof WerewolfCharacter
-				? this.character.currentFormObj().value
-				: ({} as Form);
-		},
-		dotRanges() {
-			let obj = {};
-			if (this.character.splat === EnumSplat.MAGE) {
-				Object.keys(this.splat.abilities).forEach(el => {
-					obj[el] = {
-						max: 4
-					};
-				});
+		// currentForm(): Form {
+		// 	return this.character instanceof WerewolfCharacter
+		// 		? this.character.currentFormObj().value
+		// 		: ({} as Form);
+		// },
+		// dotRanges() {
+		// 	let obj = {};
+		// 	if (this.character.splat === EnumSplat.MAGE) {
+		// 		Object.keys(this.splat.abilities).forEach(el => {
+		// 			obj[el] = {
+		// 				max: 4
+		// 			};
+		// 		});
 
-				obj[this.subType.inferiorArcanum] = {
-					max: 2
-				};
+		// 		obj[this.subType.inferiorArcanum] = {
+		// 			max: 2
+		// 		};
 
-				(this.subType.abilities || []).forEach(el => {
-					obj[el] = {
-						min: 1
-					};
-				});
-			}
+		// 		(this.subType.abilities || []).forEach(el => {
+		// 			obj[el] = {
+		// 				min: 1
+		// 			};
+		// 		});
+		// 	}
 
-			return obj;
-		}
+		// 	return obj;
+		// }
 	},
 	methods: {
 		unref,
-		nameToKey,
+		// nameToKey,
 		async rollTest() {
 			const results = [] as string[][];
 
@@ -1137,10 +1123,7 @@ export default defineComponent({
 			// if (!character.attributes)
 			// 	(character.attributes as any) = {};
 
-			(character.baseAttributes as any)[attr] =
-				(character.attributes as any)[attr] === val && val !== 1
-					? val - 1
-					: val;
+			character.attributes[attr] = character.attributes[attr] === val && val !== 1 ? val - 1 : val;
 		},
 		setTrait(
 			trait: string,
@@ -1170,22 +1153,22 @@ export default defineComponent({
 			}
 		},
 		doInputRote(ability: any, i: number) {
-			if (this.character instanceof MageCharacter) {
-				if (!this.character.rotes[i]) {
-					this.character.rotes[i] = ability;
-				}
-				// console.log(ability);
-				if (
-					!ability.arcanum &&
-					!ability.spell &&
-					!ability.creator &&
-					!ability.roteSkill
-				) {
-					// console.log(ability);
-					// eslint-disable-next-line vue/no-mutating-props
-					this.character.rotes.splice(i, 1);
-				}
-			}
+			// if (this.character instanceof MageCharacter) {
+			// 	if (!this.character.rotes[i]) {
+			// 		this.character.rotes[i] = ability;
+			// 	}
+			// 	// console.log(ability);
+			// 	if (
+			// 		!ability.arcanum &&
+			// 		!ability.spell &&
+			// 		!ability.creator &&
+			// 		!ability.roteSkill
+			// 	) {
+			// 		// console.log(ability);
+			// 		// eslint-disable-next-line vue/no-mutating-props
+			// 		this.character.rotes.splice(i, 1);
+			// 	}
+			// }
 		},
 		formDefense(form: Form) {
 			return (
@@ -1224,9 +1207,10 @@ export default defineComponent({
 			return form.defenseMod;
 		},
 		getForm(name: string) {
-			return this.character instanceof WerewolfCharacter
-				? this.character.getForm(name).value
-				: ({} as Form);
+			return {} as Form;
+			// return this.character instanceof WerewolfCharacter
+			// 	? this.character.getForm(name).value
+			// 	: ({} as Form);
 		},
 		formatNum(num: number): string {
 			return num !== 0 ? `(${num > 0 ? "+" : ""}${num})` : "";
@@ -1242,7 +1226,7 @@ export default defineComponent({
 
 		EnumSplat,
 		ref,
-		Rote,
+		// Rote,
 
 		// random: new Random(),
 		roller: new DiceRoller(),
@@ -1264,73 +1248,75 @@ export default defineComponent({
 		(window as any).vue = this;
 		this.characters = this.$store.state.characters as any;
 
+		this.character = new MortalCharacter(this.characters[this.id]);
+
 		// this.character = this.characters[this.id];
-		this.character = createCharacter(
-			this.characters[this.id] as any
-		) as any;
-		this.characters[this.id] = this.character;
+		// this.character = createCharacter(
+		// 	this.characters[this.id] as any
+		// ) as any;
+		// this.characters[this.id] = this.character;
 
-		this.sizeMinusForm = computed({
-			get: () => {
-				return this.character.size - this.currentForm.sizeMod;
-			},
-			set: val => {
-				this.character.size = val as any;
-			}
-		});
-	},
-	watch: {
-		characters: {
-			handler(newVal: { [key: string]: Character }, oldVal) {
-				// (this as any).characters[(this as any).id] = newVal;
-
-				function deep(obj: any) {
-					const newObject = _.clone(obj);
-
-					_.each(obj, (val, key) => {
-						if (val && typeof val === "object") {
-							if (val.getData) {
-								newObject[key] = deep(val.getData());
-							} else {
-								newObject[key] = deep(val);
-							}
-							if (key === "merits") {
-								console.log(key, newObject[key]);
-							}
-						}
-					});
-
-					return newObject;
-				}
-
-				const newObj = {} as any;
-
-				Object.entries(newVal)
-					.map(
-						entry =>
-							[
-								entry[0],
-								entry[1].getData ? entry[1].getData() : entry[1]
-							] as [string, any]
-					)
-					.forEach(entry => {
-						newObj[entry[0]] = entry[1];
-					});
-
-				// const newObj = deep(newVal);
-				// localStorage.characters = JSON.stringify(newVal);
-				(this as any).$store.commit("UPDATE_CHARACTERS", newObj);
-			},
-			deep: true
-		}
-		// attrMax: function(newVal, oldVal) {
-		// 	if (newVal > 5) {
-		// 		$(".sheet-dot").attr("11");
+		// this.sizeMinusForm = computed({
+		// 	get: () => {
+		// 		return this.character.size - this.currentForm.sizeMod;
+		// 	},
+		// 	set: val => {
+		// 		this.character.size = val as any;
 		// 	}
-		// }
-		// $route: function(newRoute): any {
-		// }
-	}
+		// });
+	},
+	// watch: {
+	// 	characters: {
+	// 		handler(newVal: { [key: string]: Character }, oldVal) {
+	// 			// (this as any).characters[(this as any).id] = newVal;
+
+	// 			function deep(obj: any) {
+	// 				const newObject = _.clone(obj);
+
+	// 				_.each(obj, (val, key) => {
+	// 					if (val && typeof val === "object") {
+	// 						if (val.getData) {
+	// 							newObject[key] = deep(val.getData());
+	// 						} else {
+	// 							newObject[key] = deep(val);
+	// 						}
+	// 						if (key === "merits") {
+	// 							console.log(key, newObject[key]);
+	// 						}
+	// 					}
+	// 				});
+
+	// 				return newObject;
+	// 			}
+
+	// 			const newObj = {} as any;
+
+	// 			Object.entries(newVal)
+	// 				.map(
+	// 					entry =>
+	// 						[
+	// 							entry[0],
+	// 							entry[1].getData ? entry[1].getData() : entry[1]
+	// 						] as [string, any]
+	// 				)
+	// 				.forEach(entry => {
+	// 					newObj[entry[0]] = entry[1];
+	// 				});
+
+	// 			// const newObj = deep(newVal);
+	// 			// localStorage.characters = JSON.stringify(newVal);
+	// 			(this as any).$store.commit("UPDATE_CHARACTERS", newObj);
+	// 		},
+	// 		deep: true
+	// 	}
+	// 	// attrMax: function(newVal, oldVal) {
+	// 	// 	if (newVal > 5) {
+	// 	// 		$(".sheet-dot").attr("11");
+	// 	// 	}
+	// 	// }
+	// 	// $route: function(newRoute): any {
+	// 	// }
+	// }
 });
 </script>
 

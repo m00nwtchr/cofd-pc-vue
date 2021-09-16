@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { computed, Ref, unref } from "vue";
 import { RefType, toObject } from "../Util";
 import Character, { Ability, ATTRIBUTES, def, nameToKey, SKILLS, TraitMod, WerewolfCharacter } from "./Character";

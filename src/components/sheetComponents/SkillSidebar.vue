@@ -47,10 +47,10 @@
 							></button>
 							<span
 								:class="{
-									selected: $store.state.selectedTraits[skill] !== undefined,
-									specialties:
-										character.specialties[skill] &&
-										character.specialties[skill].length > 0
+									// selected: $store.state.selectedTraits[skill] !== undefined,
+									// specialties:
+										// character.specialties[skill] &&
+										// character.specialties[skill].length > 0
 								}"
 								@click="$emit('selectSkill',skill, {
 									skill: true,
