@@ -68,7 +68,19 @@ const characters: { [index: string]: Character | any } = {
 			"composure": 3 
 		},
 
-		"skills": {},
+		"skills": {
+			academics: 3,
+			crafts: 2,
+			occult: 3,
+
+			athletics: 2,
+			stealth: 3,
+			survival: 2,
+			weaponry: 3,
+
+			animal_ken: 1,
+			subterfuge: 3
+		},
 		"merits": {},
 
 		"willpower": 6,

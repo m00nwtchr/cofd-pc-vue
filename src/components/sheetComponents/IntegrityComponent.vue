@@ -6,7 +6,7 @@
 			<!-- eslint-disable-next-line vue/no-mutating-props -->
 			<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name">
 			</div>
-		<h3 class="separator col-sm-12">{{ character.splat.integrityTraitName }}</h3>
+		<h3 class="separator col-sm-12">{{ $t(character.splat.integrityTraitName) }}</h3>
 		<div class="sheet-dots" style="margin-top:-10px;">
 			<span v-for="n in items" :key="n" >
 				<button class="sheet-dot" @click="$parent.setTrait('integrityTrait', n)" :class="{'sheet-dot-full': character.integrityTrait >= n}"></button>

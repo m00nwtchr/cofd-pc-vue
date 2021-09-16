@@ -1,5 +1,4 @@
-import { Splat, SPLATS, EnumSplat } from ".";
-
+import { Splat, SPLATS, EnumSplat, Organization, SubType } from ".";
 export const ATTRIBUTES = [
 	["intelligence", "wits", "resolve"],
 	["strength", "dexterity", "stamina"],
@@ -66,6 +65,16 @@ interface Skills {
 interface ICharacter {
 	name: string;
 
+	concept: string;
+	chronicle: string;
+	
+	organization: Organization;
+	subType: SubType;
+
+	// xsplat: string;
+	// ysplat: string;
+	// zsplat: string;
+
 	virtueAnchor: string;
 	viceAnchor: string;
 
@@ -88,24 +97,30 @@ interface ICharacter {
 	maxWillpower: number;
 	spentWillpowerDots: number;
 
-	// templates: EnumTemplate[];
 	data: Map<string, unknown>;
 }
-
-// enum EnumTemplate {
-// 	MAGE, WEREWOLF
-// }
 
 export class Character implements ICharacter {
 
 	get splat(): Splat {
-		return SPLATS[this.data.get("splat") as EnumSplat];
+		return SPLATS[this.data.get("splat") as EnumSplat] || {};
 	}
 
 	name = "";
 
+	concept: string;
+	chronicle: string;
+
 	virtueAnchor = "";
 	viceAnchor = "";
+
+	get organization(): Organization {
+		return this.splat.organizations[this.data.get("organization") as string] || {};
+	}
+
+	get subType(): SubType {
+		return this.splat.subTypes[this.data.get("subType") as string] || {};
+	}
 
 	attributes: Attributes;
 	skills: Skills;
@@ -161,7 +176,7 @@ export class Character implements ICharacter {
 	}
 
 	get defense(): number {
-		return Math.min(this.attributes.dexterity, this.attributes.wits);
+		return Math.min(this.attributes.dexterity, this.attributes.wits) + this.skills.athletics;
 	}
 
 	get initative(): number {
@@ -175,6 +190,9 @@ export class Character implements ICharacter {
 		opts = opts || {} as ICharacter;
 
 		this.name = opts.name || "";
+
+		this.concept = opts.concept || "";
+		this.chronicle = opts.chronicle || "";
 
 		this.virtueAnchor = opts.virtueAnchor || "";
 		this.viceAnchor = opts.viceAnchor || "";
@@ -245,16 +263,26 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 
 	specialties: { [index: string]: string[] };
 	
-	merits: { [key: string]: Ability };
+	// merits: { [key: string]: Ability };
+	get merits(): { [key: string]: Ability } {
+		const data = this.data.get("merits") as { [key: string]: Ability };
+
+		return data;
+	}
+
+	set merits(val: { [key: string]: Ability }) {
+		this.data.set("merits", val);
+	}
 
 	integrityTrait: number;
 
 	constructor(opts: IMortalCharacter) {
 		super(opts);
 		this.data.set("splat", EnumSplat.MORTAL);
+		this.data.set("merits", opts.merits || {});
 
 		this.specialties = opts.specialties || {};
-		this.merits = opts.merits || {};
+		// this.merits = opts.merits || {};
 		this.integrityTrait = opts.integrityTrait || 7;
 	}
 
@@ -263,6 +291,8 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 interface ISupernatural {
 
 	power: number;
+
+	abilities: { [index: string]: Ability };
 
 	maxFuel: number;
 	fuel: number;
@@ -274,8 +304,10 @@ interface ISupernaturalCharacter extends IMortalCharacter, ISupernatural {}
 class SupernaturalCharacter extends MortalCharacter implements ISupernaturalCharacter {
 
 	power: number;
-	fuel: number;
 
+	abilities: { [index: string]: Ability } = {};
+
+	fuel: number;
 	get maxFuel(): number {
 		return this.power >= 5 ?
 			this.power >= 9 ?

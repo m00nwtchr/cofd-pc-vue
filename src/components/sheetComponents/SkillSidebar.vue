@@ -52,10 +52,7 @@
 										// character.specialties[skill] &&
 										// character.specialties[skill].length > 0
 								}"
-								@click="$emit('selectSkill',skill, {
-									skill: true,
-									skillCat: i
-								})"
+								@click="$emit('selectSkill', skill, character.skills)"
 							>
 								{{ $t(`character.skill.${skill}`) }}
 							</span>
