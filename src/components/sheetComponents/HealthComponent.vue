@@ -43,7 +43,7 @@ export default defineComponent({
 	},
 	methods: {
 		pokeHealth(n: number, remAgg = true) {
-			const healthTrack: number[] = this.healthTrack as any;
+			const healthTrack = this.healthTrack as number[];
 			const c: number =  healthTrack[n];
 
 
@@ -67,6 +67,8 @@ export default defineComponent({
 					this.healthTrack.push(0);
 				}
 			}
+
+			this.$emit("update", healthTrack);
 		}
 	},
 	computed: {

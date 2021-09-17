@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <template>
 <div id="skills" >
 					<h2 class="separator col-sm-12" style="margin-bottom: 20px">
@@ -5,7 +6,7 @@
 					</h2>
 					<div
 						v-for="(cat, i) in SKILLS"
-						:key="cat"
+						:key="i"
 						class="block col col-12"
 					>
 						<h3 class="separator">
@@ -32,7 +33,7 @@
 						
 							<!-- <button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button> -->
 							<button
-								v-if="character.splat === EnumSplat.MAGE"
+								v-if="character instanceof MageCharacter"
 								class="sheet-box"
 								:class="{
 									'sheet-dot-full': character.roteSkills.includes(
@@ -95,15 +96,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, unref , isRef} from "vue";
-import { EnumSplat, } from "../../definitions/Splat";
+import { defineComponent } from "vue";
+import { Character, MageCharacter, EnumSplat, ATTRIBUTES, SKILLS } from "../../definitions";
 
 import ItemList from "./ItemList.vue";
 
-import Character, {
-	ATTRIBUTES,
-	SKILLS
-} from "../../definitions/Character";
 export default defineComponent({
 	name: "SkillSidebar",
 	components: {
@@ -121,7 +118,7 @@ export default defineComponent({
 			[index: string]: number;
 		},
 		specialtyDropSelect: null as string | null,
-
+		MageCharacter
 	}),
 	methods: {
 		specialtyDropDown(skill: string) {
@@ -136,6 +133,7 @@ export default defineComponent({
 				this.specialtyDropSelect = null;
 			} else {
 				if (!this.character.specialties[skill]) {
+					// eslint-disable-next-line vue/no-mutating-props
 					this.character.specialties[skill] = [];
 				}
 
@@ -143,7 +141,7 @@ export default defineComponent({
 			}
 		},
 		setSkill(attr: string, val: number) {
-			const character: Character = this.character;
+			const character = this.character as Character;
 
 			if (!character.skills) character.skills = {};
 

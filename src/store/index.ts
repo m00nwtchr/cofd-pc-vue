@@ -10,16 +10,16 @@ const vuexPersist = new VuexPersistence({
 	// storage: localForage as AsyncStorage
 });
 
-export type Characters = { [key: string]: Character };
+// export type Characters = { [key: string]: Character };
 
 export interface State {
-	characters: Characters;
-	selectedTraits: { [index: string]: RefType<number> };
+	characters: { [key: string]: Character };
+	selectedTraits: { [index: string]: () => number };
 }
 
-const key: InjectionKey<Store<State>> = Symbol();
+export const key: InjectionKey<Store<State>> = Symbol();
 
-export default createStore<State>({
+export const store = createStore<State>({
 	plugins: [
 		// createLogger(),
 		vuexPersist.plugin
@@ -48,8 +48,8 @@ export default createStore<State>({
 	},
 	getters: {
 		export(state) {
-			const url = `data:application/json;base64,${btoa(JSON.stringify(state.characters,null,"\t"))}`;
-			return url;
+			// const url = `data:application/json;base64,${btoa(JSON.stringify(state.characters,null,"\t"))}`;
+			return "";
 		}
 	},
 	actions: {
@@ -58,6 +58,6 @@ export default createStore<State>({
 	}
 });
 
-export function useStore() {
+export function useStore(): Store<State> {
 	return baseUseStore(key);
 }

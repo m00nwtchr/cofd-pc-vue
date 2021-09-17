@@ -1,3 +1,5 @@
+import _ from "lodash";
+import { reactive } from "vue";
 import { Splat, SPLATS, EnumSplat, Organization, SubType } from ".";
 export const ATTRIBUTES = [
 	["intelligence", "wits", "resolve"],
@@ -39,7 +41,7 @@ export const SKILLS = [
 ];
 export interface Ability {
 	key?: string;
-	name: string;
+	name?: string;
 	level: number;
 }
 
@@ -62,7 +64,14 @@ interface Skills {
 	[index: string]: number;
 }
 
+interface Armor {
+	[key: string]: number;
+	general: number;
+	ballistic: number;
+}
+
 interface ICharacter {
+	splat: Splat;
 	name: string;
 
 	concept: string;
@@ -91,11 +100,14 @@ interface ICharacter {
 	size: number;
 	speed: number;
 	defense: number;
+	armor: Armor;
 	initative: number;
 
 	willpower: number;
 	maxWillpower: number;
 	spentWillpowerDots: number;
+
+	mod(string: string): number;
 
 	data: Map<string, unknown>;
 }
@@ -144,6 +156,10 @@ export class Character implements ICharacter {
 		return track;
 	}
 
+	set healthTrack(track: number[]) {
+		this.data.set("healthTrack", track);
+	}
+
 	get woundPenalty(): number {
 		return Math.min((this.healthTrack[this.maxHealth - 1] !== 0 ?
 			-3 : this.healthTrack[this.maxHealth - 2] !== 0 ?
@@ -179,15 +195,51 @@ export class Character implements ICharacter {
 		return Math.min(this.attributes.dexterity, this.attributes.wits) + this.skills.athletics;
 	}
 
+	armor: Armor;
+
+	// get armor(): Armor {
+	// 	const data = this.data.get("armor") as Armor || {
+	// 		general: 0,
+	// 		ballistic: 0
+	// 	};
+
+	// 	const obj = {} as Armor;
+
+	// 	Object.defineProperties(obj, {
+	// 		general: {
+	// 			get: () => data.general
+	// 		},
+	// 		ballistic: {
+	// 			get: () => data.ballistic
+	// 		}
+	// 	});
+
+	// 	return obj;
+	// }
+
 	get initative(): number {
 		return this.attributes.dexterity + this.attributes.composure;
 	}
 
 	// templates: EnumTemplate[];
-	data: Map<string, unknown> = new Map();
+	data: Map<string, unknown> = reactive(new Map());
 
-	constructor(opts?: ICharacter) {
-		opts = opts || {} as ICharacter;
+	constructor(opts: ICharacter) {
+		this.data.set("splat", EnumSplat.MORTAL);
+
+		if (opts.splat) {
+			if (typeof opts.splat === "number") {
+				this.data.set("splat", opts.splat);
+			}
+		}
+
+		if (opts.subType) {
+			this.data.set("subType", opts.subType);
+		}
+
+		if (opts.organization) {
+			this.data.set("organization", opts.organization);
+		}
 
 		this.name = opts.name || "";
 
@@ -205,23 +257,24 @@ export class Character implements ICharacter {
 		{
 			const _getAttrs = () => this.data.get("attributes") as Attributes;
 			const _setAttrs = (key: string, val: number) => this.data.set("attributes", Object.assign(_getAttrs(), {[key]: val}));
-			const _defProp  = (key: string, func: () => number) => ({
-				get: () => (_getAttrs()[key] || 1) + func(),
-				set: (val: number) => _setAttrs(key, val - func())
+			const _defProp  = (key: string) => ({
+				get: () => (_getAttrs()[key] || 1) + this.mod(key),
+				set: (val: number) => _setAttrs(key, val - this.mod(key)),
+				configurable: true
 			});
 
 			this.attributes = Object.defineProperties({} as Attributes, {
-				intelligence: _defProp("intelligence", () => 0),
-				wits:         _defProp("wits",         () => 0),
-				resolve:      _defProp("resolve",      () => 0),
+				intelligence: _defProp("intelligence"),
+				wits:         _defProp("wits"),
+				resolve:      _defProp("resolve"),
 
-				strength:     _defProp("strength",     () => 0),
-				dexterity:    _defProp("dexterity",    () => 0),
-				stamina:      _defProp("stamina",      () => 0),
+				strength:     _defProp("strength"),
+				dexterity:    _defProp("dexterity"),
+				stamina:      _defProp("stamina"),
 
-				presence:     _defProp("presence",     () => 0),
-				manipulation: _defProp("manipulation", () => 0),
-				composure:    _defProp("composure",    () => 0),
+				presence:     _defProp("presence"),
+				manipulation: _defProp("manipulation"),
+				composure:    _defProp("composure"),
 			});
 		}
 
@@ -240,12 +293,31 @@ export class Character implements ICharacter {
 
 			this.skills = Object.defineProperties({} as Skills, props);
 		}
+		
+		this.data.set("armor", opts.armor || {});
+		{
+			const _getAttrs = () => this.data.get("armor") as Armor;
+			const _setAttrs = (key: string, val: number) => this.data.set("armor", Object.assign(_getAttrs(), {[key]: val}));
+			const _defProp  = (key: string, func: () => number) => ({
+				get: () => (_getAttrs()[key] || 0) + func(),
+				set: (val: number) => _setAttrs(key, val - func())
+			});
+
+			this.armor = Object.defineProperties({} as Armor, {
+				general:   _defProp("general",   () => 0),
+				ballistic: _defProp("ballistic", () => 0),
+			});
+		}
 
 		this.data.set("size", opts.size || 5);
 
 		this.data.set("healthTrack", opts.healthTrack || []);
 
 		this.data.set("spentWillpowerDots", opts.spentWillpowerDots || 0);
+	}
+
+	mod(trait: string): number {
+		return 0;
 	}
 }
 
@@ -257,12 +329,17 @@ interface IMortalCharacter extends ICharacter {
 
 	integrityTrait: number;
 
+	beats: number;
+	experience: number;
 }
 
 export class MortalCharacter extends Character implements IMortalCharacter {
 
 	specialties: { [index: string]: string[] };
 	
+	beats: number;
+	experience: number;
+
 	// merits: { [key: string]: Ability };
 	get merits(): { [key: string]: Ability } {
 		const data = this.data.get("merits") as { [key: string]: Ability };
@@ -278,8 +355,10 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 
 	constructor(opts: IMortalCharacter) {
 		super(opts);
-		this.data.set("splat", EnumSplat.MORTAL);
 		this.data.set("merits", opts.merits || {});
+
+		this.beats = opts.beats || 0;
+		this.experience = opts.experience || 0;
 
 		this.specialties = opts.specialties || {};
 		// this.merits = opts.merits || {};
@@ -299,9 +378,14 @@ interface ISupernatural {
 
 }
 
-interface ISupernaturalCharacter extends IMortalCharacter, ISupernatural {}
+interface ISupernaturalCharacter extends IMortalCharacter, ISupernatural {
+	power: number;
+	abilities: { [index: string]: Ability };
+	fuel: number;
+	maxFuel: number;
+}
 
-class SupernaturalCharacter extends MortalCharacter implements ISupernaturalCharacter {
+export class SupernaturalCharacter extends MortalCharacter implements ISupernaturalCharacter {
 
 	power: number;
 
@@ -323,29 +407,118 @@ class SupernaturalCharacter extends MortalCharacter implements ISupernaturalChar
 
 		this.power = opts.power || 1;
 		this.fuel = opts.fuel || 0;
+
+		this.abilities = {};
+
+		{
+			const defaultAbl: { [index: string]: Ability } = {};
+			const custom: { [index: string]: Ability } = {};
+
+			Object.keys(this.splat.abilities || {}).forEach(key => {
+				defaultAbl[key] = { level: 0 };
+			});
+
+			const ablTemp = Object.assign({}, defaultAbl, opts.abilities);
+
+			Object.keys(ablTemp).forEach(key => {
+				const value = ablTemp[key];
+				const def = defaultAbl[key];
+
+				if (!def) {
+					custom[key] = value;
+					delete ablTemp[key];
+				} else {
+					// value.name = def.name;
+				}
+			});
+
+			Object.keys(custom)
+				.forEach(key => ablTemp[key] = custom[key]);
+			this.abilities = reactive(ablTemp);
+		}
+
 	}
 
+	protected _getAbility(key: string): Ability {
+		return this.abilities[key] || {level:0,name:""};
+	}
 }
 
-interface IMageCharacter extends IMortalCharacter, ISupernatural {}
+interface IMageCharacter extends IMortalCharacter, ISupernatural {
+
+	roteSkills: string[];
+
+}
 
 export class MageCharacter extends SupernaturalCharacter implements IMageCharacter {
 
+	// roteSkills: string[];
+
+	get roteSkills(): string[] {
+		return this.organization.skills || this.data.get("roteSkills") as string[] || [];
+	}
+
 	constructor(opts: IMageCharacter) {
 		super(opts);
+
+
+		if (opts.roteSkills) {
+			this.data.set("roteSkills", opts.roteSkills);
+		}
+		// this.roteSkills = opts.roteSkills || [];
 	}
 
 }
 
-// interface TemplateData {
+interface IHasTouchstones {
 
-// }
+	touchstones: string[];
 
-// const EnumTemplateData: {[key in EnumTemplate]: TemplateData} = {
-// 	[EnumTemplate.MAGE]: {
-// 	}
-// };
+}
 
+interface IVampireCharacter extends IMortalCharacter, ISupernatural, IHasTouchstones {
+}
+
+function lookupAccess<T>(obj: any, prop: string) {
+	const desc = (Object.getOwnPropertyDescriptor(obj, prop) || {});
+
+	return {
+		get: desc.get || (() => null),
+		set: desc.set || ((val: T) => {})
+	} as {
+		get: () => T,
+		set: (val: T) => void
+	};
+}
+
+export class VampireCharacter extends SupernaturalCharacter implements IVampireCharacter {
+	
+	touchstones: string[];
+
+	get defense(): number {
+		return super.defense + this._getAbility("celerity").level;
+	}
+
+	get maxFuel(): number {
+		return this.power == 0 ? this.attributes.stamina : super.maxFuel;
+	}
+
+	constructor(opts: IVampireCharacter) {
+		super(opts);		
+		this.touchstones = opts.touchstones || [];
+
+		const stam = lookupAccess<number>(this.attributes, "stamina");
+		Object.defineProperty(this.attributes, "stamina", {
+			get: () => stam.get() + this._getAbility("resilience").level,
+		});
+		// set: (val: number) => stam.set(val - this._getAbility("resilience").level)
+
+		const str = lookupAccess<number>(this.attributes, "strength");
+		Object.defineProperty(this.attributes, "strength", {
+			get: () => str.get() + this._getAbility("vigor").level,
+		});
+	}
+}
 
 // interface ISupernaturalCharacter {
 // 	power: number;
@@ -376,3 +549,8 @@ export class MageCharacter extends SupernaturalCharacter implements IMageCharact
 // interface IPC extends IHasIntegrity, IEarnsBeats {
 	
 // }
+
+export function createCharacter<T extends Character>(opts: T): T {
+	const splat = SPLATS[opts.splat as unknown as EnumSplat] || SPLATS[EnumSplat.MORTAL];
+	return new splat.characterFactory(opts) as T;
+}
