@@ -20,7 +20,7 @@
 			</span>
 		</div>
 		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-			<h3 class="separator col-sm-12">{{ integrityTrackType.names[1] }} Touchstone</h3>
+			<h3 class="separator col-sm-12">{{ character.splat.integrityTrackType.names[1] }} Touchstone</h3>
 			<!-- eslint-disable-next-line vue/no-mutating-props -->
 			<input class="line" @input="doInput(2)" v-model="touchstonesTemp[1].name">
 		</div>
@@ -82,7 +82,9 @@ export default defineComponent({
 			return arr;
 		},
 		integrityTrackType(): string {
-			return typeof this.character.splat.integrityTrackType === "string" ? this.character.splat.integrityTrackType : this.character.splat.integrityTrackType.type;
+			return typeof this.character.splat.integrityTrackType === "string" ?
+				this.character.splat.integrityTrackType :
+				this.character.splat.integrityTrackType.type;
 		}
 	},
 	watch: {

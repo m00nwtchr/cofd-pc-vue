@@ -12,7 +12,7 @@ interface Option {
 	bool?: boolean;
 }
 
-export default class Merit implements Ability {
+export class Merit implements Ability {
 	name: RefType<string>;
 	level: number;
 

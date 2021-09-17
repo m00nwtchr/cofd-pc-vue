@@ -89,7 +89,7 @@
 							v-model="character.subType"
 							list="subTypes"
 						/><br />-->
-						<select v-model="character.subType" id="subType">
+						<select v-model="subType" id="subType">
 							<option
 								v-for="(el, key) in character.splat.subTypes"
 								:key="key"
@@ -103,7 +103,7 @@
 						<br />
 
 						<label for="organization">{{ $t(character.splat.orgName) }}:</label>
-						<select v-model="character.organization" id="organization">
+						<select v-model="organization" id="organization">
 							<option
 								v-for="(el, key) in character.splat.organizations"
 								:key="key"
@@ -187,6 +187,7 @@
 						<div class="col col-sm-7">
 							<ability-list
 								v-if="(character instanceof SupernaturalCharacter)"
+								:character="character"
 								:abilities="character.abilities"
 								:optionsMutable="!character.splat.finiteAbilities"
 								:abilityName="$t(character.splat.abilityName)"
@@ -197,6 +198,7 @@
 
 							<ability-list
 								v-if="(character instanceof MortalCharacter)"
+								:character="character"
 								:abilities="character.merits"
 								abilityName="Merits"
 								id="merits"
@@ -859,7 +861,6 @@ import FloatingActionMenu from "../components/FloatingActionMenu.vue";
 import SpellCalculator from "../components/sheetComponents/SpellCalculator.vue";
 
 import { DiceRoller } from "../DiceRoller";
-import { Characters } from "@/store";
 
 // import _ from "lodash";
 
@@ -896,16 +897,36 @@ export default defineComponent({
 		id(): string {
 			return this.$route.params.id as string;
 		},
+		characters(): { [key: string]: Character } {
+			return this.store.state.characters;
+		},
+		character(): Character {
+			return createCharacter(this.characters[this.id]);
+		},
 		baseAttributes: {
-			get() {
+			get(): Attributes {
 				return this.character.data.get("attributes") as Attributes;
 			},
 			set(val: Attributes) {
 				this.character.data.set("attributes", val);
 			}
 		},
-
-
+		subType: {
+			get(): string {
+				return this.character.data.get("subType") as string;
+			},
+			set(val: string) {
+				this.character.data.set("subType", val);
+			}
+		},
+		organization: {
+			get(): string {
+				return this.character.data.get("organization") as string;
+			},
+			set(val: string) {
+				this.character.data.set("organization", val);
+			}
+		},
 
 
 
@@ -1131,8 +1152,8 @@ export default defineComponent({
 
 	},
 	data: () => ({
-		characters: (null as unknown) as Characters,
-		character: (null as unknown) as Character,
+		// characters: (null as unknown) as ,
+		// character: (null as unknown) as Character,
 		// sizeMinusForm: null as any,
 
 		store: useStore(),
@@ -1166,11 +1187,10 @@ export default defineComponent({
 	}),
 	beforeMount() {
 		(window as any).vue = this;
-		this.characters = this.store.state.characters as any;
-
 		// this.character = new MortalCharacter(this.characters[this.id]);
 
-		this.character = createCharacter(this.characters[this.id]);
+		// this.character = createCharacter(this.characters[this.id]);
+		// this.character = new VampireCharacter({splat: EnumSplat.VAMPIRE});
 
 		// this.character = this.characters[this.id];
 		// this.character = createCharacter(

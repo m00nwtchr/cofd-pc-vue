@@ -8,9 +8,9 @@
 				'col-sm-12': !horizontal,
 				['col-sm-'+Math.floor(12/Object.keys(visible).length)]: horizontal
 			}">
-				<span class="line col-7" :class="{'selected': $store.state.selectedTraits[key]}" @click="$parent.selectTrait(key,{ability:true})">
+				<span class="line col-7" :class="{'selected': store.state.selectedTraits[key]}" @click="$parent.selectTrait(key,{ability:true})">
 					<input v-if="optionsMutable && !ability.key" @change="doInput(ability, key)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
-					<span v-else>{{ ability.name }}</span>
+					<span v-else>{{ ability.name || $t(`splat.${EnumSplat[character.splat.enum].toLowerCase()}.ability.${key}`) }}</span>
 					
 					<br>
 					<div v-if="ability.getOptions && meritOptionDropSelect === key">
@@ -53,23 +53,30 @@
 			</div>
 			
 			<datalist v-if="datalistFilter" :id="abilityName+'List'">
-				<option v-for="el in datalistFilter" :key="el">{{ el }}</option>
+				<option v-for="el in datalistFilter" :key="el">{{ $t(el) }}</option>
 			</datalist>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
-import { Ability, nameToKey } from "../../definitions/Character";
-import { defineComponent, unref , isRef} from "vue";
+import { nameToKey } from "../../definitions/Character";
+import { Ability, Character, Merit, EnumSplat } from "../../definitions";
+
+import { defineComponent, unref , isRef, PropType } from "vue";
 import { uniqByKeepLast } from "../../Util";
-import Merit from "@/definitions/Merit";
+import { useStore } from "../../store";
+
 export default defineComponent({
 	name: "AbilityList",
 	props: {
+		"character": {
+			required: true,
+			type: Object as PropType<Character>,
+		},
 		"abilities": {
 			required: true,
-			type: Object
+			type: Object as PropType<{[key: string]: Ability}>
 		},
 		"abilityName": {
 			required: false,
@@ -86,8 +93,8 @@ export default defineComponent({
 		},
 		"datalist": {
 			required: false,
-			default: undefined,
-			type: Object
+			default: () => ({}),
+			type: Object as PropType<{[key: string]: string}>
 		},
 		"dotRanges": {
 			required: false,
@@ -99,11 +106,12 @@ export default defineComponent({
 			default: () => false
 		}
 	},
-	data() {
-		return {
-			meritOptionDropSelect: null
-		};
-	},
+	data: () => ({
+		meritOptionDropSelect: "",
+		store: useStore(),
+
+		EnumSplat
+	}),
 	methods: {
 		isRef,
 		unref,
@@ -128,25 +136,25 @@ export default defineComponent({
 				delete this.abilities[key];
 
 				// eslint-disable-next-line vue/no-mutating-props
-				this.abilities[nameToKey(unref(ability.name))] = ability;
+				this.abilities[nameToKey(ability.name)] = ability;
 			}
 		},
 		meritOptionDropDown(name: string) {
-			if ((this as any).meritOptionDropSelect === name) {
-				(this as any).meritOptionDropSelect = null;
+			if (this.meritOptionDropSelect === name) {
+				this.meritOptionDropSelect = "";
 			} else {
-				(this as any).meritOptionDropSelect = name;
+				this.meritOptionDropSelect = name;
 			}
 		}
 	},
 	computed: {
 		visible(): {[key: string]: Ability | Merit} {
-			const abl = uniqByKeepLast(Object.entries(this.abilities), el=>el[1].name)
+			const abl = uniqByKeepLast(Object.entries(this.abilities), el=>el[1].name||el[0])
 				.map(el => ({
 					[el[0]]: el[1]	
 				}))
 				.reduce((prevVal, val) => Object.assign(prevVal, val), {});
-
+				
 			return Object.keys(abl).length >= (this.length || Number.MAX_SAFE_INTEGER) ? abl : {
 				...abl,
 				...(this.optionsMutable ? {
@@ -154,14 +162,14 @@ export default defineComponent({
 				} : {})
 			};
 		},
-		datalistFilter() {
-			return Object.keys((this as any).datalist || {})
-				.filter((el) => !(this as any).abilities[el])
-				.map(el => (this as any).datalist[el]);
+		datalistFilter(): string[] {
+			return Object.keys(this.datalist || {})
+				.filter((el) => !this.abilities[el])
+				.map(el => this.datalist[el]);
 		},
-		optsRow() {
+		optsRow(): any {
 			type n = Ability | Merit;
-			return !!(Object.values((this as any).abilities) as any[]).find((el) => el.getOptions && el.getOptions().length > 0);
+			return !!(Object.values(this.abilities) as any[]).find((el) => el.getOptions && el.getOptions().length > 0);
 		}
 	}
 });
