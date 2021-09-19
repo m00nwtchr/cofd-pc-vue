@@ -8,20 +8,24 @@
 				'col-sm-12': !horizontal,
 				['col-sm-'+Math.floor(12/Object.keys(visible).length)]: horizontal
 			}">
-				<span class="line col-7" :class="{'selected': store.state.selectedTraits[key]}" @click="$parent.selectTrait(key,{ability:true})">
-					<input v-if="optionsMutable && !ability.key" @change="doInput(ability, key)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
+				<span class="line col-7" :class="{'selected': store.state.selectedTraits[key]}" @click="$parent.selectTrait(key, abilities)">
+					<input v-if="optionsMutable && ability.name || key === 'NEW'" @change="doInput(ability, key)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
 					<span v-else>{{ ability.name || $t(`splat.${EnumSplat[character.splat.enum].toLowerCase()}.ability.${key}`) }}</span>
 					
 					<br>
-					<div v-if="ability.getOptions && meritOptionDropSelect === key">
+					<div v-if="(ability instanceof Merit) && meritOptionDropSelect === key">
 						<div>
-							<span v-for="option in ability.getOptions()" :key="option">
+							<span v-for="option in ability.getOptions()" :key="option.name">
 								{{ option.name }}:
 								<select v-if="option.list" v-model="ability[option.name]">
 									<option v-for="(val, key) in option.list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
 								</select>
-								<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" :v-model="ability[option.name][i]">
-									<option v-for="(val, key) in list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
+								<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" v-model="ability[option.name]">
+									<option 
+										v-for="(val, key) in list" 
+										:key="key" 
+										:value="val"
+									>{{ val }}</option>
 								</select>
 								<input  v-else :type="option.bool ? 'checkbox' : 'text'" v-model="ability[option.name]">
 								<br>
@@ -38,7 +42,7 @@
 							'dot-limit':      dotRanges[key] && n > dotRanges[key].max,
 						}" @click="setDots(ability, n)" v-for="n in 5" :key="n"></button>
 					</div>
-					<div class="options-toggle" v-if="ability.getOptions && ability.getOptions().length > 0">
+					<div class="options-toggle" v-if="(ability instanceof Merit) && ability.getOptions().length > 0">
 						<!-- {{ability.getOptions && ability.getOptions().length > 0}} -->
 
 						<button
@@ -110,7 +114,8 @@ export default defineComponent({
 		meritOptionDropSelect: "",
 		store: useStore(),
 
-		EnumSplat
+		EnumSplat,
+		Merit
 	}),
 	methods: {
 		isRef,
@@ -149,6 +154,7 @@ export default defineComponent({
 	},
 	computed: {
 		visible(): {[key: string]: Ability | Merit} {
+			console.log(this);
 			const abl = uniqByKeepLast(Object.entries(this.abilities), el=>el[1].name||el[0])
 				.map(el => ({
 					[el[0]]: el[1]	

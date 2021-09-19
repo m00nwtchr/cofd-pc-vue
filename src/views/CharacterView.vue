@@ -63,10 +63,10 @@
 				</div>
 				<div class="block col-sm-4">
 					<label for="virtueAnchor">{{ $t(character.splat.virtueAnchorName) }}:</label>
-					<input v-model="character.virtueAnchor" list="virtueAnchors" id="virtueAnchor" />
+					<input v-model="virtueAnchor" list="virtueAnchors" id="virtueAnchor" />
 					<br />
 					<label for="viceAnchor">{{ $t(character.splat.viceAnchorName) }}:</label>
-					<input v-model="character.viceAnchor" list="viceAnchors" id="viceAnchor" />
+					<input v-model="viceAnchor" list="viceAnchors" id="viceAnchor" />
 					<br />
 					<label for="concept">{{ $t("character.concept") }}:</label>
 					<input v-model="character.concept" id="concept" />
@@ -80,7 +80,7 @@
 						<input v-model="character.faction" id="faction" />
 						<br />
 						<label for="group-name">{{ $t(character.splat.orgName) }}:</label>
-						<input v-model="character.organization" id="group-name" />
+						<input v-model="character.organization.name" id="group-name" />
 						<br />
 					</span>
 					<span v-else>
@@ -273,14 +273,12 @@
 								<div
 									v-if="
 										character.splat.alternateBeatName &&
-										!character.splat.alternateBeatOptional
+										character.splat.alternateBeatDefault
 									"
 								>
 									<span style="float: left">
 										{{
-											character.splat.alternateBeatName(
-												$t("character.trait.beats")
-											)
+											$t(character.splat.alternateBeatName, {x: $t("character.trait.beats")})
 										}}:
 									</span>
 									<div style="float: left">
@@ -304,9 +302,7 @@
 									<span style="clear: both"></span>
 									<br />
 									{{
-										character.splat.alternateBeatName(
-											$t("character.trait.experience")
-										)
+										$t(character.splat.alternateBeatName, {x: $t("character.trait.experience")})
 									}}:
 									<input
 										v-model.number="
@@ -603,24 +599,22 @@
 				</div>
 			</div>
 
-			<div class="werewolf-traits" v-if="character.splat.enum === EnumSplat.WEREWOLF">
+			<div class="werewolf-traits" v-if="(character instanceof WerewolfCharacter)">
 				<div id="werewolf-forms" class="row w-100">
 					<div
-						v-for="form in character.getForms()"
-						:key="form"
+						v-for="(form,key) in character.forms"
+						:key="key"
 						style="text-align: left; width: 100%"
 						class="col-sm"
 					>
 						<h4
-							@click="character.currentForm = form.name.toLowerCase()"
+							@click="character.data.set('currentForm', key)"
 							:class="{
-								'form-active':
-									character.currentForm.toLowerCase() ===
-									form.name.toLowerCase()
+								'form-active': character.data.get('currentForm') === key
 							}"
 							class="separator col-sm-12"
 						>{{ form.name }}</h4>
-						<i class="subtitle">({{ form.desc }})</i>
+						<i class="subtitle">({{ $t(form.desc) }})</i>
 
 						<div>
 							<span
@@ -644,7 +638,7 @@
 								<span class="default-font">
 									{{
 										character.attributes[attr] -
-											currentForm[attr + "Mod"] +
+											character.currentForm[attr + "Mod"] +
 											form[attr + "Mod"]
 									}}
 								</span>
@@ -659,13 +653,13 @@
 							-->
 							{{ formatNum(form.sizeMod) }}:
 							<input
-								v-if="form.name === 'Hishu'"
+								v-if="key === 'hishu'"
 								v-model.number="sizeMinusForm"
 								type="number"
 							/>
 							<span class="default-font" v-else>
 								{{
-									character.size - currentForm.sizeMod + form.sizeMod
+									character.size - character.currentForm.sizeMod + form.sizeMod
 								}}
 							</span>
 							<br />
@@ -686,8 +680,8 @@
 								formatNum(
 									form.dexterityMod +
 									form.composureMod -
-									getForm("hishu").dexterityMod -
-									getForm("hishu").composureMod
+									character.forms["hishu"].dexterityMod -
+									character.forms["hishu"].composureMod
 								)
 							}}:
 							<span
@@ -695,8 +689,8 @@
 							>
 								{{
 									character.initative -
-										currentForm.dexterityMod -
-										currentForm.composureMod +
+										character.currentForm.dexterityMod -
+										character.currentForm.composureMod +
 										form.dexterityMod +
 										form.composureMod
 								}}
@@ -715,9 +709,9 @@
 							>
 								{{
 									character.speed -
-										currentForm.strengthMod -
-										currentForm.dexterityMod -
-										currentForm.speedMod +
+										character.currentForm.strengthMod -
+										character.currentForm.dexterityMod -
+										character.currentForm.speedMod +
 										form.strengthMod +
 										form.dexterityMod +
 										form.speedMod
@@ -728,10 +722,10 @@
 							<span class="default-font">
 								{{
 									`${character.armor.general -
-										currentForm.armorMod.general +
+										character.currentForm.armorMod.general +
 										form.armorMod.general}/${character.armor
 											.ballistic -
-										currentForm.armorMod.ballistic +
+											character.currentForm.armorMod.ballistic +
 										form.armorMod.ballistic}`
 								}}
 							</span>
@@ -746,8 +740,8 @@
 								class="default-font"
 							>
 								{{
-									perception -
-										currentForm.perceptionMod +
+									character.perception -
+										character.currentForm.perceptionMod +
 										form.perceptionMod
 								}}
 							</span>
@@ -758,7 +752,7 @@
 								<span class="default-font">
 									{{
 										character.attributes.stamina -
-											currentForm.staminaMod +
+											character.currentForm.staminaMod +
 											character.power
 									}}
 								</span>
@@ -792,28 +786,28 @@
 									:length="1"
 								/>
 							</div>-->
-							<ability-list
+							<!-- <ability-list
 								class="col-12"
 								:abilities="character.moonGifts"
 								abilityName="Moon Gifts"
 								:optionsMutable="true"
 								:length="2"
 								:horizontal="true"
-							/>
+							/> -->
 						</div>
 						<div class="row col-sm-12">
 							<div class="col-sm-6">
 								<h4 class="separator">Shadow Gifts</h4>
-								<item-list class="col-12" :items="character.shadowGifts" :mutable="true" />
+								<!-- <item-list class="col-12" :items="character.shadowGifts" :mutable="true" /> -->
 							</div>
 							<div class="col-sm-6">
 								<h4 class="separator">Wolf Gifts</h4>
-								<item-list class="col-12" :items="character.wolfGifts" :mutable="true" />
+								<!-- <item-list class="col-12" :items="character.wolfGifts" :mutable="true" /> -->
 							</div>
 						</div>
 						<div class="row col-sm-12">
 							<h4 class="separator">Rites</h4>
-							<item-list class="col-12" :items="character.rites" :mutable="true" :cols="2" />
+							<!-- <item-list class="col-12" :items="character.rites" :mutable="true" :cols="2" /> -->
 						</div>
 					</div>
 				</div>
@@ -835,6 +829,7 @@ import {
 	MortalCharacter,
 	SupernaturalCharacter,
 	VampireCharacter,
+	WerewolfCharacter,
 	Ability,
 	ATTRIBUTES,
 	Attributes,
@@ -844,6 +839,7 @@ import {
 	Splat,
 	EnumSplat,
 	createCharacter,
+	Form,
 } from "../definitions";
 
 import AbilityList from "../components/sheetComponents/AbilityList.vue";
@@ -861,6 +857,14 @@ import FloatingActionMenu from "../components/FloatingActionMenu.vue";
 import SpellCalculator from "../components/sheetComponents/SpellCalculator.vue";
 
 import { DiceRoller } from "../DiceRoller";
+
+import g from "../i18n";
+
+const { te } = g.global;
+
+// import { useI18n } from "vue-i18n";
+
+// const { te } = useI18n();
 
 // import _ from "lodash";
 
@@ -927,8 +931,37 @@ export default defineComponent({
 				this.character.data.set("organization", val);
 			}
 		},
+		sizeMinusForm: {
+			get() {
+				return this.character.size - this.character.currentForm.sizeMod;
+			},
+			set(val: number) {
+				this.character.size = val;
+			}
+		},
 
+		virtueAnchor: {
+			get(): string {
+				const x = (this.character.splat.virtueAnchor || (() => ""))(this.character.virtueAnchor);
+				return te(x) ? this.$t(x) : this.character.virtueAnchor;
+			},
+			set(val: string) {
+				// const x = (this.character.splat.virtueAnchor || (() => ""))(val);
 
+				this.character.virtueAnchor = val;
+			}
+		},
+		viceAnchor: {
+			get(): string {
+				const x = (this.character.splat.viceAnchor || (() => ""))(this.character.viceAnchor);
+				return te(x) ? this.$t(x) : this.character.viceAnchor;
+			},
+			set(val: string) {
+				// const x = (this.character.splat.viceAnchor || (() => ""))(val);
+
+				this.character.viceAnchor = val;
+			}
+		},
 
 		attrMax() {
 			// console.log(this.splat);
@@ -943,13 +976,6 @@ export default defineComponent({
 				(this as any).dotsOverFive ? 10 : 5
 			);
 		},
-		// perception() {
-		// 	return (
-		// 		(this as any).character.attributes.resolve +
-		// 		(this as any).character.attributes.composure +
-		// 		((this as any).currentForm.perceptionMod || 0)
-		// 	);
-		// },
 		// abilities(): {[index: string]: Ability} {
 		// 	const character: Character = this.character;
 		// 	const obj: {[index: string]: Ability} = {};
@@ -957,11 +983,6 @@ export default defineComponent({
 		// 	// 	obj[el.name.toLowerCase()] = {level: el.level, name: el.name};
 		// 	// });
 		// 	return obj;
-		// },
-		// currentForm(): Form {
-		// 	return this.character instanceof WerewolfCharacter
-		// 		? this.character.currentFormObj().value
-		// 		: ({} as Form);
 		// },
 		// dotRanges() {
 		// 	let obj = {};
@@ -987,7 +1008,6 @@ export default defineComponent({
 		// }
 	},
 	methods: {
-		unref,
 		// nameToKey,
 		async rollTest() {
 			const results = [] as string[][];
@@ -1047,7 +1067,7 @@ export default defineComponent({
 				this.store.commit({
 					type: "SELECT_TRAIT",
 					name,
-					value: () => obj[name]
+					value: () => typeof obj[name].level === "number" ? obj[name].level : obj[name]
 				});
 			}
 		},
@@ -1104,47 +1124,45 @@ export default defineComponent({
 			// 	}
 			// }
 		},
-		// formDefense(form: Form) {
-		// 	return (
-		// 		(form.defenseCalcMax ? Math.max : Math.min)(
-		// 			this.character.attributes.dexterity -
-		// 				this.currentForm.dexterityMod +
-		// 				form.dexterityMod,
-		// 			this.character.attributes.wits -
-		// 				this.currentForm.witsMod +
-		// 				form.witsMod
-		// 		) +
-		// 		(this.character.skills.athletics || 0) +
-		// 		(this.character.mod("defense") -
-		// 			(this.currentForm.defenseMod || 0) +
-		// 			(form.defenseMod || 0))
-		// 	);
-		// 	// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
-		// },
-		formDefenseMod(form: Form) {
-			// const hishu = this.getForm('hishu');
-			// let sub = 0;
+		formDefense(form: Form) {
+			if (!(this.character instanceof WerewolfCharacter)) return 0;
 
-			// const dexterity = this.character.attributes.dexterity - this.currentForm.dexterityMod + form.dexterityMod;
-			// const wits = this.character.attributes.wits - this.currentForm.witsMod + form.witsMod;
-
-			// const res = (form.defenseCalcMax ? Math.max : Math.min)(dexterity, wits);
-
-			// if (res == dexterity) {
-			// 	sub = form.dexterityMod;
-			// } else if (res == wits) {
-			// 	sub = form.witsMod;
-			// }
-
-			// return this.formDefense(form) - this.formDefense(hishu) -
-			// 	sub;
-			return form.defenseMod;
+			return (
+				(form.defenseCalcMax ? Math.max : Math.min)(
+					this.character.attributes.dexterity -
+						this.character.currentForm.dexterityMod +
+						form.dexterityMod,
+					this.character.attributes.wits -
+						this.character.currentForm.witsMod +
+						form.witsMod
+				) +
+				(this.character.skills.athletics || 0) +
+				(this.character.mod("defense") -
+					(this.character.currentForm.defenseMod || 0) +
+					(form.defenseMod || 0))
+			);
+			// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
 		},
-		getForm(name: string) {
-			return {} as Form;
-			// return this.character instanceof WerewolfCharacter
-			// 	? this.character.getForm(name).value
-			// 	: ({} as Form);
+		formDefenseMod(form: Form) {
+			if (!(this.character instanceof WerewolfCharacter)) return 0;
+
+			const hishu = this.character.forms["hishu"];
+			let sub = 0;
+
+			const dexterity = this.character.attributes.dexterity - this.character.currentForm.dexterityMod + form.dexterityMod;
+			const wits = this.character.attributes.wits - this.character.currentForm.witsMod + form.witsMod;
+
+			const res = (form.defenseCalcMax ? Math.max : Math.min)(dexterity, wits);
+
+			if (res == dexterity) {
+				sub = form.dexterityMod;
+			} else if (res == wits) {
+				sub = form.witsMod;
+			}
+
+			return this.formDefense(form) - this.formDefense(hishu) -
+				sub;
+			// return form.defenseMod;
 		},
 		formatNum(num: number): string {
 			return num !== 0 ? `(${num > 0 ? "+" : ""}${num})` : "";
@@ -1152,10 +1170,6 @@ export default defineComponent({
 
 	},
 	data: () => ({
-		// characters: (null as unknown) as ,
-		// character: (null as unknown) as Character,
-		// sizeMinusForm: null as any,
-
 		store: useStore(),
 
 		dotsOverFive: false,
@@ -1183,7 +1197,8 @@ export default defineComponent({
 		MortalCharacter,
 		MageCharacter,
 		VampireCharacter,
-		SupernaturalCharacter
+		SupernaturalCharacter,
+		WerewolfCharacter
 	}),
 	beforeMount() {
 		(window as any).vue = this;
@@ -1197,15 +1212,6 @@ export default defineComponent({
 		// 	this.characters[this.id] as any
 		// ) as any;
 		// this.characters[this.id] = this.character;
-
-		// this.sizeMinusForm = computed({
-		// 	get: () => {
-		// 		return this.character.size - this.currentForm.sizeMod;
-		// 	},
-		// 	set: val => {
-		// 		this.character.size = val as any;
-		// 	}
-		// });
 	},
 	// watch: {
 	// 	characters: {
