@@ -2,7 +2,7 @@
 	<health-component style="margin-bottom: 15px" v-if="integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.integrityTrait" :healthTrack="character.integrityTrack" :name="character.splat.integrityTraitName" />
 	<div style="margin-bottom: 15px" v-else>
 		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-			<h3 class="separator col-sm-12">{{ splat.integrityTrackType.names[0] }} Touchstone</h3>
+			<h3 class="separator col-sm-12">{{ character.splat.integrityTrackType.names[0] }} Touchstone</h3>
 			<!-- eslint-disable-next-line vue/no-mutating-props -->
 			<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name">
 			</div>

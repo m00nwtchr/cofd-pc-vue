@@ -1,7 +1,13 @@
-import { computed, Ref, unref } from "vue";
+/* eslint-disable no-fallthrough */
 import { RefType, toObject } from "../Util";
-import Character, { Ability, ATTRIBUTES, def, nameToKey, SKILLS, TraitMod, WerewolfCharacter } from "./Character";
-import { EnumSplat, SPLATS, WEREWOLF_FORMS } from "./Splat";
+import { Ability, Character, SKILLS, EnumSplat, SPLATS, ATTRIBUTES, Form } from ".";
+
+const WEREWOLF_FORMS = (SPLATS[EnumSplat.WEREWOLF] as any).forms as { [key: string]: Form };
+
+export interface Modifier {
+	trait: string;
+	mod: number | (() => number);
+}
 
 type LType = { [key: string]: string } | string[];
 
@@ -13,7 +19,8 @@ interface Option {
 }
 
 export class Merit implements Ability {
-	name: RefType<string>;
+	key?: string;
+	name?: string;
 	level: number;
 
 	// character: Character;
@@ -24,14 +31,14 @@ export class Merit implements Ability {
 		this.name = ability.name;
 		this.level = ability.level;
 
-		Object.assign(this as any, ability);
+		Object.assign(this, ability);
 	}
 
-	getOptions(): any[] {
+	getOptions(): Option[] {
 		return [];
 	}
 
-	getTraitMods(character: Character): TraitMod[] {
+	getTraitMods(character: Character): Modifier[] {
 		return [];
 	}
 
@@ -47,9 +54,9 @@ class GiantMerit extends Merit {
 		super(character, ability);
 	}
 
-	getTraitMods(): TraitMod[] {
+	getTraitMods(): Modifier[] {
 		return [
-			{trait: "size", mod: def(() => this.level >= 3 ? 1 : 0)}
+			{ trait: "size", mod: () => this.level >= 3 ? 1 : 0 }
 		];
 	}
 }
@@ -59,9 +66,9 @@ class SmallFramedMerit extends Merit {
 		super(character, ability);
 	}
 
-	getTraitMods(): TraitMod[] {
+	getTraitMods(): Modifier[] {
 		return [
-			{trait: "size", mod: def(() => this.level >= 2 ? -1 : 0)}
+			{ trait: "size", mod: () => this.level >= 2 ? -1 : 0 }
 		];
 	}
 }
@@ -75,27 +82,39 @@ class FavoredFormMerit extends Merit {
 	secondAttribute!: string;
 	skill!: string;
 
+	penaltyChoice1?: string[];
+	penaltyChoice2?: string[];
+	penaltyChoice3?: string[];
+	penaltyChoice4?: string[];
+	penaltyChoice5?: string[];
+
+	// [index: string]: s
+
 	constructor(character: Character, ability: Ability) {
 		super(character, ability);
+
+		this.getOptions().forEach(el => {
+			// (this as any)[el.name] = (ability as any)[el.name] || ;
+		});
 	}
 
-	getTraitMods(): TraitMod[] {
+	getTraitMods(): Modifier[] {
 		return [
-			{trait: this.form + this.attribute + "mod",       mod: def(() => this.level >= 2 ? 1 : 0)},
-			{trait: this.form + this.secondAttribute + "mod", mod: def(() => this.level >= 4 ? 1 : 0)},
-			...Array.from({length:this.level},(v,k)=>k+1).map(index => {
-				const name = "penaltyChoice"+index;
+			{ trait: this.form + this.attribute + "mod", mod: () => this.level >= 2 ? 1 : 0 },
+			{ trait: this.form + this.secondAttribute + "mod", mod: () => this.level >= 4 ? 1 : 0 },
+			...Array.from({ length: this.level }, (v, k) => k + 1).map(index => {
+				const name = "penaltyChoice" + index;
 				const val = (this as any)[name];
 
 				if (val && val[0] && val[1]) {
-					return {trait: val[0]+val[1]+"mod", mod: -1};
+					return { trait: val[0] + val[1] + "mod", mod: -1 };
 				}
 				return {};
-			}).filter(el => el.trait)
+			}).filter(el => el.trait) as Modifier[]
 		];
 	}
 
-	getOptions() {
+	getOptions(): Option[] {
 		const formsObj: { [key: string]: string } = {};
 		Object.entries(WEREWOLF_FORMS).forEach(entry => {
 			formsObj[entry[0]] = (entry[1] as any).name;
@@ -125,42 +144,44 @@ class FavoredFormMerit extends Merit {
 				}
 			});
 
-			opts.push({
-				name: "physicalSkill",
-				list: SKILLS[1]
-			});
-			if (this.level >= 2) {
-				opts.push({
-					name: "attribute",
-					list: formAttrs
-				});
-			}
-			if (this.level >= 3)
-				opts.push({
-					name: "facet"
-				});
-			if (this.level >= 4) {
-				const formAttrsTwo = formAttrs.filter(el => el !== this.attribute);
-				opts.push({
-					name: "secondAttribute",
-					list: formAttrsTwo
-				});
-			}
-			if (this.level >= 5)
+			switch (this.level) {
+			case (5):
 				opts.push({
 					name: "skill",
 					list: SKILLS.flat()
 				});
+			case (4):
+				opts.push({
+					name: "secondAttribute",
+					list: formAttrs.filter(el => el !== this.attribute)
+				});
+			case (3):
+				opts.push({
+					name: "facet"
+				});
+			case (2):
+				opts.push({
+					name: "attribute",
+					list: formAttrs
+				});
+			case (1):
+				opts.push({
+					name: "physicalSkill",
+					list: SKILLS[1]
+				});
+				break;
+			}
 
-			const penaltyForms = toObject(Object.entries(formsObj).filter(el => el[0] !== this.form));
+			const penaltyForms = toObject(Object.entries(formsObj)
+				.filter(el => el[0] !== this.form));
 
 			const penaltyAttrs = [
 				...ATTRIBUTES[0],
 				...ATTRIBUTES[1]
 			];
 
-			for (let index = 1; index < this.level+1; index++) {
-				const name = "penaltyChoice"+index;
+			for (let index = 1; index < this.level + 1; index++) {
+				const name = "penaltyChoice" + index;
 				if (!(this as any)[name]) {
 					(this as any)[name] = [];
 				}
@@ -186,17 +207,18 @@ class DefensiveCombatMerit extends Merit {
 	constructor(character: Character, ability: Ability) {
 		super(character, ability);
 	}
-	
-	getTraitMods(character: Character) {
+
+	getTraitMods(character: Character): Modifier[] {
 		return [
-			{trait: "defense", mod: def(() => this.level >= 1 &&
-				DefensiveCombatMerit.SKILLS.includes(this.skill) &&
-				this.use ? (-character.skills.athletics || 0) + character.skills.brawl : 0)
+			{
+				trait: "defense", mod: () => this.level >= 1 &&
+					DefensiveCombatMerit.SKILLS.includes(this.skill) &&
+					this.use ? (-character.skills.athletics || 0) + character.skills.brawl : 0
 			}
 		];
 	}
 
-	getOptions() {
+	getOptions(): Option[] {
 		const opts: Option[] = [
 			{
 				name: "skill",
@@ -220,14 +242,14 @@ class FortifiedFormMerit extends Merit {
 		super(character, ability);
 	}
 
-	getTraitMods() {
+	getTraitMods(): Modifier[] {
 		return [
-			{trait: this.form + "generalarmormod",   mod: this.level >=  5 ? 2 : this.level >= 3 ? 1 : 0},
-			{trait: this.form + "ballisticarmormod", mod: this.level === 4 ? 1 : this.level >= 5 ? 2 : 0}
+			{ trait: this.form + "generalarmormod", mod: this.level >= 5 ? 2 : this.level >= 3 ? 1 : 0 },
+			{ trait: this.form + "ballisticarmormod", mod: this.level === 4 ? 1 : this.level >= 5 ? 2 : 0 }
 		];
 	}
 
-	getOptions() {
+	getOptions(): Option[] {
 		const formsObj: { [key: string]: string } = {};
 		Object.entries(WEREWOLF_FORMS).forEach(entry => {
 			formsObj[entry[0]] = (entry[1] as any).name;
@@ -255,13 +277,13 @@ class LivingWeaponMerit extends Merit {
 		super(character, ability);
 	}
 
-	getTraitMods() {
+	getTraitMods(): Modifier[] {
 		return [
-			{trait: this.form + this.weapon + "damagemod", mod: this.level >= 4 ? 1 : 0},
+			{ trait: this.form + this.weapon + "damagemod", mod: this.level >= 4 ? 1 : 0 },
 		];
 	}
 
-	getOptions() {
+	getOptions(): Option[] {
 		const formsObj: { [key: string]: string } = {};
 		Object.entries((SPLATS[EnumSplat.WEREWOLF] as any).forms).forEach(entry => {
 			formsObj[entry[0]] = (entry[1] as any).name;
@@ -293,11 +315,11 @@ class EmbodimentOfTheFirstbornMerit extends Merit {
 
 	getTraitMods() {
 		return [
-			{trait: this.attribute, mod: this.level >= 5 ? 1 : 0},
+			{ trait: this.attribute, mod: this.level >= 5 ? 1 : 0 },
 		];
 	}
 
-	getOptions() {
+	getOptions(): Option[] {
 		return [{
 			name: "attribute",
 			list: ATTRIBUTES.flat()
@@ -311,12 +333,12 @@ class InstinctiveDefenseMerit extends Merit {
 		super(character, ability);
 	}
 
-	getTraitMods() {
-		const mod = def(() => this.level >= 2 ? 1 : 0);
+	getTraitMods(): Modifier[] {
+		const mod = () => this.level >= 2 ? 1 : 0;
 
 		return [
-			{trait: "urhandefensecalcmax", mod},
-			{trait: "urshuldefensecalcmax", mod}
+			{ trait: "urhandefensecalcmax", mod },
+			{ trait: "urshuldefensecalcmax", mod }
 		];
 	}
 }
@@ -327,15 +349,15 @@ class DistillationOfFormMerit extends Merit {
 		super(character, ability);
 	}
 
-	getTraitMods(character: Character) {
-		const mod = def(() => character.power >= 3 && this.level >= 4 ? 1 : 0);
+	getTraitMods(character: Character): Modifier[] {
+		const mod = () => character.power >= 3 && this.level >= 4 ? 1 : 0;
 
 		return [
-			{trait: "gaurusizemod"    , mod},
-			{trait: "gaurustrengthmod", mod},
+			{ trait: "gaurusizemod", mod },
+			{ trait: "gaurustrengthmod", mod },
 
-			{trait: "urshulsizemod"   , mod},
-			{trait: "urshultrengthmod", mod},
+			{ trait: "urshulsizemod", mod },
+			{ trait: "urshultrengthmod", mod },
 		];
 	}
 }
@@ -346,10 +368,10 @@ function createTraitMerit(trait: string, maxLevel = 3, minLevel = 1, bonusMax?: 
 		constructor(character: Character, ability: Ability) {
 			super(character, ability);
 		}
-	
-		getTraitMods() {
+
+		getTraitMods(): Modifier[] {
 			return [
-				{trait, mod: def(() => this.level >= minLevel ? Math.max(Math.min(this.level, maxLevel), bonusMax || maxLevel) : 0)},
+				{ trait, mod: () => this.level >= minLevel ? Math.max(Math.min(this.level, maxLevel), bonusMax || maxLevel) : 0 },
 			];
 		}
 	};

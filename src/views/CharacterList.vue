@@ -3,23 +3,20 @@
 		<header class="col-12">
 			<div>My Characters</div>
 		</header>
+
 		<ul class="col-12" id="list">
 			<router-link :key="key" v-for="(el, key) in characters"  :to="'/character/'+key"><li class="list-item">
-			
 				<div>
 					<span class="name">{{el.name}}</span><br>
 					<span style="text-transform: capitalize;" class="desc">
 						<span v-if="el.concept">{{ el.concept }}<br></span>
-						{{
-							$t(`splat.${nameToKey(EnumSplat[el.splat])}.name`,EnumSplat[el.splat])
-						}}, {{
-							$t(`splat.${nameToKey(EnumSplat[el.splat])}.organization.${el.organization}`,el.organization)
-							}} {{el.legacy ||""}} {{
-								el.subType ? $t(`splat.${nameToKey(EnumSplat[el.splat])}.subType.${el.subType}`,el.subType) : ""
-							}}
+						<!-- {{ el.splat }}, {{ el.organization.name }} {{el.legacy ||""}} {{ el.subType.name }} -->
+						{{ $t(el.splat.name) }}, {{ el.organization.name && $t(el.organization.name) }} {{ el.legacy || "" }} {{ el.subType.name && $t(el.subType.name) }}
+						<br><span v-if="el.splat.name === ''" style="color: red">Warning: Unknown/Unsupported splat or malformed data</span>
 					</span>
+					<!-- {{key === "b153b71d-57b0-488e-8a14-165f0ebc5b20" && el}} -->
+
 				</div>
-			
 			</li></router-link>
 
 		</ul>
@@ -28,9 +25,9 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { EnumSplat } from "../definitions/Splat";
 
-import { nameToKey } from "../definitions/Character";
+import { EnumSplat, createCharacter, Character } from "../definitions";
+import { useStore } from "../store";
 
 console.log(EnumSplat);
 
@@ -40,16 +37,21 @@ export default defineComponent({
 	},
 	data() {
 		return {
+			store: useStore(),
+
 			EnumSplat,
 		};
 	},
 	computed: {
-		characters() {
-			return this.$store.state.characters;
+		characters(): {[key: string]: Character} {
+			return Object.entries(this.store.state.characters)
+				.map(el => [el[0], createCharacter(el[1])])
+				.map(el => ({
+					[el[0]]: el[1]
+				})).reduce((prev, val) => Object.assign(prev, val));
 		}
 	},
 	methods: {
-		nameToKey
 	}
 });
 </script>
