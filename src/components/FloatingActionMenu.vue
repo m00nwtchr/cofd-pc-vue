@@ -9,13 +9,15 @@
 				@click="item.action"
 			>
 				<span v-if="item.icon" class="material-icons">
-					{{ item.icon }}
+					<!-- {{ item.icon }} -->
+					<font-awesome-icon :icon="item.icon" />
 				</span>
 				<span v-else>
 					{{ item.name }}
 				</span>
 			</button>
 		</div>
+
 		<button @click="extended = !extended" class="fab material-icons">
 			menu
 		</button>
@@ -23,7 +25,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 
 interface MenuItem {
 	name: string;
@@ -35,8 +37,8 @@ export default defineComponent({
 	name: "FloatingActionMenu",
 	props: {
 		"items": {
-			type: Array,
-			required: true
+			required: true,
+			type: Array as PropType<MenuItem[]>,
 		}
 	},
 	data() {

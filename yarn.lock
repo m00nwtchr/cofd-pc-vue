@@ -1282,6 +1282,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/fontawesome-common-types@npm:^0.3.0-beta2":
+  version: 0.3.0-beta2
+  resolution: "@fortawesome/fontawesome-common-types@npm:0.3.0-beta2"
+  checksum: b45cfa380595979aa87dd016ffdfbf7ef3dfa4e4e3e40cf88917e5ef2ab9f029962e5d584b00c9762a6f322fff4ba3032ca47cb957febad7ba304fcb0b662e13
+  languageName: node
+  linkType: hard
+
+"@fortawesome/fontawesome-svg-core@npm:next":
+  version: 1.3.0-beta2
+  resolution: "@fortawesome/fontawesome-svg-core@npm:1.3.0-beta2"
+  dependencies:
+    "@fortawesome/fontawesome-common-types": ^0.3.0-beta2
+  checksum: de0cd16f9f342fd8f8fb299ea53c0329a4d175b7f3c7506c7b2b40c42eb47ddad74167e1ec3ea4c95371e78925bad7cf631da200572731aa904694acabeb85d3
+  languageName: node
+  linkType: hard
+
+"@fortawesome/free-solid-svg-icons@npm:next":
+  version: 6.0.0-beta2
+  resolution: "@fortawesome/free-solid-svg-icons@npm:6.0.0-beta2"
+  dependencies:
+    "@fortawesome/fontawesome-common-types": ^0.3.0-beta2
+  checksum: 1887d5d0edb8f827cc8112be7e7910d6d237a3aa4bc5f74c64f9016ee2d8fd538161d50a2c06ec4445b21832c837113939ba738714e55aad675e871a46ddf0ff
+  languageName: node
+  linkType: hard
+
+"@fortawesome/vue-fontawesome@npm:prerelease":
+  version: 3.0.0-4
+  resolution: "@fortawesome/vue-fontawesome@npm:3.0.0-4"
+  peerDependencies:
+    "@fortawesome/fontawesome-svg-core": ">= 1.2.0 < 1.3"
+    vue: ">= 3.0.0 < 4"
+  checksum: 7ca5544bd0276068b7432e5c1d02761b04b1069c3039f7e473533a706b6afdc554a245f251ebac8bae3030a016dbefac26d227f6d4ec128e37b8c2e0c9980778
+  languageName: node
+  linkType: hard
+
 "@hapi/address@npm:2.x.x":
   version: 2.1.4
   resolution: "@hapi/address@npm:2.1.4"
@@ -4134,6 +4169,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "cofd-pc@workspace:."
   dependencies:
+    "@fortawesome/fontawesome-svg-core": next
+    "@fortawesome/free-solid-svg-icons": next
+    "@fortawesome/vue-fontawesome": prerelease
     "@intlify/vite-plugin-vue-i18n": ^2.2.1
     "@intlify/vue-i18n-loader": ^2.1.0
     "@types/cannon": ^0.1.5

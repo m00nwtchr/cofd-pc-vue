@@ -154,7 +154,7 @@ export class Character implements ICharacter {
 
 	get healthTrack(): number[] {
 		const ogTrack = (this.data.get("healthTrack") as number[]) || [];
-		const track = Object.assign(new Array(this.maxHealth).fill(0), ogTrack);
+		const track = Object.assign(new Array(this.maxHealth || 0).fill(0), ogTrack);
 
 		if (this.maxHealth < track.length) {
 			const deleted = track.splice(this.maxHealth - 1, track.length - this.maxHealth);
@@ -419,11 +419,11 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 	}
 
 	get size(): number {
-		return super.size + this.meritTraitMods.size;
+		return super.size + (this.meritTraitMods.size || 0);
 	}
 
 	set size(val: number) {
-		super.size = val - this.meritTraitMods.size;
+		super.size = val - (this.meritTraitMods.size || 0);
 	}
 
 	integrityTrait: number;
@@ -610,17 +610,15 @@ interface IWerewolfCharacter extends IMortalCharacter, ISupernatural, IHasTouchs
 
 	huntersAspect: string;
 
-	// moonGifts: [Ability | undefined, Ability | undefined];
+	moonGift1: Ability;
+	moonGift2: Ability;
 
-	// moonGift1: Ability;
-	// moonGift2: Ability;
+	moonGifts: { [key: string]: Ability };
 
-	// moonGifts: { [key: string]: Ability };
+	shadowGifts: string[];
+	wolfGifts: string[];
 
-	// shadowGifts: string[];
-	// wolfGifts: string[];
-
-	// rites: string[];
+	rites: string[];
 }
 
 export interface FormMods {
@@ -679,16 +677,48 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 		return super.speed + this.currentForm.speedMod;
 	}
 
+	get maxHealth(): number {
+		return super.maxHealth + (this.moonGifts.full.level >= 2 ?
+			this.abilities.purity.level : 0)
+	}
+
 	kuruthTriggers: { passive: string; common: string; specific: string; };
 	huntersAspect: string;
 
 	// moonGift1: Ability;
-	// moonGift2: Ability;
-	// moonGifts: { [key: string]: Ability; };
 
-	// shadowGifts: string[];
-	// wolfGifts: string[];
-	// rites: string[];
+	get moonGift1(): Ability {
+		if (this.subType.name) {
+			const key = (this.subType.moonGifts as string[])[0];
+			const renown = this.subType.abilities[0];
+
+			return {
+				// name: "splat.werewolf.gift.moon." + key,
+				key,
+				level: this.abilities[renown].level
+			} as Ability;
+		}
+		return this.data.get("moonGift1") as Ability || { name: "", key: "", level: 0 } as Ability;
+	}
+	set moonGift1(val: Ability) {
+		if (!this.subType.name) {
+			this.data.set("moonGift1", val);
+		}		
+	}
+
+	moonGift2: Ability;
+
+	get moonGifts(): { [key: string]: Ability } {
+		if (!this.moonGift2.key) this.moonGift2.key = "NEW";
+		return {
+			[this.moonGift1.key || ""]: this.moonGift1,
+			[this.moonGift2.key || ""]: this.moonGift2,
+		};
+	}
+
+	shadowGifts: string[];
+	wolfGifts: string[];
+	rites: string[];
 
 	touchstones: string[];
 
@@ -709,9 +739,13 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 		};
 		this.huntersAspect = opts.huntersAspect || "";
 
+		this.moonGift2 = opts.moonGift2 || {name: "", level: 0};
+	
+		this.shadowGifts = opts.shadowGifts || [];
+		this.wolfGifts = opts.wolfGifts || [];
+		this.rites = opts.rites || [];
 
 		const descs = Object.getOwnPropertyDescriptors(this.attributes);
-		// const stam = lookupAccess<number>(this.attributes, "stamina");
 
 		const _defProp = (key: string, func: () => number) => ({
 			get: () => ((descs[key].get || (() => 0))() || 1) + func(),
