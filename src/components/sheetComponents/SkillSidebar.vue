@@ -35,10 +35,10 @@
 				></button>
 				<span
 					:class="{
-						// selected: $store.state.selectedTraits[skill] !== undefined,
-						// specialties:
-						// character.specialties[skill] &&
-						// character.specialties[skill].length > 0
+						selected: store.state.selectedTraits[skill] !== undefined,
+						specialties:
+						character.specialties[skill] &&
+						character.specialties[skill].length > 0
 					}"
 					@click="$emit('selectSkill', skill, character.skills)"
 				>{{ $t(`character.skill.${skill}`) }}</span>
@@ -79,6 +79,8 @@
 import { defineComponent } from "vue";
 import { Character, MageCharacter, EnumSplat, ATTRIBUTES, SKILLS } from "../../definitions";
 
+import { useStore } from "../../store";
+
 import ItemList from "./ItemList.vue";
 
 export default defineComponent({
@@ -93,6 +95,8 @@ export default defineComponent({
 		}
 	},
 	data: () => ({
+		store: useStore(),
+
 		SKILLS, ATTRIBUTES, EnumSplat,
 		skillCats: { mental: -3, physical: -1, social: -1 } as {
 			[index: string]: number;

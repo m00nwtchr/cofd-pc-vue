@@ -7,7 +7,8 @@
 
 	<floating-action-menu :items="[
 		{
-			name: 'Roll Selected',
+			// name: 'Roll Selected',
+			icon: 'dice-d20',
 			action: rollSelected
 		}
 	]"></floating-action-menu>
@@ -213,19 +214,16 @@
 								:items="character.conditions"
 								:mutable="true"
 							/>-->
-							<br v-if="character.splat.enum === EnumSplat.WEREWOLF" />
+							<br>
 
-							<span v-if="character.splat.enum === EnumSplat.WEREWOLF">
+							<span v-if="(character instanceof WerewolfCharacter)">
 								<h3 class="separator col-sm-12">Hunter's Aspect</h3>
 								<input class="line w-100" type="text" v-model="character.huntersAspect" />
 							</span>
 
 							<div id="minorTraits" class="block col col-12">
-								<br v-if="character.splat.enum === EnumSplat.WEREWOLF" />
-
-								<span v-if="
-									character.splat.enum !== EnumSplat.WEREWOLF
-								">
+								<br   v-if="(character instanceof WerewolfCharacter)">
+								<span v-else>
 									{{ $t("character.trait.size") }}:
 									<input v-model.number="character.size" type="number" />
 									<br />
@@ -599,219 +597,8 @@
 				</div>
 			</div>
 
-			<div class="werewolf-traits" v-if="(character instanceof WerewolfCharacter)">
-				<div id="werewolf-forms" class="row w-100">
-					<div
-						v-for="(form,key) in character.forms"
-						:key="key"
-						style="text-align: left; width: 100%"
-						class="col-sm"
-					>
-						<h4
-							@click="character.data.set('currentForm', key)"
-							:class="{
-								'form-active': character.data.get('currentForm') === key
-							}"
-							class="separator col-sm-12"
-						>{{ form.name }}</h4>
-						<i class="subtitle">({{ $t(form.desc) }})</i>
-
-						<div>
-							<span
-								v-for="attr in ATTRIBUTES.flat().filter(
-									el =>
-										[
-											'strength',
-											'dexterity',
-											'stamina',
-											'manipulation'
-										].includes(el) || form[el + 'Mod'] !== 0
-								)"
-								:key="attr"
-							>
-								{{
-									$t("character.attribute." + attr)
-								}}
-								<!--
-								-->
-								{{ formatNum(form[attr + "Mod"]) }}:
-								<span class="default-font">
-									{{
-										character.attributes[attr] -
-											character.currentForm[attr + "Mod"] +
-											form[attr + "Mod"]
-									}}
-								</span>
-								<br />
-							</span>
-
-							<br />
-							{{
-								$t("character.trait.size")
-							}}
-							<!--
-							-->
-							{{ formatNum(form.sizeMod) }}:
-							<input
-								v-if="key === 'hishu'"
-								v-model.number="sizeMinusForm"
-								type="number"
-							/>
-							<span class="default-font" v-else>
-								{{
-									character.size - character.currentForm.sizeMod + form.sizeMod
-								}}
-							</span>
-							<br />
-							{{
-								$t("character.trait.defense")
-							}}
-							<!--
-							-->
-							{{ formatNum(formDefenseMod(form)) }}:
-							<span class="default-font">{{ formDefense(form) }}</span>
-							<br />
-							{{
-								$t("character.trait.initative")
-							}}
-							<!--
-							-->
-							{{
-								formatNum(
-									form.dexterityMod +
-									form.composureMod -
-									character.forms["hishu"].dexterityMod -
-									character.forms["hishu"].composureMod
-								)
-							}}:
-							<span
-								class="default-font"
-							>
-								{{
-									character.initative -
-										character.currentForm.dexterityMod -
-										character.currentForm.composureMod +
-										form.dexterityMod +
-										form.composureMod
-								}}
-							</span>
-							<br />
-
-							<!-- Armor: <input v-model="character.armor" /><br> -->
-							{{
-								$t("character.trait.speed")
-							}}
-							<!--
-							-->
-							{{ formatNum(form.speedMod + form.strengthMod + form.dexterityMod) }}:
-							<span
-								class="default-font"
-							>
-								{{
-									character.speed -
-										character.currentForm.strengthMod -
-										character.currentForm.dexterityMod -
-										character.currentForm.speedMod +
-										form.strengthMod +
-										form.dexterityMod +
-										form.speedMod
-								}}
-							</span>
-							<br />
-							{{ $t("character.trait.armor") }}:
-							<span class="default-font">
-								{{
-									`${character.armor.general -
-										character.currentForm.armorMod.general +
-										form.armorMod.general}/${character.armor
-											.ballistic -
-											character.currentForm.armorMod.ballistic +
-										form.armorMod.ballistic}`
-								}}
-							</span>
-							<br />
-							{{
-								$t("character.trait.perception")
-							}}
-							<!--
-							-->
-							{{ formatNum(form.perceptionMod + form.witsMod + form.composureMod) }}:
-							<span
-								class="default-font"
-							>
-								{{
-									character.perception -
-										character.currentForm.perceptionMod +
-										form.perceptionMod
-								}}
-							</span>
-							<br />
-
-							<span v-if="form.name === 'Gauru'">
-								Kuruth Limit:
-								<span class="default-font">
-									{{
-										character.attributes.stamina -
-											character.currentForm.staminaMod +
-											character.power
-									}}
-								</span>
-							</span>
-							<br />
-
-							<div style="line-height: 15px" class="form-traits">
-								<span v-for="(trait, i) in form.traits" :key="i">
-									<br />
-									<i class="subtitle">{{ trait }}</i>
-								</span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col-sm-4">
-						<h2 class="separator col-sm-12" style="margin-bottom: 20px;">Totem</h2>
-					</div>
-					<div class="col-sm-8">
-						<h2 class="separator col-sm-12" style="margin-bottom: 20px;">Gifts and Rites</h2>
-
-						<!-- <h4 class="separator col-sm-12">Moon Gifts</h4> -->
-
-						<div class="row" style="margin-bottom: 10px">
-							<!-- <div class="col-6" v-for="(gift, i) in character.moonGifts" :key="i">
-								<ability-list
-									:abilities="{gift: unref(gift)}"
-									:optionsMutable="i !== 0 || !Object.keys(character.getSplat().subTypes).includes(nameToKey(character.subType))"
-									:length="1"
-								/>
-							</div>-->
-							<!-- <ability-list
-								class="col-12"
-								:abilities="character.moonGifts"
-								abilityName="Moon Gifts"
-								:optionsMutable="true"
-								:length="2"
-								:horizontal="true"
-							/> -->
-						</div>
-						<div class="row col-sm-12">
-							<div class="col-sm-6">
-								<h4 class="separator">Shadow Gifts</h4>
-								<!-- <item-list class="col-12" :items="character.shadowGifts" :mutable="true" /> -->
-							</div>
-							<div class="col-sm-6">
-								<h4 class="separator">Wolf Gifts</h4>
-								<!-- <item-list class="col-12" :items="character.wolfGifts" :mutable="true" /> -->
-							</div>
-						</div>
-						<div class="row col-sm-12">
-							<h4 class="separator">Rites</h4>
-							<!-- <item-list class="col-12" :items="character.rites" :mutable="true" :cols="2" /> -->
-						</div>
-					</div>
-				</div>
-			</div>
+			<werewolf-traits v-if="(character instanceof WerewolfCharacter)" :character="character">
+			</werewolf-traits>
 
 			<div id="vampire-traits" v-if="(character instanceof VampireCharacter)" class="row col-12"></div>
 		</div>
@@ -820,7 +607,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, reactive, ref, Ref, toRefs, unref } from "vue";
+import { defineComponent } from "vue";
 
 import { useStore } from "../store";
 
@@ -850,6 +637,7 @@ import ObjectList from "../components/sheetComponents/ObjectList.vue";
 import DiceRollerComponent from "../components/sheetComponents/diceRoller/DiceRoller.vue";
 
 import SkillSidebar from "../components/sheetComponents/SkillSidebar.vue";
+import WerewolfTraits from "../components/sheetComponents/WerewolfTraits.vue";
 
 import ModalComponent from "../components/ModalComponent.vue";
 import FloatingActionMenu from "../components/FloatingActionMenu.vue";
@@ -894,7 +682,9 @@ export default defineComponent({
 		SpellCalculator,
 		FloatingActionMenu,
 
-		SkillSidebar
+		SkillSidebar,
+
+		WerewolfTraits,
 		// "fab": fab
 	},
 	computed: {
@@ -931,14 +721,7 @@ export default defineComponent({
 				this.character.data.set("organization", val);
 			}
 		},
-		sizeMinusForm: {
-			get() {
-				return this.character.size - this.character.currentForm.sizeMod;
-			},
-			set(val: number) {
-				this.character.size = val;
-			}
-		},
+
 
 		virtueAnchor: {
 			get(): string {
@@ -1124,50 +907,7 @@ export default defineComponent({
 			// 	}
 			// }
 		},
-		formDefense(form: Form) {
-			if (!(this.character instanceof WerewolfCharacter)) return 0;
-
-			return (
-				(form.defenseCalcMax ? Math.max : Math.min)(
-					this.character.attributes.dexterity -
-						this.character.currentForm.dexterityMod +
-						form.dexterityMod,
-					this.character.attributes.wits -
-						this.character.currentForm.witsMod +
-						form.witsMod
-				) +
-				(this.character.skills.athletics || 0) +
-				(this.character.mod("defense") -
-					(this.character.currentForm.defenseMod || 0) +
-					(form.defenseMod || 0))
-			);
-			// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
-		},
-		formDefenseMod(form: Form) {
-			if (!(this.character instanceof WerewolfCharacter)) return 0;
-
-			const hishu = this.character.forms["hishu"];
-			let sub = 0;
-
-			const dexterity = this.character.attributes.dexterity - this.character.currentForm.dexterityMod + form.dexterityMod;
-			const wits = this.character.attributes.wits - this.character.currentForm.witsMod + form.witsMod;
-
-			const res = (form.defenseCalcMax ? Math.max : Math.min)(dexterity, wits);
-
-			if (res == dexterity) {
-				sub = form.dexterityMod;
-			} else if (res == wits) {
-				sub = form.witsMod;
-			}
-
-			return this.formDefense(form) - this.formDefense(hishu) -
-				sub;
-			// return form.defenseMod;
-		},
-		formatNum(num: number): string {
-			return num !== 0 ? `(${num > 0 ? "+" : ""}${num})` : "";
-		},
-
+		
 	},
 	data: () => ({
 		store: useStore(),

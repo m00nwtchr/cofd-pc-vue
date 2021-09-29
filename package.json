@@ -15,6 +15,9 @@
     "postpublish": "pinst --enable"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "next",
+    "@fortawesome/free-solid-svg-icons": "next",
+    "@fortawesome/vue-fontawesome": "prerelease",
     "@types/node": "^15.12.3",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.1",

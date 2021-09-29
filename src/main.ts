@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 
-import { store, key, Characters } from "./store";
+import { store, key } from "./store";
 import router from "./router";
 import i18n from "./i18n";
 
@@ -19,11 +19,18 @@ import "./assets/fonts/MtA/stylesheet.css";
 
 import "./style/style.scss";
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faDiceD20 } from '@fortawesome/free-solid-svg-icons';
 
-import { EnumSplat } from "./definitions/Splat";
+library.add(faDiceD20);
+console.log(faDiceD20);
+
+import { EnumSplat } from "./definitions";
 import { WebGLDiceRoller } from "./components/sheetComponents/diceRoller/3DDiceRoller";
 
 import { Character } from "./definitions";
+
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 (window as any).Character = Character;
 
@@ -32,6 +39,7 @@ const app = createApp(App);
 app.use(store, key)
 	.use(router)
 	.use(i18n)
+	.component('font-awesome-icon', FontAwesomeIcon)
 	// .use(Vuetify)
 	// .use(BootstrapVue)
 	.mount("#app");
@@ -260,24 +268,24 @@ const characters: { [index: string]: Character | any } = {
 		"abilities": {
 			"cunning": { "level": 0 },
 			"glory": { "level": 1 },
-			"honor": { "level": 0 }, 
-			"purity": { "level": 3 }, 
+			"honor": { "level": 0 },
+			"purity": { "level": 3 },
 			"wisdom": { "level": 0 }
 		},
-		"name": "Amos Gray", 
-		"splat": 3, 
-		"player": "m00n", 
-		"chronicle": "", 
-		"concept": "", 
+		"name": "Amos Gray",
+		"splat": 3,
+		"player": "m00n",
+		"chronicle": "",
+		"concept": "",
 		"virtueAnchor": "destroyer",
-		"viceAnchor": "lone_wolf", 
-		"subType": "rahu", 
-		"organization": "blood_talons", 
-		"legacy": "", 
-		"attributes": { "intelligence": 1, "wits": 3, "resolve": 2, "strength": 3, "dexterity": 2, "stamina": 3, "presence": 3, "manipulation": 1, "composure": 3 }, 
-		"kuruthTriggers": { "passive": "Your auspice moon is in the sky.", "common": "You witness your auspice moon in the sky.", "specific": "Hear a wolf or werewolf howl when your auspice moon is in the sky." }, 
-		"moonGift2": { "name": "", "level": 0 }, "shadowGifts": ["-Gift of Rage", "Slaughterer (Purity)", " -Gift of Strength", "Primal Strength (Purity)"], "wolfGifts": ["The Father's Form"], 
-		"rites": ["Sacred Hunt (••)"], 
+		"viceAnchor": "lone_wolf",
+		"subType": "rahu",
+		"organization": "blood_talons",
+		"legacy": "",
+		"attributes": { "intelligence": 1, "wits": 3, "resolve": 2, "strength": 3, "dexterity": 2, "stamina": 3, "presence": 3, "manipulation": 1, "composure": 3 },
+		"kuruthTriggers": { "passive": "Your auspice moon is in the sky.", "common": "You witness your auspice moon in the sky.", "specific": "Hear a wolf or werewolf howl when your auspice moon is in the sky." },
+		"moonGift2": { "name": "", "level": 0 }, "shadowGifts": ["-Gift of Rage", "Slaughterer (Purity)", " -Gift of Strength", "Primal Strength (Purity)"], "wolfGifts": ["The Father's Form"],
+		"rites": ["Sacred Hunt (••)"],
 		"huntersAspect": "Dominant"
 	}
 };

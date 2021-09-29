@@ -10,7 +10,7 @@
 			}">
 				<span class="line col-7" :class="{'selected': store.state.selectedTraits[key]}" @click="$parent.selectTrait(key, abilities)">
 					<input v-if="optionsMutable && ability.name || key === 'NEW'" @change="doInput(ability, key)" v-model="ability.name" :list="datalistFilter ? abilityName+'List' : ''" >
-					<span v-else>{{ ability.name || $t(`splat.${EnumSplat[character.splat.enum].toLowerCase()}.ability.${key}`) }}</span>
+					<span v-else>{{ ability.name || $t((translationKey ? translationKey : `splat.${EnumSplat[character.splat.enum].toLowerCase()}.ability.`)+key) }}</span>
 					
 					<br>
 					<div v-if="(ability instanceof Merit) && meritOptionDropSelect === key">
@@ -83,6 +83,10 @@ export default defineComponent({
 			type: Object as PropType<{[key: string]: Ability}>
 		},
 		"abilityName": {
+			required: false,
+			type: String
+		},
+		"translationKey": {
 			required: false,
 			type: String
 		},
