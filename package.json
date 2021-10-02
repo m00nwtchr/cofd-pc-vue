@@ -15,6 +15,9 @@
     "postpublish": "pinst --enable"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "next",
+    "@fortawesome/free-solid-svg-icons": "next",
+    "@fortawesome/vue-fontawesome": "prerelease",
     "@types/node": "^15.12.3",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.1",
@@ -26,6 +29,7 @@
     "material-design-icons-iconfont": "^6.1.0",
     "popper.js": "^1.16.1",
     "register-service-worker": "^1.7.2",
+    "uuid": "^8.3.2",
     "vue": "^3.1.1",
     "vue-i18n": "^9.1.6",
     "vue-router": "^4.0.9",
@@ -38,6 +42,7 @@
     "@intlify/vue-i18n-loader": "^2.1.0",
     "@types/jquery": "^3.5.5",
     "@types/lodash": "^4.14.170",
+    "@types/uuid": "^8",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
     "@vitejs/plugin-vue": "^1.2.3",

@@ -73,7 +73,9 @@
     "mortal": {
       "name": "Śmiertelnik",
       "legacy": "Frakcja",
-      "organization": {"name": "Nazwa Grupy"}
+      "organization": {
+        "name": "Nazwa Grupy"
+      }
     },
     "mage": {
       "name": "Mag",
@@ -97,7 +99,7 @@
       },
       "subType": {
         "name": "Ścieżka"
-      },      
+      },
       "organization": {
         "name": "Zakon"
       }
@@ -105,7 +107,7 @@
     "vampire": {
       "name": "Vampir",
       "integrityTrait": "Człowieczeństwo",
-      "fuelTrait": "Krew",
+      "fuelTrait": "Żywot/Krew",
       "legacy": "",
       "powerTrait": "Moc Krwi",
       "alternateBeat": "{x} Krwi",
@@ -127,6 +129,35 @@
       },
       "organization": {
         "name": "Przymierze"
+      },
+      "anchor": {
+        "authoritarian": "Dyktator",
+        "child": "Dziecko",
+        "competitor": "Konkurent",
+        "conformist": "Konformista",
+        "conspirator": "Spiskowiec",
+        "courtesan": "Kurtyzana",
+        "cult_leader": "Przywódca kultu",
+        "deviant": "Zboczeniec",
+        "follower": "Zwolennik",
+        "guru": "Guru",
+        "idealist": "Idealista",
+        "jester": "Błazen",
+        "junkie": "Ćpun",
+        "martyr": "Męczennik",
+        "masochist": "Masochista",
+        "monster": "Potwór",
+        "nomad": "Koczownik",
+        "nurturer": "",
+        "perfectionist": "Perfekcjonista",
+        "penitent": "Penitent",
+        "questioner": "Pytający",
+        "rebel": "Buntownik",
+        "scholar": "Uczony",
+        "social_chameleon": "Kameleon społeczny",
+        "spy": "Szpieg",
+        "survivor": "Ocalały",
+        "visionary": "Wizjoner"
       }
     },
     "werewolf": {
@@ -175,5 +206,29 @@
         "community_organizer": "Organizator Społeczności"
       }
     }
+  },
+  "virtue": {
+    "ambitious": "Ambitny",
+    "courageous": "Odważny",
+    "generous": "Hojny",
+    "honest": "Uczciwy",
+    "hopeful": "Pe",
+    "just": "",
+    "loving": "",
+    "loyal": "",
+    "patient": "",
+    "trustworthy": ""
+  },
+  "vice": {
+    "pessimistic": "",
+    "hateful": "",
+    "hasty": "",
+    "greedy": "",
+    "dogmatic": "",
+    "deceitful": "",
+    "cruel": "",
+    "corrupt": "",
+    "ambitious": "",
+    "addictive": ""
   }
 }

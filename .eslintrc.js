@@ -17,7 +17,10 @@ module.exports = {
 	},
 	"parserOptions": {
 		"ecmaVersion": 2018,
-		"parser": "@typescript-eslint/parser"
+		"parser": "@typescript-eslint/parser",
+		"vueFeatures": {
+			"interpolationAsNonHTML": true
+		}
 	},
 	"plugins": [
 		"vue",
