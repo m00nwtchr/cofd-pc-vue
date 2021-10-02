@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<h3 class="separator col-sm-12">{{ `${name} ${woundPenalty < 0 ? `(${woundPenalty})` : ''}` }}</h3>
+		<h3 class="separator col-sm-12">
+			{{ name }} 
+			{{ (woundPenalty < 0 && `(${woundPenalty})`) || '' }}
+		</h3>
 		<slot></slot>
 		<!-- <div class="sheet-dots" style="margin-top:-10px;"> -->
 			<!-- <button v-for="n in maxHealth" :key="n" class="sheet-dot" :class="{'sheet-dot-full': true}"></button> -->
@@ -14,7 +17,6 @@
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import { Ability } from "@/definitions/NewCharacter";
 import { defineComponent } from "vue";
 export default defineComponent({
 	name: "HealthComponent",
@@ -29,7 +31,8 @@ export default defineComponent({
 		},
 		"woundPenalty": {
 			required: false,
-			type: Number
+			type: Number,
+			default: () => 0
 		},
 		"maxMarkValue": {
 			required: false,
