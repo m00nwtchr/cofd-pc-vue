@@ -19,8 +19,8 @@ import "./assets/fonts/MtA/stylesheet.css";
 
 import "./style/style.scss";
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faDiceD20, faCaretDown, faCaretRight, faBars, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faDiceD20, faCaretDown, faCaretRight, faBars, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faDiceD20, faCaretDown, faCaretRight, faBars, faPlus);
 console.log(library);
@@ -30,7 +30,7 @@ import { WebGLDiceRoller } from "./components/sheetComponents/diceRoller/3DDiceR
 
 import { Character } from "./definitions";
 
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 (window as any).Character = Character;
 
@@ -39,7 +39,7 @@ const app = createApp(App);
 app.use(store, key)
 	.use(router)
 	.use(i18n)
-	.component('font-awesome-icon', FontAwesomeIcon)
+	.component("font-awesome-icon", FontAwesomeIcon)
 	// .use(Vuetify)
 	// .use(BootstrapVue)
 	.mount("#app");
@@ -292,7 +292,7 @@ const characters: { [index: string]: Character | any } = {
 	}
 };
 if (import.meta.env.MODE === "development" || Object.keys(store.state.characters || {}).length === 0) {
-	// store.commit("UPDATE_CHARACTERS", characters);
+	store.commit("UPDATE_CHARACTERS", characters);
 }
 
 // (window as any).export = (): void => {
