@@ -20,10 +20,10 @@ import "./assets/fonts/MtA/stylesheet.css";
 import "./style/style.scss";
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faDiceD20 } from '@fortawesome/free-solid-svg-icons';
+import { faDiceD20, faCaretDown, faCaretRight, faBars, faPlus } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faDiceD20);
-console.log(faDiceD20);
+library.add(faDiceD20, faCaretDown, faCaretRight, faBars, faPlus);
+console.log(library);
 
 import { EnumSplat } from "./definitions";
 import { WebGLDiceRoller } from "./components/sheetComponents/diceRoller/3DDiceRoller";
@@ -43,6 +43,8 @@ app.use(store, key)
 	// .use(Vuetify)
 	// .use(BootstrapVue)
 	.mount("#app");
+
+// (window as any).vue = app;
 
 const characters: { [index: string]: Character | any } = {
 	"488669fb-7e01-4ed7-b368-fbba0d37379a": {
@@ -290,7 +292,7 @@ const characters: { [index: string]: Character | any } = {
 	}
 };
 if (import.meta.env.MODE === "development" || Object.keys(store.state.characters || {}).length === 0) {
-	store.commit("UPDATE_CHARACTERS", characters);
+	// store.commit("UPDATE_CHARACTERS", characters);
 }
 
 // (window as any).export = (): void => {

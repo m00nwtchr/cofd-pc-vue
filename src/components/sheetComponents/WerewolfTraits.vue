@@ -17,15 +17,12 @@
 
 			<div>
 				<span
-					v-for="attr in ATTRIBUTES.flat().filter(
-						el =>
-							[
-								'strength',
-								'dexterity',
-								'stamina',
-								'manipulation'
-							].includes(el) || form[el + 'Mod'] !== 0
-					)"
+					v-for="attr in ATTRIBUTES.flat().filter(el => [
+						'strength',
+						'dexterity',
+						'stamina',
+						'manipulation'
+					].includes(el) || form[el + 'Mod'] !== 0)"
 					:key="attr"
 				>
 					{{
@@ -41,10 +38,10 @@
 								form[attr + "Mod"]
 						}}
 					</span>
-					<br />
+					<br>
 				</span>
 
-				<br />
+				<br>
 				{{
 					$t("character.trait.size")
 				}}
@@ -61,7 +58,7 @@
 						character.size - character.currentForm.sizeMod + form.sizeMod
 					}}
 				</span>
-				<br />
+				<br>
 				{{
 					$t("character.trait.defense")
 				}}
@@ -69,7 +66,7 @@
 				-->
 				{{ formatNum(formDefenseMod(form)) }}:
 				<span class="default-font">{{ formDefense(form) }}</span>
-				<br />
+				<br>
 				{{
 					$t("character.trait.initative")
 				}}
@@ -94,7 +91,7 @@
 							form.composureMod
 					}}
 				</span>
-				<br />
+				<br>
 
 				<!-- Armor: <input v-model="character.armor" /><br> -->
 				{{
@@ -116,7 +113,7 @@
 							form.speedMod
 					}}
 				</span>
-				<br />
+				<br>
 				{{ $t("character.trait.armor") }}:
 				<span class="default-font">
 					{{
@@ -128,7 +125,7 @@
 							form.armorMod.ballistic}`
 					}}
 				</span>
-				<br />
+				<br>
 				{{
 					$t("character.trait.perception")
 				}}
@@ -144,7 +141,7 @@
 							form.perceptionMod
 					}}
 				</span>
-				<br />
+				<br>
 
 				<span v-if="form.name === 'Gauru'">
 					Kuruth Limit:
@@ -156,11 +153,11 @@
 						}}
 					</span>
 				</span>
-				<br />
+				<br>
 
 				<div style="line-height: 15px" class="form-traits">
 					<span v-for="(trait, i) in form.traits" :key="i">
-						<br />
+						<br>
 						<i class="subtitle">{{ trait }}</i>
 					</span>
 				</div>
@@ -185,16 +182,28 @@
 					:optionsMutable="true"
 					:length="2"
 					:horizontal="true"
-				></ability-list>
+				/>
 			</div>
 			<div class="row col-sm-12">
 				<div class="col-sm-6">
 					<h4 class="separator">Shadow Gifts</h4>
-					<item-list class="col-12" :items="character.shadowGifts" :mutable="true" />
+					<item-list 
+						class="col-12" 
+						:items="character.shadowGifts" 
+						:mutable="true"
+
+						:min="Math.max(character.shadowGifts.length, character.wolfGifts.length)+1"
+					/>
 				</div>
 				<div class="col-sm-6">
 					<h4 class="separator">Wolf Gifts</h4>
-					<item-list class="col-12" :items="character.wolfGifts" :mutable="true" />
+					<item-list 
+						class="col-12" 
+						:items="character.wolfGifts" 
+						:mutable="true" 
+					
+						:min="Math.max(character.shadowGifts.length, character.wolfGifts.length)+1"
+					/>
 				</div>
 			</div>
 			<div class="row col-sm-12">
@@ -289,3 +298,13 @@ export default defineComponent({
 	}
 });
 </script>
+<style lang="scss">
+#werewolf-forms {
+	padding-left: 30px;
+	// background-image: url('../assets/images/werewolf-forms.webp');
+	background-repeat: no-repeat;
+	background-origin: content-box;
+	background-size: contain;
+	background-position: center;
+}
+</style>

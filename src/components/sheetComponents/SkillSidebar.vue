@@ -14,7 +14,7 @@
 				style="font-style: italic; font-size: 10px; line-height: 10px"
 				v-if="character.splat === EnumSplat.MAGE"
 			>
-				Rote<br />
+				Rote<br>
 				Skill
 			</div>
 
@@ -44,8 +44,10 @@
 				>{{ $t(`character.skill.${skill}`) }}</span>
 
 				<button class="dropdown-toggle material-icons" @click="specialtyDropDown(skill)">
-					<span v-if="specialtyDropSelect === skill">arrow_drop_down</span>
-					<span v-else>arrow_right</span>
+					<font-awesome-icon icon="caret-down" v-if="specialtyDropSelect === skill"/>
+					<!-- arrow_drop_down</span> -->
+					<!-- <span v-else>arrow_right</span> -->
+					<font-awesome-icon icon="caret-right" v-else />
 				</button>
 
 				<div class="sheet-dots">
@@ -61,7 +63,7 @@
 						}"
 					></button>
 				</div>
-				<br />
+				<br>
 
 				<item-list
 					v-if="specialtyDropSelect === skill"
@@ -71,7 +73,7 @@
 				/>
 			</span>
 		</div>
-		<br />
+		<br>
 	</div>
 </template>
 
@@ -145,4 +147,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.dropdown-toggle svg {
+	width: 7px;
+	margin-top: 3px;
+	height: 15px;
+}
 </style>
