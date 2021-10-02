@@ -10,7 +10,7 @@ export default defineConfig({
 		vue(),
 		vueI18n({
 			include: path.resolve(__dirname, "./src/locales/**"),
-			runtimeOnly: false
+			// runtimeOnly: false
 		})
 	],
 	base: "./",

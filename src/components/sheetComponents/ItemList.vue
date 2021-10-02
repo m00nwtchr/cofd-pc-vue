@@ -18,14 +18,13 @@
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import { Ability } from "@/definitions/Character";
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 export default defineComponent({
 	name: "ItemList",
 	props: {
 		"items": {
 			required: true,
-			type: Array
+			type: Array as PropType<string[]>
 		},
 		"name": {
 			required: false,
@@ -44,7 +43,17 @@ export default defineComponent({
 		"teleport": {
 			required: false,
 			type: String,
-		}	
+		},
+		"min": {
+			required: false,
+			type: Number,
+			default: () => 1
+		},
+		"max": {
+			required: false,
+			type: Number,
+			default: () => Number.MAX_VALUE
+		}
 	},
 	methods: {
 		doInput(ability: string, i: number) {
@@ -58,14 +67,20 @@ export default defineComponent({
 		}
 	},
 	computed: {
-		visibleArr(): Ability[] {
-			const arr: any[] = [].concat(this.items as any);
+		visibleArr(): string[] {
+			const arr = [...this.items];
 
 			if (this.mutable) {
-				arr.push("");
+				do {
+					if (arr.length == this.max) {
+						break;
+					}
+
+					arr.push("");
+				} while(arr.length < this.min);
 			}
 
-			return arr as Ability[];
+			return arr;
 		}
 	},
 	watch: {

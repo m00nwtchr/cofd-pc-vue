@@ -100,8 +100,8 @@
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import Character, { Ability } from "@/definitions/Character";
-import { EnumSplat, SPLATS } from "../../definitions/Splat";
+// import Character, { Ability } from "@/definitions/Character";
+import { EnumSplat, SPLATS, Character, Ability } from "../../definitions";
 
 
 import { defineComponent } from "vue";

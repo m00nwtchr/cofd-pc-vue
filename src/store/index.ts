@@ -3,37 +3,90 @@ import { createStore, useStore as baseUseStore, Store, createLogger } from "vuex
 
 import VuexPersistence, { AsyncStorage } from "vuex-persist";
 import localForage from "localforage";
-import Character from "@/definitions/Character";
 
-const vuexPersist = new VuexPersistence({
-	// storage: localForage as AsyncStorage
+import _ from "lodash";
+
+import { Character, createCharacter } from "../definitions";
+
+const vuexPersist = new VuexPersistence<State>({
+	strictMode: true,
+	// reducer: (state: State) => {
+	// 	const ch = Object.entries(state.characters)
+	// 		.map(([key, val]) => val.getData ?
+	// 			({ [key]: val.getData() }) : { [key]: val })
+	// 		.reduce((acc, el) => Object.assign(acc, el), {});
+
+	// 	return {
+	// 		characters: ch
+	// 	};
+	// },
+	// storage: localForage as AsyncStorage,
+	// asyncStorage: true
 });
 
-export type Characters = { [key: string]: Character };
+// export type Characters = { [key: string]: Character };
 
 export interface State {
-	characters: Characters;
+	flag: boolean;
+	characters: { [key: string]: Character };
+	selectedTraits: { [index: string]: () => number };
 }
 
-const key: InjectionKey<Store<State>> = Symbol();
+abstract class AsyncStore<T> extends Store<T> {
+	restored!: Promise<State>;
+}
 
-export default createStore<State>({
+
+export const key: InjectionKey<Store<State>> = Symbol();
+
+export const store = createStore<State>({
+	// strict: true,
 	plugins: [
 		// createLogger(),
 		vuexPersist.plugin
 	],
 	state: {
-		characters: {}
+		flag: true,
+		characters: {},
+		selectedTraits: {}
 	},
 	mutations: {
 		UPDATE_CHARACTERS(state, val) {
 			state.characters = val;
+		},
+		UPDATE_CHARACTER(state, { id, val }) {
+			state.characters[id] = val;
+			state.flag = true;
+		},
+		UPDATE_SELECTED(state, val) {
+			state.selectedTraits = val;
+		},
+		SELECT_TRAIT(state, payload) {
+			state.selectedTraits = {
+				...state.selectedTraits,
+				[payload.name]: payload.value
+			};
+		},
+		UNSELECT_TRAIT(state, name) {
+			// Vue.set(state.selectedTraits, name, undefined);
+			delete state.selectedTraits[name];
+		},
+
+		// RESTORE_MUTATION: vuexPersist.RESTORE_MUTATION
+		RESTORE_MUTATION(state, savedState) {
+			const mergedState = _.merge(state, savedState || {})
+			for (const propertyName of Object.keys(mergedState as {})) {
+				(state as any)[propertyName] = (mergedState as any)[propertyName];
+			}
 		}
 	},
 	getters: {
 		export(state) {
-			const url = `data:application/json;base64,${btoa(JSON.stringify(state.characters,null,"\t"))}`;
-			return url;
+			const data = new Blob([
+				JSON.stringify(state.characters, null, "\t")
+			], { type: 'application/json' });
+
+			return URL.createObjectURL(data);
 		}
 	},
 	actions: {
@@ -42,6 +95,6 @@ export default createStore<State>({
 	}
 });
 
-export function useStore() {
+export function useStore(): Store<State> {
 	return baseUseStore(key);
 }

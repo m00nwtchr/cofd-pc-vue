@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
-import store from "../store"; // ...or wherever your `vuex` store is defined
+import { store } from "../store"; // ...or wherever your `vuex` store is defined
 
 
 import Home from "../views/Home.vue";
@@ -38,7 +38,7 @@ const router = createRouter({
 });
 
 // router.beforeEach(async (to, from, next) => {
-// 	await (store as any).restored;
+// 	await store.restored;
 // 	next();
 // });
 

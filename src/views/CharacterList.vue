@@ -1,56 +1,106 @@
 <template>
-	<div>
-		<header class="col-12">
-			<div>My Characters</div>
-		</header>
-		<ul class="col-12" id="list">
-			<router-link :key="key" v-for="(el, key) in characters"  :to="'/character/'+key"><li class="list-item">
-			
-				<div>
-					<span class="name">{{el.name}}</span><br>
-					<span style="text-transform: capitalize;" class="desc">
-						<span v-if="el.concept">{{ el.concept }}<br></span>
-						{{
-							$t(`splat.${nameToKey(EnumSplat[el.splat])}.name`,EnumSplat[el.splat])
-						}}, {{
-							$t(`splat.${nameToKey(EnumSplat[el.splat])}.organization.${el.organization}`,el.organization)
-							}} {{el.legacy ||""}} {{
-								el.subType ? $t(`splat.${nameToKey(EnumSplat[el.splat])}.subType.${el.subType}`,el.subType) : ""
-							}}
-					</span>
-				</div>
-			
-			</li></router-link>
+	<header class="col-12">
+		<div>My Characters</div>
+	</header>
+	<modal-component
+		modalWidth="80%"
+		modalHeight="80%"
+		title="New Character"
+		:button="false"
+		:modalOpen="addModalOpen"
+		@close="addModalOpen = false; newChar();"
+		ref="modal"
+	>
+		<new-character ref="newchar"/>
+	</modal-component>
 
-		</ul>
-	</div>
+	<floating-action-menu
+		:items="[{
+			// name: 'Roll Selected',
+			icon: 'plus',
+			action: () => addModalOpen = true,
+		}]"
+	></floating-action-menu>
+
+	<ul class="col-12" id="list">
+		<router-link :key="key" v-for="(el, key) in characters" :to="'/character/' + key">
+			<li class="list-item">
+				<div>
+					<span class="name">{{ el.name }}</span>
+					<br />
+					<span style="text-transform: capitalize;" class="desc">
+						<span v-if="el.concept">
+							{{ el.concept }}
+							<br />
+						</span>
+						<!-- {{ el.splat }}, {{ el.organization.name }} {{el.legacy ||""}} {{ el.subType.name }} -->
+						{{ $t(el.splat.name) }}, {{ el.organization.name && $t(el.organization.name) }} {{ el.legacy || "" }} {{ el.subType.name && $t(el.subType.name) }}
+						<br />
+						<span
+							v-if="el.splat.name === ''"
+							style="color: red"
+						>Warning: Unknown/Unsupported splat or malformed data</span>
+					</span>
+					<!-- {{key === "b153b71d-57b0-488e-8a14-165f0ebc5b20" && el}} -->
+				</div>
+			</li>
+		</router-link>
+	</ul>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { EnumSplat } from "../definitions/Splat";
 
-import { nameToKey } from "../definitions/Character";
+import { EnumSplat, createCharacter, Character } from "../definitions";
+import { useStore } from "../store";
 
-console.log(EnumSplat);
+import FloatingActionMenu from "../components/FloatingActionMenu.vue";
+import ModalComponent from "../components/ModalComponent.vue";
+
+import NewCharacter from "./NewCharacter.vue";
+
+import { v4 as uuidv4 } from "uuid";
+
 
 export default defineComponent({
 	name: "CharacterList",
 	components: {
+		FloatingActionMenu,
+		ModalComponent,
+		NewCharacter
 	},
-	data() {
-		return {
-			EnumSplat,
-		};
-	},
+	data: () => ({
+		store: useStore(),
+
+		addModalOpen: false
+	}),
 	computed: {
-		characters() {
-			return this.$store.state.characters;
+		characters(): { [key: string]: Character } {
+			return Object.entries(this.store.state.characters)
+				.map(el => [el[0], createCharacter(el[1])])
+				.map(el => ({
+					[el[0]]: el[1]
+				})).reduce((prev, val) => Object.assign(prev, val), {});
 		}
 	},
 	methods: {
-		nameToKey
-	}
+		newChar() {
+			const char = createCharacter({
+				id: uuidv4(),
+				splat: this.$refs.newchar.splat,
+
+				name: "Unnamed",
+				
+			} as any);
+
+			this.store.commit("UPDATE_CHARACTERS", {
+				...this.store.state.characters,
+				[char.id]: char
+			});
+		}
+	},	beforeMount() {
+		(window as any).vue = this;
+	},
 });
 </script>
 
@@ -68,9 +118,9 @@ header {
 
 	$spread: -10px;
 
-	-webkit-box-shadow: 0px 6px 17px $spread rgba(0,0,0,0.34); 
-	box-shadow: 0px 6px 17px $spread rgba(0,0,0,0.34);
-	
+	-webkit-box-shadow: 0px 6px 17px $spread rgba(0, 0, 0, 0.34);
+	box-shadow: 0px 6px 17px $spread rgba(0, 0, 0, 0.34);
+
 	div {
 		margin-left: 15px;
 		padding-top: 5px;
@@ -94,7 +144,6 @@ header {
 		border-radius: 5px;
 
 		text-align: left;
-
 
 		height: 60px;
 		background-color: $accent;
@@ -126,5 +175,4 @@ a:hover {
 	text-decoration: none;
 	color: inherit;
 }
-
 </style>

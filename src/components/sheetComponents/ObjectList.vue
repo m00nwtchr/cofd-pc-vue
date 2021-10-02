@@ -1,25 +1,28 @@
 <template>
 	<!-- <teleport :to="teleport" :disabled="!teleport"> -->
-		<div class="list" :id="name.toLowerCase()+'-list'">
-			<h3 class="separator w-100">{{ name }}</h3>
-			<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
-			<div style="margin:0" v-for="(item, i) in visibleArr" :key="i" class="row w-100">
-				<div v-for="(attr) in attrs" :key="attr" :class="{[`${attr}-col`]: true}" class="col w-100">
-					
-					<i v-if="i === 0" class="subtitle" style="text-transform: capitalize;">{{ camelPad(attr) }}</i>
-					<!-- eslint-disable-next-line vue/no-mutating-props -->
-					<input @input="doInput(item, attr, i);" :type="(typeof item[attr])" :value="item[attr]" class="line col-12" style="max-width: 370px">
-				</div>
-				
+	<div class="list" :id="name.toLowerCase() + '-list'">
+		<h3 class="separator w-100">{{ name }}</h3>
+		<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
+		<div style="margin:0" v-for="(item, i) in visibleArr" :key="i" class="row w-100">
+			<div v-for="(attr) in attrs" :key="attr" :class="{ [`${attr}-col`]: true }" class="col w-100">
+				<i v-if="i === 0" class="subtitle" style="text-transform: capitalize;">{{ camelPad(attr) }}</i>
+				<!-- eslint-disable-next-line vue/no-mutating-props -->
+				<input
+					@input="doInput(item, attr, i);"
+					:type="(typeof item[attr])"
+					v-model.number="item[attr]"
+					class="line col-12"
+					style="max-width: 370px"
+				/>
 			</div>
 		</div>
+	</div>
 	<!-- </teleport> -->
 </template>
 
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import { Ability } from "@/definitions/Character";
 import { defineComponent } from "vue";
 export default defineComponent({
 	name: "ObjectList",
@@ -34,7 +37,8 @@ export default defineComponent({
 		},
 		"name": {
 			required: false,
-			type: String
+			type: String,
+			default: () => ""
 		},
 		"mutable": {
 			required: false,
@@ -44,31 +48,31 @@ export default defineComponent({
 		"teleport": {
 			required: false,
 			type: String,
-		}	
+		}
 	},
 	beforeMount() {
-		console.log(this.items);
-	},	
+	},
 	methods: {
 		doInput(item: any, attr: string, i: number) {
-			if (this.mutable && Object.values(item).filter(el => el).length === 0) {
-				console.log(item, this.items);
+			if (!this.items.includes(item)) {
+				this.items.push(item);
+			}
+
+			if (this.mutable && Object.values(item).filter(el => !!el).length === 0) {
 				// eslint-disable-next-line vue/no-mutating-props
 				this.items.splice(i, 1);
 			}
 		},
-		camelPad(str: string){ return str
+		camelPad: (str: string) => str
 			// Look for long acronyms and filter out the last letter
 			.replace(/([A-Z]+)([A-Z][a-z])/g, " $1 $2")
 			// Look for lower-case letters followed by upper-case letters
 			.replace(/([a-z\d])([A-Z])/g, "$1 $2")
 			// Look for lower-case letters followed by numbers
 			.replace(/([a-zA-Z])(\d)/g, "$1 $2")
-			.replace(/^./, s=>s.toUpperCase())
+			.replace(/^./, s => s.toUpperCase())
 			// Remove any white space left around the word
-			.trim();
-		}
-		
+			.trim()
 	},
 	computed: {
 		visibleArr() {
@@ -76,18 +80,20 @@ export default defineComponent({
 
 			if (this.mutable) {
 				arr.push(this.itemFactory ? new (this.itemFactory as any)() : {});
-				console.log(arr);
-
 			}
 
 			return arr;
 		},
-		attrs() {
-			// [].reduce();
-			return Object.keys((this as any).visibleArr
-				.reduce((prev: any, val: any) =>
-					Object.assign({}, prev, val), {})
-			);
+		attrs(): string[] {
+			const arr: any[] = this.visibleArr;
+
+			if (this.itemFactory) {
+				return Object.keys(new (this.itemFactory as any)());
+			} else {
+				return Object.keys(arr.reduce(
+					(prev, val) => Object.assign({}, prev, val),
+				{}));
+			}
 		}
 	},
 	watch: {
@@ -114,7 +120,7 @@ export default defineComponent({
 		// 		newArr.forEach(el => {
 		// 			if ((ability as any).false) {
 		// 				delete (ability as any).false;
-				
+
 		// 				// eslint-disable-next-line vue/no-mutating-props
 		// 				this.abilityArr.push(ability);
 		// 			}
@@ -140,7 +146,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-	.list {
-		margin-bottom: 10px;
-	}
+.list {
+	margin-bottom: 10px;
+}
 </style>
