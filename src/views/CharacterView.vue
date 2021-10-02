@@ -37,7 +37,10 @@
 	>
 		<!-- <fab /> -->
 		{
-		<span :key="val[0]" v-for="val in Object.entries(store.state.selectedTraits)">{{ val[0] }}: {{ val[1]() }},</span>
+		<span
+			:key="val[0]"
+			v-for="val in Object.entries(store.state.selectedTraits)"
+		>{{ val[0] }}: {{ val[1]() }},</span>
 		}
 		<!-- {{  }} -->
 		<div id="page-1">
@@ -47,18 +50,18 @@
 				<div class="block col-sm-4">
 					{{ $t(character.splat.nameName) }}:
 					<input v-model="character.name" />
-					<br>
+					<br />
 					<span v-if="character.splat.enum === EnumSplat.MORTAL">
 						<label for="age">{{ $t("character.age") }}:</label>
 						<input v-model.number="character.age" type="number" id="age" />
-						<br>
+						<br />
 						<label for="player">{{ $t("character.player") }}:</label>
 						<input v-model="character.player" id="player" />
 					</span>
 					<span v-else>
 						<label for="player">{{ $t("character.player") }}:</label>
 						<input v-model="character.player" id="player" />
-						<br>
+						<br />
 						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
 						<input v-model="character.chronicle" id="chronicle" />
 					</span>
@@ -66,10 +69,10 @@
 				<div class="block col-sm-4">
 					<label for="virtueAnchor">{{ $t(character.splat.virtueAnchorName) }}:</label>
 					<input v-model="virtueAnchor" list="virtueAnchors" id="virtueAnchor" />
-					<br>
+					<br />
 					<label for="viceAnchor">{{ $t(character.splat.viceAnchorName) }}:</label>
 					<input v-model="viceAnchor" list="viceAnchors" id="viceAnchor" />
-					<br>
+					<br />
 					<label for="concept">{{ $t("character.concept") }}:</label>
 					<input v-model="character.concept" id="concept" />
 				</div>
@@ -77,13 +80,13 @@
 					<span v-if="character.splat.enum === EnumSplat.MORTAL">
 						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
 						<input v-model="character.chronicle" id="chronicle" />
-						<br>
+						<br />
 						<label for="faction">{{ $t(character.splat.legacyName) }}:</label>
 						<input v-model="character.faction" id="faction" />
-						<br>
+						<br />
 						<label for="group-name">{{ $t(character.splat.orgName) }}:</label>
 						<input v-model="character.organization.name" id="group-name" />
-						<br>
+						<br />
 					</span>
 					<span v-else>
 						<label for="subType">{{ $t(character.splat.subTypeName) }}:</label>
@@ -99,10 +102,10 @@
 							>{{ $t(el.name) }}</option>
 							<option></option>
 						</select>
-						<br>
+						<br />
 						<label for="legacy">{{ $t(character.splat.legacyName) }}:</label>
 						<input v-model="character.legacy" id="legacy" />
-						<br>
+						<br />
 
 						<label for="organization">{{ $t(character.splat.orgName) }}:</label>
 						<select v-model="organization" id="organization">
@@ -142,11 +145,11 @@
 			<div id="attrBar" class="bar row">
 				<div id="attr-cats" style="text-align: right" class="block col-sm-2">
 					{{ $t("character.attribute.power") }}
-					<br>
+					<br />
 					{{ $t("character.attribute.finesse") }}
-					<br>
+					<br />
 					{{ $t("character.attribute.resistance") }}
-					<br>
+					<br />
 				</div>
 				<div class="attr-proper row col-sm-10">
 					<div v-for="(attrCat,i) in ATTRIBUTES" :key="i" class="block col-sm-4">
@@ -175,7 +178,7 @@
 									}"
 								></button>
 							</div>
-							<br>
+							<br />
 						</span>
 					</div>
 				</div>
@@ -215,7 +218,7 @@
 								:items="character.conditions"
 								:mutable="true"
 							/>
-							<br>
+							<br />
 
 							<span v-if="(character instanceof WerewolfCharacter)">
 								<h3 class="separator col-sm-12">Hunter's Aspect</h3>
@@ -227,13 +230,13 @@
 								<span v-else>
 									{{ $t("character.trait.size") }}:
 									<input v-model.number="character.size" type="number" />
-									<br>
+									<br />
 									{{ $t("character.trait.speed") }}:
 									{{ character.speed }}
-									<br>
+									<br />
 									{{ $t("character.trait.defense") }}:
 									{{ character.defense }}
-									<br>
+									<br />
 									<!-- {{ $t("character.trait.armor") }}: <input v-model="character.armor" /><br> -->
 									{{ $t("character.trait.armor") }}:
 									{{
@@ -243,10 +246,10 @@
 											character.armor.ballistic
 											: ""
 									}}
-									<br>
+									<br />
 									{{ $t("character.trait.initative") }}:
 									{{ character.initative }}
-									<br>
+									<br />
 								</span>
 								<span style="float: left; margin-right: 5px">{{ $t("character.trait.beats") }}:</span>
 								<div style="float: left; margin-right: 10px">
@@ -262,13 +265,13 @@
 									</span>
 								</div>
 								<span style="clear: both"></span>
-								<br>
+								<br />
 								{{ $t("character.trait.experience") }}:
 								<input
 									v-model.number="character.experience"
 									type="number"
 								/>
-								<br>
+								<br />
 								<div
 									v-if="
 										character.splat.alternateBeatName &&
@@ -299,7 +302,7 @@
 										</span>
 									</div>
 									<span style="clear: both"></span>
-									<br>
+									<br />
 									{{
 										$t(character.splat.alternateBeatName, { x: $t("character.trait.experience") })
 									}}:
@@ -309,7 +312,7 @@
 										"
 										type="number"
 									/>
-									<br>
+									<br />
 								</div>
 							</div>
 						</div>
@@ -439,9 +442,9 @@
 								<!-- <div style="color:black;" class="col-12"> -->
 								Passive:
 								<input class="line" style="width: 70%" v-model="character.kuruthTriggers.passive" />
-								<br>Common:
+								<br />Common:
 								<input class="line" style="width: 70%" v-model="character.kuruthTriggers.common" />
-								<br>Specific:
+								<br />Specific:
 								<input class="line" style="width: 70%" v-model="character.kuruthTriggers.specific" />
 								<!-- </div> -->
 								<!-- </div> -->
@@ -680,18 +683,20 @@ export default defineComponent({
 			name: string,
 			obj: any
 		) {
-			if (this.store.state.selectedTraits[name] !== undefined) {
-				this.store.commit("UNSELECT_TRAIT", name);
-			} else if (name) {
-				if (Object.keys(this.store.state.selectedTraits).length === 3) {
-					this.store.commit("UPDATE_SELECTED", {});
-				}
+			if (obj[name] && typeof (obj[name].level || obj[name]) === "number") {
+				if (this.store.state.selectedTraits[name] !== undefined) {
+					this.store.commit("UNSELECT_TRAIT", name);
+				} else if (name) {
+					if (Object.keys(this.store.state.selectedTraits).length === 3) {
+						this.store.commit("UPDATE_SELECTED", {});
+					}
 
-				this.store.commit({
-					type: "SELECT_TRAIT",
-					name,
-					value: () => typeof obj[name].level === "number" ? obj[name].level : obj[name]
-				});
+					this.store.commit({
+						type: "SELECT_TRAIT",
+						name,
+						value: () => typeof obj[name].level === "number" ? obj[name].level : obj[name]
+					});
+				}
 			}
 		},
 		setAttr(attr: string, val: number) {
@@ -760,7 +765,7 @@ export default defineComponent({
 		character: {
 			deep: true,
 			handler(val) {
-				this.store.commit("UPDATE_CHARACTER", {id: this.id, val: val.getData()});
+				this.store.commit("UPDATE_CHARACTER", { id: this.id, val: val.getData() });
 			}
 		}
 	}
@@ -984,7 +989,6 @@ button.sheet-dot-small {
 	background-color: #484747;
 	color: white;
 }
-
 
 .dropdown-toggle {
 	border: none;
