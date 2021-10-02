@@ -158,7 +158,6 @@ export default defineComponent({
 	},
 	computed: {
 		visible(): {[key: string]: Ability | Merit} {
-			console.log(this);
 			const abl = uniqByKeepLast(Object.entries(this.abilities), el=>el[1].name||el[0])
 				.map(el => ({
 					[el[0]]: el[1]	

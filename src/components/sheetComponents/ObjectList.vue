@@ -51,7 +51,6 @@ export default defineComponent({
 		}
 	},
 	beforeMount() {
-		console.log(this.items);
 	},
 	methods: {
 		doInput(item: any, attr: string, i: number) {
@@ -60,7 +59,6 @@ export default defineComponent({
 			}
 
 			if (this.mutable && Object.values(item).filter(el => !!el).length === 0) {
-				console.log(item, this.items);
 				// eslint-disable-next-line vue/no-mutating-props
 				this.items.splice(i, 1);
 			}
@@ -82,7 +80,6 @@ export default defineComponent({
 
 			if (this.mutable) {
 				arr.push(this.itemFactory ? new (this.itemFactory as any)() : {});
-				console.log(arr);
 			}
 
 			return arr;

@@ -564,9 +564,6 @@ export default defineComponent({
 		characters(): { [key: string]: Character } {
 			return this.store.state.characters;
 		},
-		character(): Character {
-			return createCharacter(this.characters[this.id]);
-		},
 		baseAttributes: {
 			get(): Attributes {
 				return this.character.data.get("attributes") as Attributes;
@@ -732,6 +729,9 @@ export default defineComponent({
 	},
 	data: () => ({
 		store: useStore(),
+
+		character: undefined as unknown as Character,
+
 		// random: new Random(),
 		roller: new DiceRoller(),
 
@@ -750,17 +750,14 @@ export default defineComponent({
 	}),
 	beforeMount() {
 		(window as any).vue = this;
+
+		this.character = createCharacter(this.characters[this.id]);
 	},
 	watch: {
 		character: {
 			deep: true,
 			handler(val) {
-				this.store.commit("UPDATE");
-				// if (this.store.state.flag) {
-				// 	this.store.state.flag = false;
-					console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-				// 	this.store.commit("UPDATE_CHARACTER", {id: this.id, val});
-				// }
+				this.store.commit("UPDATE_CHARACTER", {id: this.id, val: val.getData()});
 			}
 		}
 	}
