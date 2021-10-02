@@ -204,4 +204,8 @@ export default defineComponent({
 .options-toggle span {
 	font-size: 24px !important;
 }
+
+input {
+	width: 100%;
+}
 </style>

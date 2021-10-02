@@ -546,7 +546,10 @@ export const SPLATS = {
 		
 				perceptionMod: 1,
 		
-				armorMod: {}
+				armorMod: {
+					general: 0,
+					ballistic: 0
+				}
 			},
 			dalu: {
 				name: "Dalu",
@@ -578,7 +581,10 @@ export const SPLATS = {
 				biteDamage: 0,
 				clawDamage: 0,
 		
-				armorMod: {}
+				armorMod: {
+					general: 0,
+					ballistic: 0
+				}
 			},
 			gauru: {
 				name: "Gauru",
@@ -611,8 +617,11 @@ export const SPLATS = {
 		
 				biteDamage: 2,
 				clawDamage: 2,
-		
-				armorMod: {}
+
+				armorMod: {
+					general: 0,
+					ballistic: 0
+				}
 			},
 			urshul: {
 				name: "Urshul",
@@ -673,9 +682,12 @@ export const SPLATS = {
 		
 				biteDamage: 1,
 		
-				armorMod: {}
+				armorMod: {
+					general: 0,
+					ballistic: 0
+				}
 			}
-		} as {[key: string]: Form}
+		} as unknown as {[key: string]: Form}
 	}
 } as { [key: number]: Splat };
 

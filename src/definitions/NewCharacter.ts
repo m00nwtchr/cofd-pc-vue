@@ -124,13 +124,17 @@ export class Character implements ICharacter {
 		};
 	}
 
-	name = "";
+	set splat(val: Splat) {
+		this.data.set("splat", val.enum);
+	}
+
+	name: string;
 
 	concept: string;
 	chronicle: string;
 
-	virtueAnchor = "";
-	viceAnchor = "";
+	virtueAnchor: string;
+	viceAnchor: string;
 
 	get organization(): Organization {
 		return this.splat.organizations[this.data.get("organization") as string] || Object.defineProperties({}, {
@@ -246,12 +250,12 @@ export class Character implements ICharacter {
 	data: Map<string, unknown> = reactive(new Map());
 
 	constructor(opts: ICharacter) {
-		this.data.set("splat", EnumSplat.MORTAL);
+		console.log(opts.splat)
 
-		if (opts.splat) {
-			if (typeof opts.splat === "number") {
-				this.data.set("splat", opts.splat);
-			}
+		if (typeof opts.splat === "number") {
+			this.data.set("splat", opts.splat);
+		} else if (typeof opts.splat === "object" && typeof opts.splat.enum === "number") {
+			this.data.set("splat", opts.splat.enum);
 		}
 
 		if (opts.subType) {
@@ -272,7 +276,17 @@ export class Character implements ICharacter {
 
 		this.willpower = opts.willpower || 0;
 
-		this.data.set("attributes", opts.attributes || {} as Attributes);
+		this.data.set("attributes", Object.assign({
+			intelligence: 1,
+			wits: 1,
+			resolve: 1,
+			strength: 1,
+			dexterity: 1,
+			stamina: 1,
+			presence: 1,
+			manipulation: 1,
+			composure: 1
+		} as Attributes, opts.attributes));
 		this.data.set("skills", opts.skills || {} as Skills);
 
 		{
@@ -338,6 +352,21 @@ export class Character implements ICharacter {
 		this.data.set("spentWillpowerDots", opts.spentWillpowerDots || 0);
 	}
 
+	getData(): any {
+		const clone = Object.assign({}, this);
+
+		Object.getOwnPropertyDescriptors(clone);
+
+		console.log("getData", clone, this.data)
+
+		this.data.forEach((val, key) => {
+			(clone as any)[key] = val;
+		});
+		console.log("getData", clone)
+
+		return clone;
+	}
+
 	mod(trait: string): number {
 		return 0;
 	}
@@ -357,7 +386,7 @@ interface IMortalCharacter extends ICharacter {
 
 
 const MERIT_CACHE: {
-	[index: number]: {
+	[key: string]: {
 		[index: string]: Merit
 	}
 } = {};
@@ -428,10 +457,10 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 
 	integrityTrait: number;
 
-	private id: number;
+	private id: string;
 	constructor(opts: IMortalCharacter) {
 		super(opts);
-		this.id = Math.random();
+		this.id = (opts as any).id || "";
 		this.data.set("merits", opts.merits || {});
 
 		this.beats = opts.beats || 0;
@@ -439,6 +468,8 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 
 		this.specialties = opts.specialties || {};
 		this.integrityTrait = opts.integrityTrait || 7;
+
+		console.log(this.data)
 	}
 
 }
@@ -526,11 +557,54 @@ interface IMageCharacter extends IMortalCharacter, ISupernatural {
 
 	roteSkills: string[];
 
+	activeSpells: string[];
+	yantras: string[];
+	magicalTools: string[];
+	praxes: string[];
+	inuredSpells: string[];
+	nimbus: string[];
+
+	attainments: string[];
+	legacyAttainments: string[];
+
+	rotes: Rote[];
+}
+
+
+export class Rote {
+	arcanum: string;
+	level: number;
+	spell: string;
+	creator?: string;
+	roteSkill: string;
+
+	constructor(opts: Rote) {
+		opts = opts || {};
+		this.arcanum = opts.arcanum || "";
+		this.level = opts.level || 0;
+
+		this.spell = opts.spell || "";
+		this.creator = opts.creator || "";
+
+		this.roteSkill = opts.roteSkill || "";
+	}
 }
 
 export class MageCharacter extends SupernaturalCharacter implements IMageCharacter {
 
 	// roteSkills: string[];
+
+	activeSpells: string[];
+	yantras: string[];
+	magicalTools: string[];
+	praxes: string[];
+	inuredSpells: string[];
+	nimbus: string[];
+
+	attainments: string[];
+	legacyAttainments: string[];
+
+	rotes: Rote[];
 
 	get roteSkills(): string[] {
 		return this.organization.skills || this.data.get("roteSkills") as string[] || [];
@@ -539,6 +613,18 @@ export class MageCharacter extends SupernaturalCharacter implements IMageCharact
 	constructor(opts: IMageCharacter) {
 		super(opts);
 
+		this.activeSpells = opts.activeSpells || [];
+		this.yantras = opts.yantras || [];
+		this.magicalTools = opts.magicalTools || [];
+		this.praxes = opts.praxes || [];
+		this.inuredSpells = opts.inuredSpells || [];
+		this.nimbus = opts.nimbus || [];
+
+		this.attainments = opts.attainments || [];
+		this.legacyAttainments = opts.legacyAttainments || [];
+
+
+		this.rotes = opts.rotes || [];
 
 		if (opts.roteSkills) {
 			this.data.set("roteSkills", opts.roteSkills);
@@ -703,7 +789,7 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 	set moonGift1(val: Ability) {
 		if (!this.subType.name) {
 			this.data.set("moonGift1", val);
-		}		
+		}
 	}
 
 	moonGift2: Ability;
@@ -739,8 +825,8 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 		};
 		this.huntersAspect = opts.huntersAspect || "";
 
-		this.moonGift2 = opts.moonGift2 || {name: "", level: 0};
-	
+		this.moonGift2 = opts.moonGift2 || { name: "", level: 0 };
+
 		this.shadowGifts = opts.shadowGifts || [];
 		this.wolfGifts = opts.wolfGifts || [];
 		this.rites = opts.rites || [];
@@ -801,7 +887,7 @@ export function createCharacter<T extends Character>(opts: T): T {
 	try {
 		console.log(opts);
 		const splat = SPLATS[opts.splat as unknown as EnumSplat] || SPLATS[EnumSplat.MORTAL];
-		return new splat.characterFactory(opts) as T;
+		return reactive(new splat.characterFactory(opts) as any) as T;
 	} catch (e) {
 		console.error(e);
 	}

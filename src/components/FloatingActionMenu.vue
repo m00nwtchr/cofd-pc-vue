@@ -8,18 +8,25 @@
 				:style="{ bottom: (i + 1) * (24 * 2 + 15) + 'px' }"
 				@click="item.action"
 			>
-				<span v-if="item.icon" class="material-icons">
-					<!-- {{ item.icon }} -->
+				<span v-if="item.icon">
 					<font-awesome-icon :icon="item.icon" />
 				</span>
-				<span v-else>
-					{{ item.name }}
-				</span>
+				<span v-else>{{ item.name }}</span>
 			</button>
 		</div>
 
-		<button @click="extended = !extended" class="fab material-icons">
-			menu
+		<button v-if="items.length > 1" @click="extended = !extended" class="fab">
+			<font-awesome-icon icon="bars"/>
+		</button>
+		<button
+			v-else
+			class="fab"
+			@click="items[0].action"
+		>
+			<span v-if="items[0].icon" class="material-icons">
+				<font-awesome-icon :icon="items[0].icon" />
+			</span>
+			<span v-else>{{ items[0].name }}</span>
 		</button>
 	</div>
 </template>
@@ -28,9 +35,9 @@
 import { defineComponent, PropType } from "vue";
 
 interface MenuItem {
-	name: string;
+	name?: string;
 	icon?: string;
-	action: () => void;
+	action?: () => void;
 }
 
 export default defineComponent({
@@ -66,6 +73,8 @@ export default defineComponent({
 
 
 <style lang="scss" scoped>
+@use "sass:math";
+
 $radius: 24px;
 
 .fab {
@@ -77,6 +86,12 @@ $radius: 24px;
 	position: fixed;
 
 	right: 10px;
+}
+
+.fab svg {
+	margin-top: math.div($radius, 8);
+	width: $radius;
+	height: $radius;	
 }
 
 .fam {
