@@ -37,7 +37,7 @@
 	>
 		<!-- <fab /> -->
 		{
-		<span v-for="val in Object.entries(store.state.selectedTraits)">{{ val[0] }}: {{ val[1]() }},</span>
+		<span :key="val[0]" v-for="val in Object.entries(store.state.selectedTraits)">{{ val[0] }}: {{ val[1]() }},</span>
 		}
 		<!-- {{  }} -->
 		<div id="page-1">
@@ -208,13 +208,13 @@
 							/>
 
 							<!-- <div id="werewolf-conditions"> </div> -->
-							<!-- <item-list
-								v-if="character.splat === EnumSplat.WEREWOLF"
+							<item-list
+								v-if="(character instanceof WerewolfCharacter)"
 								class="col-12"
 								name="Conditions"
 								:items="character.conditions"
 								:mutable="true"
-							/>-->
+							/>
 							<br>
 
 							<span v-if="(character instanceof WerewolfCharacter)">
@@ -447,32 +447,35 @@
 								<!-- </div> -->
 							</div>
 
-							<br>
+							<!-- <br> -->
 
-							<!-- <item-list
+							<item-list
 								class="col-12"
 								name="Conditions"
 								:items="character.conditions"
 								:mutable="true"
-							/>-->
-							<br>
+								:min="6"
+							/>
+							<!-- <br> -->
 
-							<!-- <item-list
+							<item-list
 								class="col-12"
 								name="Aspirations"
 								:items="character.aspirations"
 								:mutable="true"
-							/>-->
+								:min="6"
+							/>
 
 							<!-- <br v-if="character.splat.enum === EnumSplat.MAGE"> -->
 
-							<!-- <item-list
+							<item-list
 								v-if="(character instanceof MageCharacter)"
 								class="col-12"
 								name="Obsessions"
 								:items="character.obsessions"
 								:mutable="true"
-							/>-->
+								:min="6"
+							/>
 						</div>
 					</div>
 				</div>
@@ -545,10 +548,10 @@ export default defineComponent({
 		HealthComponent,
 		IntegrityComponent,
 		ItemList,
-		ObjectList,
+		// ObjectList,
 		DiceRoller: DiceRollerComponent,
-		ModalComponent,
-		SpellCalculator,
+		// ModalComponent,
+		// SpellCalculator,
 		FloatingActionMenu,
 
 		SkillSidebar,
@@ -844,7 +847,10 @@ input:focus {
 	text-transform: uppercase;
 	text-align: center;
 
-	margin-top: 0px;
+	margin-top: 20px;
+	margin-bottom: 0.3rem;
+	// margin-bottom: 0px;
+
 	// margin-bottom: 15px;
 }
 

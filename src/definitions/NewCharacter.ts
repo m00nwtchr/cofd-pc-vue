@@ -549,6 +549,7 @@ interface IMageCharacter extends IMortalCharacter, ISupernatural {
 	praxes: string[];
 	inuredSpells: string[];
 	nimbus: string[];
+	obsessions: string[];
 
 	attainments: string[];
 	legacyAttainments: string[];
@@ -586,6 +587,7 @@ export class MageCharacter extends SupernaturalCharacter implements IMageCharact
 	praxes: string[];
 	inuredSpells: string[];
 	nimbus: string[];
+	obsessions: string[];
 
 	attainments: string[];
 	legacyAttainments: string[];
@@ -605,6 +607,8 @@ export class MageCharacter extends SupernaturalCharacter implements IMageCharact
 		this.praxes = opts.praxes || [];
 		this.inuredSpells = opts.inuredSpells || [];
 		this.nimbus = opts.nimbus || [];
+
+		this.obsessions = opts.obsessions || [];
 
 		this.attainments = opts.attainments || [];
 		this.legacyAttainments = opts.legacyAttainments || [];
@@ -634,7 +638,7 @@ function lookupAccess<T>(obj: any, prop: string) {
 
 	return {
 		get: desc.get || (() => null),
-		set: desc.set || ((val: T) => { })
+		set: desc.set || ((val: T) => null)
 	} as {
 		get: () => T,
 		set: (val: T) => void
@@ -751,7 +755,7 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 
 	get maxHealth(): number {
 		return super.maxHealth + (this.moonGifts.full.level >= 2 ?
-			this.abilities.purity.level : 0)
+			this.abilities.purity.level : 0);
 	}
 
 	kuruthTriggers: { passive: string; common: string; specific: string; };
