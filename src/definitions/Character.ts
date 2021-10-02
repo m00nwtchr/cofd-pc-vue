@@ -269,7 +269,7 @@ export class Character implements ICharacter {
 			this.data.set("subType", opts.subType);
 		}
 
-		if (opts.organization) {
+		if (opts.organization && this.splat.organizations[opts.organization as unknown as string]) {
 			this.data.set("organization", opts.organization);
 		}
 
@@ -364,6 +364,7 @@ export class Character implements ICharacter {
 		this.data.forEach((val, key) => {
 			(clone as any)[key] = val;
 		});
+		console.log("ORG", clone.organization);
 		return clone;
 	}
 
