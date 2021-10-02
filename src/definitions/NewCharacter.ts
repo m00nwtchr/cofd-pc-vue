@@ -250,8 +250,6 @@ export class Character implements ICharacter {
 	data: Map<string, unknown> = reactive(new Map());
 
 	constructor(opts: ICharacter) {
-		console.log(opts.splat)
-
 		if (typeof opts.splat === "number") {
 			this.data.set("splat", opts.splat);
 		} else if (typeof opts.splat === "object" && typeof opts.splat.enum === "number") {
@@ -354,16 +352,9 @@ export class Character implements ICharacter {
 
 	getData(): any {
 		const clone = Object.assign({}, this);
-
-		Object.getOwnPropertyDescriptors(clone);
-
-		console.log("getData", clone, this.data)
-
 		this.data.forEach((val, key) => {
 			(clone as any)[key] = val;
 		});
-		console.log("getData", clone)
-
 		return clone;
 	}
 
@@ -468,8 +459,6 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 
 		this.specialties = opts.specialties || {};
 		this.integrityTrait = opts.integrityTrait || 7;
-
-		console.log(this.data)
 	}
 
 }
@@ -543,9 +532,6 @@ export class SupernaturalCharacter extends MortalCharacter implements ISupernatu
 				.forEach(key => ablTemp[key] = custom[key]);
 			this.abilities = reactive(ablTemp);
 		}
-
-		console.log(this.abilities);
-
 	}
 
 	protected _getAbility(key: string): Ability {
@@ -885,7 +871,6 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 
 export function createCharacter<T extends Character>(opts: T): T {
 	try {
-		console.log(opts);
 		const splat = SPLATS[opts.splat as unknown as EnumSplat] || SPLATS[EnumSplat.MORTAL];
 		return reactive(new splat.characterFactory(opts) as any) as T;
 	} catch (e) {

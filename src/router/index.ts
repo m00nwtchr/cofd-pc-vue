@@ -37,9 +37,9 @@ const router = createRouter({
 	routes
 });
 
-router.beforeEach(async (to, from, next) => {
-	await (store as any).restored;
-	next();
-});
+// router.beforeEach(async (to, from, next) => {
+// 	await store.restored;
+// 	next();
+// });
 
 export default router;

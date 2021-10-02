@@ -4,24 +4,24 @@ import { createStore, useStore as baseUseStore, Store, createLogger } from "vuex
 import VuexPersistence, { AsyncStorage } from "vuex-persist";
 import localForage from "localforage";
 
+import _ from "lodash";
+
 import { Character, createCharacter } from "../definitions";
-import { conforms } from "lodash";
 
 const vuexPersist = new VuexPersistence<State>({
 	strictMode: true,
-	reducer: (state: State) => {
-		const ch = Object.entries(state.characters)
-		.map(([key, val]) => val.getData ?
-			({[key]: val.getData()}) : {[key]: val})
-		.reduce((acc, el) => Object.assign(acc, el), {});
+	// reducer: (state: State) => {
+	// 	const ch = Object.entries(state.characters)
+	// 		.map(([key, val]) => val.getData ?
+	// 			({ [key]: val.getData() }) : { [key]: val })
+	// 		.reduce((acc, el) => Object.assign(acc, el), {});
 
-		console.log("Reducer",ch);
-		return {
-			characters: ch
-		};
-	},
-	storage: localForage as AsyncStorage,
-	asyncStorage: true
+	// 	return {
+	// 		characters: ch
+	// 	};
+	// },
+	// storage: localForage as AsyncStorage,
+	// asyncStorage: true
 });
 
 // export type Characters = { [key: string]: Character };
@@ -31,6 +31,11 @@ export interface State {
 	characters: { [key: string]: Character };
 	selectedTraits: { [index: string]: () => number };
 }
+
+abstract class AsyncStore<T> extends Store<T> {
+	restored!: Promise<State>;
+}
+
 
 export const key: InjectionKey<Store<State>> = Symbol();
 
@@ -46,14 +51,10 @@ export const store = createStore<State>({
 		selectedTraits: {}
 	},
 	mutations: {
-		UPDATE(state) {
-			state = {...state};
-		},
-
 		UPDATE_CHARACTERS(state, val) {
 			state.characters = val;
 		},
-		UPDATE_CHARACTER(state, {id, val}) {
+		UPDATE_CHARACTER(state, { id, val }) {
 			state.characters[id] = val;
 			state.flag = true;
 		},
@@ -70,15 +71,13 @@ export const store = createStore<State>({
 			// Vue.set(state.selectedTraits, name, undefined);
 			delete state.selectedTraits[name];
 		},
-		
+
 		// RESTORE_MUTATION: vuexPersist.RESTORE_MUTATION
 		RESTORE_MUTATION(state, savedState) {
-			console.log("RESTORE_MUTATION", savedState);
-			Object.assign(state.characters, savedState.characters);
-		
-			// Object.entries(state.characters).forEach(([key, val]) => {
-			// 	state.characters[key] = createCharacter(val);
-			// });
+			const mergedState = _.merge(state, savedState || {})
+			for (const propertyName of Object.keys(mergedState as {})) {
+				(state as any)[propertyName] = (mergedState as any)[propertyName];
+			}
 		}
 	},
 	getters: {

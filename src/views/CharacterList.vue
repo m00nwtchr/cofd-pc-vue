@@ -93,8 +93,6 @@ export default defineComponent({
 				
 			} as any);
 
-			console.log(char);
-
 			this.store.commit("UPDATE_CHARACTERS", {
 				...this.store.state.characters,
 				[char.id]: char
