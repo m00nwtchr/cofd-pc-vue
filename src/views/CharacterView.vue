@@ -747,11 +747,11 @@ export default defineComponent({
 			if (navigator.clipboard) {
 				const txt = encodeURI(JSON.stringify(this.character.getData()));
 
-				navigator.clipboard.writeText(`${document.location.origin+document.location.pathname}/#/preview/${txt}`);
+				navigator.clipboard.writeText(`${document.location.origin+document.location.pathname}/#/character/?data=${txt}`);
 			}
 		},
 		importCharacter() {
-			const data = JSON.parse(decodeURI(this.$route.params.data));
+			const data = JSON.parse(decodeURI(this.$route.query.data));
 
 			data.id = uuidv4();
 
@@ -789,8 +789,8 @@ export default defineComponent({
 
 		let data = this.characters[this.id];
 
-		if (!data && this.$route.params.data) {
-			let routeData = this.$route.params.data as string;
+		if (!data && this.$route.query.data) {
+			let routeData = this.$route.query.data as string;
 
 			data = JSON.parse(decodeURI(routeData));
 		}
@@ -801,7 +801,7 @@ export default defineComponent({
 		character: {
 			deep: true,
 			handler(val) {
-				if (this.$route.params.data) return;
+				if (this.$route.query.data) return;
 
 				this.store.commit("UPDATE_CHARACTER", { id: this.id, val: val.getData() });
 			}
