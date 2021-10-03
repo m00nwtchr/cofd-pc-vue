@@ -34,7 +34,7 @@
 							<br />
 						</span>
 						{{ el.splat.name && $t(el.splat.name) }}
-						{{ el.organization.name && $t(el.organization.name) }} {{ el.legacy || "" }} {{ el.subType.name && $t(el.subType.name) }}
+						{{ el.legacy || "" }} {{ el.subType.name && $t(el.subType.name) }} {{ el.organization.name && $t(el.organization.name) }}
 						<br />
 						<span
 							v-if="el.splat.name === ''"
