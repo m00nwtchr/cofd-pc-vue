@@ -747,7 +747,7 @@ export default defineComponent({
 			if (navigator.clipboard) {
 				const txt = encodeURI(JSON.stringify(this.character.getData()));
 
-				navigator.clipboard.writeText(`${document.location.origin+document.location.pathname}/#/character/?data=${txt}`);
+				navigator.clipboard.writeText(`${document.location.origin+document.location.pathname}#/character/?data=${txt}`);
 			}
 		},
 		importCharacter() {
