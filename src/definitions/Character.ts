@@ -391,6 +391,19 @@ const MERIT_CACHE: {
 	}
 } = {};
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+function proxy<T extends object>(obj: T, bonusHandler?: ProxyHandler<T>) {
+	return new Proxy(obj, Object.assign({
+		get(target: any, property: any) {
+			if (typeof property === "string") {
+				return target[property] || {
+					level: 0
+				};
+			}
+		},
+	}, bonusHandler || {}));
+}
+
 export class MortalCharacter extends Character implements IMortalCharacter {
 
 	specialties: { [index: string]: string[] };
@@ -418,7 +431,7 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 			obj[key] = MERIT_CACHE[this.id][key] || value;
 		});
 
-		return new Proxy(obj, {
+		return proxy(obj, {
 			set: (target, prop, val) => {
 				target[prop as string] = val;
 
@@ -554,11 +567,13 @@ export class SupernaturalCharacter extends MortalCharacter implements ISupernatu
 				.forEach(key => ablTemp[key] = custom[key]);
 			this.abilities = reactive(ablTemp);
 		}
+
+		this.abilities = proxy(this.abilities);
 	}
 
-	protected _getAbility(key: string): Ability {
-		return this.abilities[key] || { level: 0, name: "" };
-	}
+	// protected _getAbility(key: string): Ability {
+	// 	return this.abilities[key] || { level: 0, name: "" };
+	// }
 }
 
 interface IMageCharacter extends IMortalCharacter, ISupernatural {
@@ -625,10 +640,11 @@ export class MageCharacter extends SupernaturalCharacter implements IMageCharact
 		super(opts);
 
 		this.activeSpells = opts.activeSpells || [];
-		this.yantras = opts.yantras || [];
 		this.magicalTools = opts.magicalTools || [];
-		this.praxes = opts.praxes || [];
 		this.inuredSpells = opts.inuredSpells || [];
+
+		this.yantras = opts.yantras || [];
+		this.praxes = opts.praxes || [];
 		this.nimbus = opts.nimbus || [];
 
 		this.obsessions = opts.obsessions || [];
@@ -677,7 +693,7 @@ export class VampireCharacter extends SupernaturalCharacter implements IVampireC
 	touchstones: string[];
 
 	get defense(): number {
-		return super.defense + this._getAbility("celerity").level;
+		return super.defense + this.abilities.celerity.level;
 	}
 
 	get maxFuel(): number {
@@ -690,13 +706,13 @@ export class VampireCharacter extends SupernaturalCharacter implements IVampireC
 
 		const stam = lookupAccess<number>(this.attributes, "stamina");
 		Object.defineProperty(this.attributes, "stamina", {
-			get: () => stam.get() + this._getAbility("resilience").level,
+			get: () => stam.get() + this.abilities.resilience.level,
 		});
 		// set: (val: number) => stam.set(val - this._getAbility("resilience").level)
 
 		const str = lookupAccess<number>(this.attributes, "strength");
 		Object.defineProperty(this.attributes, "strength", {
-			get: () => str.get() + this._getAbility("vigor").level,
+			get: () => str.get() + this.abilities.vigor.level,
 		});
 	}
 }
@@ -809,10 +825,10 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 
 	get moonGifts(): { [key: string]: Ability } {
 		if (!this.moonGift2.key) this.moonGift2.key = "NEW";
-		return {
+		return proxy({
 			[this.moonGift1.key || ""]: this.moonGift1,
 			[this.moonGift2.key || ""]: this.moonGift2,
-		};
+		});
 	}
 
 	shadowGifts: string[];
