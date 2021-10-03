@@ -7,7 +7,7 @@
 				name="Active Spells"
 				:items="character.activeSpells"
 				:mutable="true"
-				:min="character.power"
+				:min="10 || character.power"
 				style="margin-bottom: 15px"
 			/>
 			<item-list
@@ -17,6 +17,7 @@
 				:items="character.yantras"
 				:mutable="true"
 				style="margin-bottom: 15px"
+				:min="5"
 			/>
 			<item-list
 				id="tools"
@@ -25,6 +26,7 @@
 				:items="character.magicalTools"
 				:mutable="true"
 				style="margin-bottom: 15px"
+				:min="5"
 			/>
 			<item-list
 				id="praxes"
@@ -33,6 +35,7 @@
 				:items="character.praxes"
 				:mutable="true"
 				style="margin-bottom: 15px"
+				:min="12"
 			/>
 			<item-list
 				id="inuredSpells"
@@ -41,6 +44,7 @@
 				:items="character.inuredSpells"
 				:mutable="true"
 				style="margin-bottom: 15px"
+				:min="10"
 			/>
 		</div>
 
@@ -48,15 +52,19 @@
 			<object-list 
 				name="Rotes" 
 				:items="character.rotes" 
-				:itemFactory="Rote">
+				:itemFactory="Rote"
+				:col-sizes="['2', '1', '5', '2', '2']"
+				:min="12"
+			>
 			</object-list>
-			<item-list name="Nimbus" class="w-100" :items="character.nimbus" :mutable="true"></item-list>
+			<item-list name="Nimbus" class="w-100" :items="character.nimbus" :min="6" :mutable="true"></item-list>
 			<div class="w-100 row">
 				<div class="col-6">
 					<item-list
 						name="Arcana Attainments"
 						:items="character.attainments"
 						:mutable="true"
+						:min="10"
 					/>
 				</div>
 				<div class="col-6">
@@ -64,6 +72,7 @@
 						name="Legacy Attainments"
 						:items="character.legacyAttainments"
 						:mutable="true"
+						:min="10"
 					/>
 				</div>
 			</div>

@@ -692,7 +692,7 @@ export default defineComponent({
 			name: string,
 			obj: any
 		) {
-			if (obj[name] && typeof (obj[name].level || obj[name]) === "number") {
+			if (typeof (obj[name].level || obj[name]) === "number") {
 				if (this.store.state.selectedTraits[name] !== undefined) {
 					this.store.commit("UNSELECT_TRAIT", name);
 				} else if (name) {
@@ -876,7 +876,7 @@ input:focus {
 	@media (max-width: $xs-max) {
 		margin: auto;
 		margin-top: 15px;
-		width: 60%;
+		// width: 60%;
 	}
 }
 
