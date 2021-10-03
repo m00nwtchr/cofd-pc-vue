@@ -9,7 +9,7 @@ module.exports = {
 		"eslint:recommended",
 		// "plugin:vue/essential",
 		"plugin:@typescript-eslint/eslint-recommended",
-		"@vue/typescript/recommended"
+		"@vue/typescript/recommended",
 	],
 	"globals": {
 		"Atomics": "readonly",

@@ -11,6 +11,11 @@
 				// name: 'Roll Selected',
 				icon: 'dice-d20',
 				action: rollSelected
+			},
+			{
+				// name: 'Roll Selected',
+				icon: $route.params.data ? 'file-import' : 'file-export',
+				action: $route.params.data ? importCharacter : exportCharacter
 			}
 		]"
 	></floating-action-menu>
@@ -501,7 +506,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { defineComponent, reactive, readonly } from "vue";
+import { encode, decode } from "base2048";
+import { Buffer } from "buffer";
 
 import { useStore } from "../store";
 
@@ -540,6 +547,8 @@ import FloatingActionMenu from "../components/FloatingActionMenu.vue";
 import SpellCalculator from "../components/sheetComponents/SpellCalculator.vue";
 
 import { DiceRoller } from "../DiceRoller";
+import { v4 as uuidv4 } from "uuid";
+
 
 import g from "../i18n";
 const { te } = g.global;
@@ -733,6 +742,25 @@ export default defineComponent({
 						: character["alternateExperience"]++;
 				}
 			}
+		},
+		exportCharacter() {
+			if (navigator.clipboard) {
+				const txt = encodeURI(JSON.stringify(this.character.getData()));
+
+				navigator.clipboard.writeText(`${document.location.origin}/#/preview/${txt}`);
+			}
+		},
+		importCharacter() {
+			const data = JSON.parse(decodeURI(this.$route.params.data));
+
+			data.id = uuidv4();
+
+			this.store.commit("UPDATE_CHARACTER", {
+				id: data.id,
+				val: data
+			});
+
+			this.$router.push({name:"character", params: {id: data.id}});
 		}
 	},
 	data: () => ({
@@ -759,12 +787,22 @@ export default defineComponent({
 	beforeMount() {
 		(window as any).vue = this;
 
-		this.character = createCharacter(this.characters[this.id]);
+		let data = this.characters[this.id];
+
+		if (!data && this.$route.params.data) {
+			let routeData = this.$route.params.data as string;
+
+			data = JSON.parse(decodeURI(routeData));
+		}
+
+		this.character = createCharacter(data);
 	},
 	watch: {
 		character: {
 			deep: true,
 			handler(val) {
+				if (this.$route.params.data) return;
+
 				this.store.commit("UPDATE_CHARACTER", { id: this.id, val: val.getData() });
 			}
 		}

@@ -20,9 +20,20 @@ import "./assets/fonts/MtA/stylesheet.css";
 import "./style/style.scss";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faDiceD20, faCaretDown, faCaretRight, faBars, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+	faDiceD20,
+	faCaretDown,
+	faCaretRight,
+	faBars,
+	faPlus,
+	faFileExport,
+	faFileImport
+} from "@fortawesome/free-solid-svg-icons";
 
-library.add(faDiceD20, faCaretDown, faCaretRight, faBars, faPlus);
+library.add(
+	faDiceD20, faCaretDown, faCaretRight, faBars, faPlus,
+	faFileImport, faFileExport
+);
 // console.log(library);
 
 import { EnumSplat } from "./definitions";
@@ -292,8 +303,8 @@ const characters: { [index: string]: Character | any } = {
 		"huntersAspect": "Dominant"
 	}
 };
-if (import.meta.env.MODE === "development" || Object.keys(store.state.characters || {}).length === 0) {
-	// store.commit("UPDATE_CHARACTERS", characters);
+if (import.meta.env.MODE === "development" && Object.keys(store.state.characters || {}).length === 0) {
+	store.commit("UPDATE_CHARACTERS", characters);
 }
 
 // (window as any).export = (): void => {
