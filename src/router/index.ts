@@ -19,11 +19,11 @@ const routes: Array<RouteRecordRaw> = [
 	},
 	{
 		path: "/character/",
-		name: "character",
 		component: CharacterView,
 		children: [
 			{
 				path: ":id",
+				name: "character",
 				component: CharacterView
 			}
 		]
