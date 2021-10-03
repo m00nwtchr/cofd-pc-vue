@@ -14,12 +14,17 @@ const routes: Array<RouteRecordRaw> = [
 	// },
 	{
 		path: "/",
-		name: "List",
+		name: "list",
 		component: CharacterList
 	},
 	{
 		path: "/character/:id",
-		name: "Character",
+		name: "character",
+		component: CharacterView
+	},
+	{
+		path: "/preview/:data",
+		name: "preview",
 		component: CharacterView
 	},
 	// {

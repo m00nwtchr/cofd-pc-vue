@@ -3326,10 +3326,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base64-js@npm:^1.0.2":
+"base2048@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "base2048@npm:2.0.1"
+  checksum: 87725f7fbe1c7511c168bb72f73cad82e67418941dcd4147d5ef6b4a43235b44f4e06bd36d12f101893d6e53f36ac9395f10beed3d98805245f6da46a8ad9c2d
+  languageName: node
+  linkType: hard
+
+"base64-js@npm:^1.0.2, base64-js@npm:^1.3.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
   checksum: c1b41a26ddc6620eb7f1ee6c29c812f5942a4e328e74263f995872cfb8ca3aee08542beb25cd10fd7ef16e4f16603e25c35a26e776c01fd55277e5035e829e0e
+  languageName: node
+  linkType: hard
+
+"base65536@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "base65536@npm:4.0.2"
+  checksum: bb36aaf97434ae616ccec162292405bd26fdecc072414b49cd0b1f2a994ec01991c504c80e9937838b712a6c5e4cfe5b86c142e33521da3961dfe3c16b0b398a
   languageName: node
   linkType: hard
 
@@ -3650,6 +3664,16 @@ __metadata:
     ieee754: ^1.1.4
     isarray: ^1.0.0
   checksum: e29ecda22aa854008e26a8df294be1e5339a3bec8cbf537a794fecf63a024da68165743bc9afb1524909c74d8b03392e93a9c8fa5c2b064b1b2a52d4680c204e
+  languageName: node
+  linkType: hard
+
+"buffer@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "buffer@npm:6.0.3"
+  dependencies:
+    base64-js: ^1.3.1
+    ieee754: ^1.2.1
+  checksum: a8cf6a58571dc7c43b24ab821ad4c72222d9040775f49fd143a30fad45f33ec0a8e0d572ca80d589ad4f8b4715aa012c029dc2b925dc95467f135c2d13d7abfb
   languageName: node
   linkType: hard
 
@@ -4200,7 +4224,10 @@ __metadata:
     "@vue/compiler-sfc": ^3.1.1
     "@vue/eslint-config-typescript": ^7.0.0
     axios: ^0.21.1
+    base2048: ^2.0.1
+    base65536: ^4.0.2
     bootstrap: ^5.0.1
+    buffer: ^6.0.3
     cannon: ^0.6.2
     core-js: ^3.14.0
     deepmerge: ^4.2.2
@@ -7271,7 +7298,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"ieee754@npm:^1.1.4":
+"ieee754@npm:^1.1.4, ieee754@npm:^1.2.1":
   version: 1.2.1
   resolution: "ieee754@npm:1.2.1"
   checksum: 6c1cfab995ecab3b0dbb6cfb7e192686eb02f0f8e788f2d962e1fc02e2d5ab38a85e06d417221f136bd029663a77cdb920d99605d68d3730a05597dd7910426a
