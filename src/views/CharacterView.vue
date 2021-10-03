@@ -14,8 +14,8 @@
 			},
 			{
 				// name: 'Roll Selected',
-				icon: $route.params.data ? 'file-import' : 'file-export',
-				action: $route.params.data ? importCharacter : exportCharacter
+				icon: $route.query.data ? 'file-import' : 'file-export',
+				action: $route.query.data ? importCharacter : exportCharacter
 			}
 		]"
 	></floating-action-menu>
