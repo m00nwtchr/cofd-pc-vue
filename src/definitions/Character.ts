@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { watch } from "vue";
 import { reactive } from "vue";
 import { Splat, SPLATS, EnumSplat, Organization, SubType, MERITS, Merit, Modifier } from ".";
 
@@ -431,15 +432,9 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 			obj[key] = MERIT_CACHE[this.id][key] || value;
 		});
 
-		return proxy(obj, {
-			set: (target, prop, val) => {
-				target[prop as string] = val;
+		// obj = reactive(obj);
 
-				this.data.set("merits", target);
-
-				return true;
-			}
-		});
+		return reactive(obj);
 	}
 
 	set merits(val: { [key: string]: Ability }) {
@@ -479,6 +474,10 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 		super(opts);
 		this.id = (opts as any).id || "";
 		this.data.set("merits", opts.merits || {});
+
+		watch(() => this.merits, (val) => {
+			this.data.set("merits", val);
+		}, {deep:true});
 
 		this.beats = opts.beats || 0;
 		this.experience = opts.experience || 0;
