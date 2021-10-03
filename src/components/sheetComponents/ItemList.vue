@@ -8,7 +8,7 @@
 			}">
 				<div style="margin:0" v-for="(item, i) in visibleArr" :key="i" class="col-sm-12">
 					<!-- eslint-disable-next-line vue/no-mutating-props -->
-					<input @input="doInput(item, calc(i,n))" v-model="items[calc(i,n)]" class="line col-12" style="max-width: 370px">
+					<input @input="doInput(item, calc(i,n))" v-model="items[calc(i,n)]" class="line col-12">
 				</div>
 			</div>
 		</div>

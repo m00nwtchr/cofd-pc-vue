@@ -9,7 +9,8 @@ function getLang() {
 
 export default createI18n({
 	legacy: false,
-	locale: process.env.VUE_APP_I18N_LOCALE || getLang(),
+	locale: "en",
+	// locale: process.env.VUE_APP_I18N_LOCALE || getLang(),
 	fallbackLocale: "en",
 	globalInjection: true,
 	messages

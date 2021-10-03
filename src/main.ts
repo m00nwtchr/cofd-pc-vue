@@ -268,6 +268,7 @@ const characters: { [index: string]: Character | any } = {
 		"yantras": ["High Speech (+2)", "Shadow Name (+3)"],
 		"praxes": ["Know Nature", "Choose the Threads"],
 		"nimbus": ["A sense of anxiety/doubt creeping into your head."],
+		"magicalTools": ["A small knife", "A short iron rod", "", "Dedicated: Smartphone (Mirror)"],
 
 		"beats": 1, "experience": 2,
 		"alternateBeats": 0, "alternateExperience": 1,

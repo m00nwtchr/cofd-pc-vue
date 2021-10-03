@@ -4,14 +4,19 @@
 		<h3 class="separator w-100">{{ name }}</h3>
 		<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
 		<div style="margin:0" v-for="(item, i) in visibleArr" :key="i" class="row w-100">
-			<div v-for="(attr) in attrs" :key="attr" :class="{ [`${attr}-col`]: true }" class="col w-100">
+			<div
+				v-for="(attr, j) in attrs"
+				:key="attr"
+				:class="{ [`${attr}-col`]: true, ['col-' + colSizes[j]]: colSizes[j] }"
+				class="col"
+			>
 				<i v-if="i === 0" class="subtitle" style="text-transform: capitalize;">{{ camelPad(attr) }}</i>
 				<!-- eslint-disable-next-line vue/no-mutating-props -->
 				<input
 					@input="doInput(item, attr, i);"
 					:type="(typeof item[attr])"
 					v-model.number="item[attr]"
-					class="line col-12"
+					class="line w-100"
 					style="max-width: 370px"
 				/>
 			</div>
@@ -23,7 +28,7 @@
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 export default defineComponent({
 	name: "ObjectList",
 	props: {
@@ -48,9 +53,22 @@ export default defineComponent({
 		"teleport": {
 			required: false,
 			type: String,
+		},
+		"colSizes": {
+			required: false,
+			type: Array as PropType<string[]>,
+			default: () => []
+		},
+		"min": {
+			required: false,
+			type: Number,
+			default: () => 1
+		},
+		"max": {
+			required: false,
+			type: Number,
+			default: () => Number.MAX_VALUE
 		}
-	},
-	beforeMount() {
 	},
 	methods: {
 		doInput(item: any, attr: string, i: number) {
@@ -79,7 +97,14 @@ export default defineComponent({
 			const arr: any[] = [].concat(this.items as any);
 
 			if (this.mutable) {
-				arr.push(this.itemFactory ? new (this.itemFactory as any)() : {});
+
+				do {
+					if (arr.length == this.max) {
+						break;
+					}
+
+					arr.push(this.itemFactory ? new (this.itemFactory as any)() : {});
+				} while (arr.length < this.min);
 			}
 
 			return arr;
@@ -92,7 +117,7 @@ export default defineComponent({
 			} else {
 				return Object.keys(arr.reduce(
 					(prev, val) => Object.assign({}, prev, val),
-				{}));
+					{}));
 			}
 		}
 	},
@@ -146,6 +171,10 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.row > * {
+	padding-left: 5px !important;
+	padding-right: 5px !important;
+}
 .list {
 	margin-bottom: 10px;
 }
