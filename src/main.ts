@@ -23,7 +23,7 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { faDiceD20, faCaretDown, faCaretRight, faBars, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faDiceD20, faCaretDown, faCaretRight, faBars, faPlus);
-console.log(library);
+// console.log(library);
 
 import { EnumSplat } from "./definitions";
 import { WebGLDiceRoller } from "./components/sheetComponents/diceRoller/3DDiceRoller";
@@ -256,6 +256,7 @@ const characters: { [index: string]: Character | any } = {
 		],
 		"yantras": ["High Speech (+2)", "Shadow Name (+3)"],
 		"praxes": ["Know Nature", "Choose the Threads"],
+		"nimbus": ["A sense of anxiety/doubt creeping into your head."],
 
 		"beats": 1, "experience": 2,
 		"alternateBeats": 0, "alternateExperience": 1,
@@ -292,7 +293,7 @@ const characters: { [index: string]: Character | any } = {
 	}
 };
 if (import.meta.env.MODE === "development" || Object.keys(store.state.characters || {}).length === 0) {
-	store.commit("UPDATE_CHARACTERS", characters);
+	// store.commit("UPDATE_CHARACTERS", characters);
 }
 
 // (window as any).export = (): void => {

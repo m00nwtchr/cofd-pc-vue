@@ -364,7 +364,6 @@ export class Character implements ICharacter {
 		this.data.forEach((val, key) => {
 			(clone as any)[key] = val;
 		});
-		console.log("ORG", clone.organization);
 		return clone;
 	}
 
@@ -411,19 +410,23 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 			const meritKey = key.includes("(") ? key.substr(0, key.indexOf("(") - 1) : key;
 
 			const m = MERITS[meritKey];
-			const cache = MERIT_CACHE[this.id][key];
 
-			if (cache) {
-				obj[key] = cache;
-			} else if (m) {
-				const merit = new m(this, value);
-				MERIT_CACHE[this.id][key] = merit;
-
-				obj[key] = merit;
+			if (!MERIT_CACHE[this.id][key] && m) {
+				MERIT_CACHE[this.id][key] = new m(this, value);
 			}
+
+			obj[key] = MERIT_CACHE[this.id][key] || value;
 		});
 
-		return reactive(obj);
+		return new Proxy(obj, {
+			set: (target, prop, val) => {
+				target[prop as string] = val;
+
+				this.data.set("merits", target);
+
+				return true;
+			}
+		});
 	}
 
 	set merits(val: { [key: string]: Ability }) {
@@ -482,6 +485,9 @@ interface ISupernatural {
 	maxFuel: number;
 	fuel: number;
 
+	alternateBeats: number;
+	alternateExperience: number;
+
 }
 
 interface ISupernaturalCharacter extends IMortalCharacter, ISupernatural {
@@ -508,11 +514,17 @@ export class SupernaturalCharacter extends MortalCharacter implements ISupernatu
 			: 10 + this.power - 1;
 	}
 
+	alternateBeats: number;
+	alternateExperience: number;
+
 	constructor(opts: ISupernaturalCharacter) {
 		super(opts);
 
 		this.power = opts.power || 1;
 		this.fuel = opts.fuel || 0;
+
+		this.alternateBeats = opts.alternateBeats || 0;
+		this.alternateExperience = opts.alternateExperience || 0;
 
 		this.abilities = {};
 
@@ -554,10 +566,11 @@ interface IMageCharacter extends IMortalCharacter, ISupernatural {
 	roteSkills: string[];
 
 	activeSpells: string[];
-	yantras: string[];
 	magicalTools: string[];
-	praxes: string[];
 	inuredSpells: string[];
+
+	yantras: string[];
+	praxes: string[];
 	nimbus: string[];
 	obsessions: string[];
 
