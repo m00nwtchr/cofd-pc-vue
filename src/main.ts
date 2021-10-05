@@ -270,6 +270,8 @@ const characters: { [index: string]: Character | any } = {
 		"nimbus": ["A sense of anxiety/doubt creeping into your head."],
 		"magicalTools": ["A small knife", "A short iron rod", "", "Dedicated: Smartphone (Mirror)"],
 
+		"attainments": ["Mind’s Eye", "Temporal Sympathy"],
+
 		"beats": 1, "experience": 2,
 		"alternateBeats": 0, "alternateExperience": 1,
 		"willpower": 5
