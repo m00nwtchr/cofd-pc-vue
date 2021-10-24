@@ -390,16 +390,14 @@ const MERIT_CACHE: {
 	[key: string]: {
 		[index: string]: Merit
 	}
-} = {};
+} = reactive({});
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-function proxy<T extends object>(obj: T, bonusHandler?: ProxyHandler<T>) {
+function proxy<T extends object>(obj: T, bonusHandler?: ProxyHandler<T>, def?: any) {
 	return new Proxy(obj, Object.assign({
 		get(target: any, property: any) {
 			if (typeof property === "string") {
-				return target[property] || {
-					level: 0
-				};
+				return target[property] || def || 0;
 			}
 		},
 	}, bonusHandler || {}));
@@ -456,7 +454,7 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 				return acc;
 			}, {} as { [key: string]: number });
 
-		return obj;
+		return proxy(obj);
 	}
 
 	get size(): number {
@@ -567,7 +565,7 @@ export class SupernaturalCharacter extends MortalCharacter implements ISupernatu
 			this.abilities = reactive(ablTemp);
 		}
 
-		this.abilities = proxy(this.abilities);
+		this.abilities = proxy(this.abilities, {}, { level: 0 });
 	}
 
 	// protected _getAbility(key: string): Ability {
@@ -767,16 +765,52 @@ export interface Form extends FormMods {
 	[index: string]: any;
 }
 
+function _getForm(character: WerewolfCharacter, key: string) {
+	const forms = SPLATS[EnumSplat.WEREWOLF].forms as { [key: string]: Form };
+	const form  = forms[key];
+
+	const def = (attr: string) => 
+		({ [attr]: { get: () => form[attr+"Mod"] + character.meritTraitMods[key+attr+"mod"]} });
+
+	return Object.defineProperties({...form} as Form, {
+		...def("intelligence"),
+		...def("wits"),
+		...def("resolve"),
+
+		...def("strength"),
+		...def("dexterity"),
+		...def("stamina"),
+
+		...def("presence"),
+		...def("manipulation"),
+		...def("composure"),
+		// intelligenceMod: { get: () => form.intelligenceMod + character.meritTraitMods[key+"intelligencemod"] },
+		// witsMod:         { get: () => form.witsMod + character.meritTraitMods[key+"intelligencemod"] },
+		// resolveMod:      { get: () => form.resolveMod + character.meritTraitMods[key+"intelligencemod"] },
+
+		// strengthMod:     { get: () => form.strengthMod  + character.meritTraitMods[key+"intelligencemod"] },
+		// dexterityMod:    { get: () => form.dexterityMod  + character.meritTraitMods[key+"intelligencemod"] },
+		// staminaMod:      { get: () => form.staminaMod  + character.meritTraitMods[key+"intelligencemod"] },
+
+		// presenceMod:     { get: () => form.presenceMod + },
+		// manipulationMod: { get: () => form.manipulationMod },
+		// composureMod:    { get: () => form.composureMod },
+	});
+}
 
 export class WerewolfCharacter extends SupernaturalCharacter implements IWerewolfCharacter {
 
 	// currentForm: Form;
 	get currentForm(): Form {
-		return this.forms[this.data.get("currentForm") as string] || {};
+		const f = this.forms[this.data.get("currentForm") as string];
+		return f || {};
 	}
 
 	get forms(): { [key: string]: Form } {
-		return (SPLATS[EnumSplat.WEREWOLF] as any).forms as { [key: string]: Form };
+		const forms: {[key: string]: Form} = {};
+		Object.keys(SPLATS[EnumSplat.WEREWOLF].forms || {})
+			.forEach(key => forms[key] = _getForm(this, key));
+		return forms;
 	}
 
 	get size(): number {
@@ -827,7 +861,7 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 		return proxy({
 			[this.moonGift1.key || ""]: this.moonGift1,
 			[this.moonGift2.key || ""]: this.moonGift2,
-		});
+		}, {}, { level: 0 });
 	}
 
 	shadowGifts: string[];
