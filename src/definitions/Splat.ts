@@ -56,6 +56,8 @@ export interface Splat {
 		[index: string]: Organization
 	},
 	legacies?: string[];
+
+	forms?: {[key: string]: Form}
 }
 
 export interface Organization {
@@ -400,7 +402,7 @@ export const SPLATS = {
 		alternateBeatName: "splat.werewolf.alternateBeat",
 
 		integrityTraitName: "splat.werewolf.integrityTrait",
-		
+
 		virtueAnchors: [
 			"alpha",
 			"challenger",
@@ -521,174 +523,176 @@ export const SPLATS = {
 		// abilityName: "Renown",
 		finiteAbilities: true,
 		// fuelTraitName: "Essence",
-		forms: {
-			hishu: {
-				name: "Hishu",
-				desc: "splat.werewolf.form.human",
-				traits: [
-					"Sheep's Clothing"
-				],
-		
-				intelligenceMod: 0,
-				witsMod: 0,
-				resolveMod: 0,
-		
-				strengthMod: 0,
-				dexterityMod: 0,
-				staminaMod: 0,
-		
-				presenceMod: 0,
-				manipulationMod: 0,
-				composureMod: 0,
-		
-				sizeMod: 0,
-				speedMod: 0,
-		
-				perceptionMod: 1,
-		
-				armorMod: {
-					general: 0,
-					ballistic: 0
-				}
-			},
-			dalu: {
-				name: "Dalu",
-				desc: "splat.werewolf.form.near_human",
-				traits: [
-					"Teeth/Claws +0L",
-					"Defense vs. Firearms",
-					"Mild Lunacy",
-					"Badass Motherfucker"
-				],
-		
-				intelligenceMod: 0,
-				witsMod: 0,
-				resolveMod: 0,
-		
-				strengthMod: 1,
-				dexterityMod: 0,
-				staminaMod: 1,
-		
-				presenceMod: 0,
-				manipulationMod: -1,
-				composureMod: 0,
-		
-				sizeMod: 1,
-				speedMod: 0,
-		
-				perceptionMod: 2,
-		
-				biteDamage: 0,
-				clawDamage: 0,
-		
-				armorMod: {
-					general: 0,
-					ballistic: 0
-				}
-			},
-			gauru: {
-				name: "Gauru",
-				desc: "splat.werewolf.form.wolf_man",
-				traits: [
-					"Teeth/Claws +2L (Initative +3)",
-					"Defense vs. Firearms",
-					"Full Lunacy",
-					"Regeneration",
-					"Rage",
-					"Primal Fear"
-				],
-		
-				intelligenceMod: 0,
-				witsMod: 0,
-				resolveMod: 0,
-		
-				strengthMod: 3,
-				dexterityMod: 1,
-				staminaMod: 2,
-		
-				presenceMod: 0,
-				manipulationMod: 0,
-				composureMod: 0,
-		
-				sizeMod: 2,
-				speedMod: 0,
-		
-				perceptionMod: 3,
-		
-				biteDamage: 2,
-				clawDamage: 2,
-
-				armorMod: {
-					general: 0,
-					ballistic: 0
-				}
-			},
-			urshul: {
-				name: "Urshul",
-				desc: "splat.werewolf.form.near_wolf",
-				traits: [
-					"Teeth +2L/Claws +1L",
-					"Defense vs. Firearms",
-					"Moderate Lunacy",
-					"Weaken the Prey",
-				],
-		
-				intelligenceMod: 0,
-				witsMod: 0,
-				resolveMod: 0,
-		
-				strengthMod: 2,
-				dexterityMod: 2,
-				staminaMod: 2,
-		
-				presenceMod: 0,
-				manipulationMod: -1,
-				composureMod: 0,
-		
-				sizeMod: 1,
-				speedMod: 3,
-		
-				perceptionMod: 3,
-		
-				biteDamage: 2,
-				clawDamage: 1,
-		
-				armorMod: {}
-			},
-			urhan: {
-				name: "Urhan",
-				desc: "splat.werewolf.form.wolf",
-				traits: [
-					"Teeth +1L",
-					"Chase Down"
-				],
-		
-				intelligenceMod: 0,
-				witsMod: 0,
-				resolveMod: 0,
-		
-				strengthMod: 0,
-				dexterityMod: 2,
-				staminaMod: 1,
-		
-				presenceMod: 0,
-				manipulationMod: -1,
-				composureMod: 0,
-		
-				sizeMod: -1,
-				speedMod: 3,
-		
-				perceptionMod: 4,
-		
-				biteDamage: 1,
-		
-				armorMod: {
-					general: 0,
-					ballistic: 0
-				}
-			}
-		} as unknown as {[key: string]: Form}
 	}
 } as { [key: number]: Splat };
+
+export const WEREWOLF_FORMS = {
+	hishu: {
+		name: "Hishu",
+		desc: "splat.werewolf.form.human",
+		traits: [
+			"Sheep's Clothing"
+		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
+		strengthMod: 0,
+		dexterityMod: 0,
+		staminaMod: 0,
+
+		presenceMod: 0,
+		manipulationMod: 0,
+		composureMod: 0,
+
+		sizeMod: 0,
+		speedMod: 0,
+
+		perceptionMod: 1,
+
+		armorMod: {
+			general: 0,
+			ballistic: 0
+		}
+	},
+	dalu: {
+		name: "Dalu",
+		desc: "splat.werewolf.form.near_human",
+		traits: [
+			"Teeth/Claws +0L",
+			"Defense vs. Firearms",
+			"Mild Lunacy",
+			"Badass Motherfucker"
+		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
+		strengthMod: 1,
+		dexterityMod: 0,
+		staminaMod: 1,
+
+		presenceMod: 0,
+		manipulationMod: -1,
+		composureMod: 0,
+
+		sizeMod: 1,
+		speedMod: 0,
+
+		perceptionMod: 2,
+
+		biteDamage: 0,
+		clawDamage: 0,
+
+		armorMod: {
+			general: 0,
+			ballistic: 0
+		}
+	},
+	gauru: {
+		name: "Gauru",
+		desc: "splat.werewolf.form.wolf_man",
+		traits: [
+			"Teeth/Claws +2L (Initative +3)",
+			"Defense vs. Firearms",
+			"Full Lunacy",
+			"Regeneration",
+			"Rage",
+			"Primal Fear"
+		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
+		strengthMod: 3,
+		dexterityMod: 1,
+		staminaMod: 2,
+
+		presenceMod: 0,
+		manipulationMod: 0,
+		composureMod: 0,
+
+		sizeMod: 2,
+		speedMod: 0,
+
+		perceptionMod: 3,
+
+		biteDamage: 2,
+		clawDamage: 2,
+
+		armorMod: {
+			general: 0,
+			ballistic: 0
+		}
+	},
+	urshul: {
+		name: "Urshul",
+		desc: "splat.werewolf.form.near_wolf",
+		traits: [
+			"Teeth +2L/Claws +1L",
+			"Defense vs. Firearms",
+			"Moderate Lunacy",
+			"Weaken the Prey",
+		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
+		strengthMod: 2,
+		dexterityMod: 2,
+		staminaMod: 2,
+
+		presenceMod: 0,
+		manipulationMod: -1,
+		composureMod: 0,
+
+		sizeMod: 1,
+		speedMod: 3,
+
+		perceptionMod: 3,
+
+		biteDamage: 2,
+		clawDamage: 1,
+
+		armorMod: {}
+	},
+	urhan: {
+		name: "Urhan",
+		desc: "splat.werewolf.form.wolf",
+		traits: [
+			"Teeth +1L",
+			"Chase Down"
+		],
+
+		intelligenceMod: 0,
+		witsMod: 0,
+		resolveMod: 0,
+
+		strengthMod: 0,
+		dexterityMod: 2,
+		staminaMod: 1,
+
+		presenceMod: 0,
+		manipulationMod: -1,
+		composureMod: 0,
+
+		sizeMod: -1,
+		speedMod: 3,
+
+		perceptionMod: 4,
+
+		biteDamage: 1,
+
+		armorMod: {
+			general: 0,
+			ballistic: 0
+		}
+	}
+} as unknown as { [key: string]: Form };
+SPLATS[EnumSplat.WEREWOLF].forms = WEREWOLF_FORMS;
 
 // (WEREWOLF as any).forms = WEREWOLF_FORMS;

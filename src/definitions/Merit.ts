@@ -1,6 +1,7 @@
 /* eslint-disable no-fallthrough */
+import { reactive } from "vue";
 import { RefType, toObject } from "../Util";
-import { Ability, Character, SKILLS, EnumSplat, SPLATS, ATTRIBUTES, Form } from ".";
+import { Ability, Character, SKILLS, EnumSplat, SPLATS, ATTRIBUTES, Form, WerewolfCharacter } from ".";
 
 const WEREWOLF_FORMS = (SPLATS[EnumSplat.WEREWOLF] as any).forms as { [key: string]: Form };
 
@@ -28,10 +29,13 @@ export class Merit implements Ability {
 	constructor(character: Character, ability: Ability) {
 		// this.character = character;
 
-		this.name = ability.name;
+		if (ability.key) 
+			this.key = ability.key;
+		if (ability.name)
+			this.name = ability.name;
 		this.level = ability.level;
 
-		Object.assign(this, ability);
+		// Object.assign(this, ability);
 	}
 
 	getOptions(): Option[] {
@@ -76,11 +80,12 @@ class SmallFramedMerit extends Merit {
 
 class FavoredFormMerit extends Merit {
 
-	form!: string;
-	physicalSkill!: string;
-	attribute!: string;
-	secondAttribute!: string;
-	skill!: string;
+	form: string;
+	physicalSkill: string;
+	attribute?: string;
+	facet?: string;
+	secondAttribute?: string;
+	skill?: string;
 
 	penaltyChoice1?: string[];
 	penaltyChoice2?: string[];
@@ -90,18 +95,57 @@ class FavoredFormMerit extends Merit {
 
 	// [index: string]: s
 
-	constructor(character: Character, ability: Ability) {
+	constructor(character: Character, ability: FavoredFormMerit) {
 		super(character, ability);
 
-		this.getOptions().forEach(el => {
-			// (this as any)[el.name] = (ability as any)[el.name] || ;
-		});
+		this.form = ability.form || "";
+		this.physicalSkill = ability.physicalSkill || "";
+
+		console.log(ability);
+
+		if (this.attribute)
+			this.attribute = ability.attribute;
+		
+		if (this.facet)
+			this.facet = ability.facet;
+
+		if (this.secondAttribute)
+			this.secondAttribute = ability.secondAttribute;
+
+		if (this.skill)
+			this.skill = ability.skill;
+
+		if (ability.penaltyChoice1)
+			this.penaltyChoice1 = ability.penaltyChoice1 || [];
+
+		if (ability.penaltyChoice2)
+			this.penaltyChoice2 = ability.penaltyChoice2 || [];
+
+		if (ability.penaltyChoice3)
+			this.penaltyChoice3 = ability.penaltyChoice3 || [];
+
+		if (ability.penaltyChoice4)
+			this.penaltyChoice4 = ability.penaltyChoice4 || [];
+
+		if (ability.penaltyChoice5)
+			this.penaltyChoice5 = ability.penaltyChoice5 || [];
+
+		// this.penaltyChoice2 = ability.penaltyChoice2 || [];
+		// this.penaltyChoice3 = ability.penaltyChoice3 || [];
+		// this.penaltyChoice4 = ability.penaltyChoice4 || [];
+		// this.penaltyChoice5 = ability.penaltyChoice5 || [];
+
+		// Array.from({ length: this.level }, (v, k) => k + 1).forEach(index => {
+		// 	const name = "penaltyChoice" + index;
+		// 	(this as any)[name] = (ability as any)[name] || [];
+		// });
+		// this.getOptions().forEach(el => {
+		// 	(this as any)[el.name] = (ability as any)[el.name] || ;
+		// });
 	}
 
 	getTraitMods(): Modifier[] {
-		return [
-			{ trait: this.form + this.attribute + "mod", mod: () => this.level >= 2 ? 1 : 0 },
-			{ trait: this.form + this.secondAttribute + "mod", mod: () => this.level >= 4 ? 1 : 0 },
+		const mods = [
 			...Array.from({ length: this.level }, (v, k) => k + 1).map(index => {
 				const name = "penaltyChoice" + index;
 				const val = (this as any)[name];
@@ -112,6 +156,20 @@ class FavoredFormMerit extends Merit {
 				return {};
 			}).filter(el => el.trait) as Modifier[]
 		];
+
+		if (this.attribute) {
+			mods.push(
+				{ trait: this.form + this.attribute + "mod", mod: () => this.level >= 2 ? 1 : 0 },
+			);
+		}
+		if (this.secondAttribute) {
+			mods.push(
+				{ trait: this.form + this.secondAttribute + "mod", mod: () => this.level >= 4 ? 1 : 0 },
+			);
+		}
+
+		console.log(mods);
+		return mods;
 	}
 
 	getOptions(): Option[] {
@@ -350,6 +408,8 @@ class DistillationOfFormMerit extends Merit {
 	}
 
 	getTraitMods(character: Character): Modifier[] {
+		if (!(character instanceof WerewolfCharacter)) return [];
+
 		const mod = () => character.power >= 3 && this.level >= 4 ? 1 : 0;
 
 		return [
@@ -378,7 +438,7 @@ function createTraitMerit(trait: string, maxLevel = 3, minLevel = 1, bonusMax?: 
 }
 
 
-export const MERITS: { [index: string]: new (character: Character, ability: Ability) => Merit } = {
+export const MERITS: { [index: string]: new <T extends Merit>(character: Character, ability: T) => Merit } = {
 	giant: GiantMerit,
 	small_framed: SmallFramedMerit,
 	defensive_combat: DefensiveCombatMerit,

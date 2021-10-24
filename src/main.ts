@@ -277,9 +277,40 @@ const characters: { [index: string]: Character | any } = {
 		"willpower": 5
 	},
 	"b153b71d-57b0-488e-8a14-165f0ebc5b20": {
+		"splat": 3,
+		"name": "Amos Gray",
+		"player": "m00n",
+
+		"chronicle": "",
+		"concept": "",
+
+		"virtueAnchor": "destroyer",
+		"viceAnchor": "lone_wolf",
+
+		"subType": "rahu",
+		"organization": "blood_talons",
+
 		"skills": { "investigation": 2, "medicine": 2, "athletics": 2, "brawl": 3, "stealth": 2, "survival": 3, "intimidation": 3, "persuasion": 4 },
 		"specialties": { "brawl": ["Claws"], "stealth": ["Stalking"], "intimidation": ["Direct Threats"] },
-		"merits": { "giant": { "name": "Giant", "level": 3 }, "trained_observer": { "name": "Trained Observer", "level": 1 }, "defensive_combat_(brawl)": { "name": "Defensive Combat (Brawl)", "level": 1, "skill": "brawl", "use": true }, "favored_form_(gauru)": { "name": "Favored Form (Gauru)", "level": 2, "form": "gauru", "physicalSkill": "brawl", "attribute": "strength", "penaltyChoice1": ["urhan", "stamina"], "penaltyChoice2": ["dalu", "stamina"] }, "efficient_killer": { "name": "Efficient Killer", "level": 2 }, "relentless_assault": { "name": "Relentless Assault", "level": 2 }, "language": { "name": "Language", "level": 1 }, "totem": { "name": "Totem", "level": 1 }, "fortified_form_(dalu)": { "name": "Fortified Form (Dalu)", "level": 0, "form": "dalu" } },
+		"merits": {
+			"giant": { "name": "Giant", "level": 3 },
+			"trained_observer": { "name": "Trained Observer", "level": 1 },
+			"defensive_combat_(brawl)": { "name": "Defensive Combat (Brawl)", "level": 1, "skill": "brawl", "use": true },
+			"favored_form_(gauru)": { 
+				"name": "Favored Form (Gauru)", 
+				"level": 2, 
+				"form": "gauru", 
+				"physicalSkill": "brawl", 
+				"attribute": "strength", 
+				"penaltyChoice1": ["urhan", "stamina"], 
+				"penaltyChoice2": ["dalu", "stamina"] 
+			},
+			"efficient_killer": { "name": "Efficient Killer", "level": 2 },
+			"relentless_assault": { "name": "Relentless Assault", "level": 2 },
+			"language": { "name": "Language", "level": 1 },
+			"totem": { "name": "Totem", "level": 1 },
+			"fortified_form_(dalu)": { "name": "Fortified Form (Dalu)", "level": 0, "form": "dalu" }
+		},
 		"power": 3, "fuel": 7, "integrityTrait": 7,
 		"touchstones": [{ "name": "The Old Gang" }, { "name": "The Ambitious Totem" }],
 		"abilities": {
@@ -289,15 +320,6 @@ const characters: { [index: string]: Character | any } = {
 			"purity": { "level": 3 },
 			"wisdom": { "level": 0 }
 		},
-		"name": "Amos Gray",
-		"splat": 3,
-		"player": "m00n",
-		"chronicle": "",
-		"concept": "",
-		"virtueAnchor": "destroyer",
-		"viceAnchor": "lone_wolf",
-		"subType": "rahu",
-		"organization": "blood_talons",
 		"legacy": "",
 		"attributes": { "intelligence": 1, "wits": 3, "resolve": 2, "strength": 3, "dexterity": 2, "stamina": 3, "presence": 3, "manipulation": 1, "composure": 3 },
 		"kuruthTriggers": { "passive": "Your auspice moon is in the sky.", "common": "You witness your auspice moon in the sky.", "specific": "Hear a wolf or werewolf howl when your auspice moon is in the sky." },
@@ -306,9 +328,11 @@ const characters: { [index: string]: Character | any } = {
 		"huntersAspect": "Dominant"
 	}
 };
-if (import.meta.env.MODE === "development" && Object.keys(store.state.characters || {}).length === 0) {
-	store.commit("UPDATE_CHARACTERS", characters);
-}
+// if (import.meta.env.MODE === "development" && Object.keys(store.state.characters || {}).length === 0) {
+store.commit("UPDATE_CHARACTERS", characters);
+console.log(store.state);
+// debugger;
+// }
 
 // (window as any).export = (): void => {
 // 	const chara = {} as Characters;
