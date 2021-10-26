@@ -390,7 +390,7 @@ const MERIT_CACHE: {
 	[key: string]: {
 		[index: string]: Merit
 	}
-} = reactive({});
+} = {};
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 function proxy<T extends object>(obj: T, bonusHandler?: ProxyHandler<T>, def?: any) {
