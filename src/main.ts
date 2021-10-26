@@ -329,11 +329,11 @@ const characters: { [index: string]: Character | any } = {
 		"huntersAspect": "Dominant"
 	}
 };
-// if (import.meta.env.MODE === "development" && Object.keys(store.state.characters || {}).length === 0) {
-store.commit("UPDATE_CHARACTERS", characters);
-console.log(store.state);
+if (import.meta.env.MODE === "development" && Object.keys(store.state.characters || {}).length === 0) {
+	store.commit("UPDATE_CHARACTERS", characters);
+	console.log(store.state);
 // debugger;
-// }
+}
 
 // (window as any).export = (): void => {
 // 	const chara = {} as Characters;
