@@ -774,6 +774,7 @@ export default defineComponent({
 		skillCats: { mental: -3, physical: -1, social: -1 } as {
 			[index: string]: number;
 		},
+		flag: true,
 
 		EnumSplat,
 		ATTRIBUTES,
@@ -803,7 +804,12 @@ export default defineComponent({
 			handler(val) {
 				if (this.$route.query.data) return;
 
+				// if (this.flag) {
+				// this.flag = false;
 				this.store.commit("UPDATE_CHARACTER", { id: this.id, val: val.getData() });
+				// } else {
+				// this.flag = true;
+				// }
 			}
 		}
 	}

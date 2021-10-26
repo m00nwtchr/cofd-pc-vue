@@ -101,18 +101,18 @@ class FavoredFormMerit extends Merit {
 		this.form = ability.form || "";
 		this.physicalSkill = ability.physicalSkill || "";
 
-		console.log(ability);
+		console.log(ability.attribute);
 
-		if (this.attribute)
+		if (ability.attribute)
 			this.attribute = ability.attribute;
-		
-		if (this.facet)
+
+		if (ability.facet)
 			this.facet = ability.facet;
 
-		if (this.secondAttribute)
+		if (ability.secondAttribute)
 			this.secondAttribute = ability.secondAttribute;
 
-		if (this.skill)
+		if (ability.skill)
 			this.skill = ability.skill;
 
 		if (ability.penaltyChoice1)
@@ -130,6 +130,8 @@ class FavoredFormMerit extends Merit {
 		if (ability.penaltyChoice5)
 			this.penaltyChoice5 = ability.penaltyChoice5 || [];
 
+
+		console.log(ability, this);
 		// this.penaltyChoice2 = ability.penaltyChoice2 || [];
 		// this.penaltyChoice3 = ability.penaltyChoice3 || [];
 		// this.penaltyChoice4 = ability.penaltyChoice4 || [];
@@ -167,23 +169,16 @@ class FavoredFormMerit extends Merit {
 				{ trait: this.form + this.secondAttribute + "mod", mod: () => this.level >= 4 ? 1 : 0 },
 			);
 		}
-
-		console.log(mods);
 		return mods;
 	}
 
 	getOptions(): Option[] {
-		const formsObj: { [key: string]: string } = {};
-		Object.entries(WEREWOLF_FORMS).forEach(entry => {
-			formsObj[entry[0]] = (entry[1] as any).name;
-		});
-
-		// delete formsObj["hishu"];
+		const forms: string[] = Object.keys(WEREWOLF_FORMS);
 
 		const opts: Option[] = [
 			{
 				name: "form",
-				list: toObject(Object.entries(formsObj).filter(el => el[0] !== "hishu"))
+				list: forms.filter(el => el !== "hishu")
 			}
 		];
 
@@ -230,8 +225,7 @@ class FavoredFormMerit extends Merit {
 				break;
 			}
 
-			const penaltyForms = toObject(Object.entries(formsObj)
-				.filter(el => el[0] !== this.form));
+			const penaltyForms = forms.filter(el => el[0] !== this.form);
 
 			const penaltyAttrs = [
 				...ATTRIBUTES[0],
