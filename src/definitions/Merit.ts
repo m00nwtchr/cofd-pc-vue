@@ -250,14 +250,19 @@ class FavoredFormMerit extends Merit {
 
 class DefensiveCombatMerit extends Merit {
 
-	skill!: string;
+	skill: string;
 
-	use!: boolean;
+	use?: boolean;
 
 	private static SKILLS = ["brawl", "weaponry"];
 
-	constructor(character: Character, ability: Ability) {
+	constructor(character: Character, ability: DefensiveCombatMerit) {
 		super(character, ability);
+
+		this.skill = ability.skill;
+		if (ability.use) {
+			this.use = ability.use;
+		}
 	}
 
 	getTraitMods(character: Character): Modifier[] {
@@ -288,10 +293,12 @@ class DefensiveCombatMerit extends Merit {
 
 class FortifiedFormMerit extends Merit {
 
-	form!: string;
+	form: string;
 
-	constructor(character: Character, ability: Ability) {
+	constructor(character: Character, ability: FortifiedFormMerit) {
 		super(character, ability);
+
+		this.form = ability.form;
 	}
 
 	getTraitMods(): Modifier[] {
@@ -322,11 +329,14 @@ class FortifiedFormMerit extends Merit {
 
 class LivingWeaponMerit extends Merit {
 
-	form!: string;
+	form: string;
 	weapon!: string;
 
-	constructor(character: Character, ability: Ability) {
+	constructor(character: Character, ability: LivingWeaponMerit) {
 		super(character, ability);
+
+		this.form = ability.form;
+		this.weapon = ability.weapon;
 	}
 
 	getTraitMods(): Modifier[] {
