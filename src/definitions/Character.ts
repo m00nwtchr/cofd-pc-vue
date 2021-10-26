@@ -473,9 +473,15 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 		this.id = (opts as any).id || "";
 		this.data.set("merits", opts.merits || {});
 
+		let flag = true;
 		watch(() => this.merits, (val) => {
-			this.data.set("merits", val);
-		}, {deep:true});
+			if (flag) {
+				flag = false;
+				this.data.set("merits", val);
+			} else {
+				flag = true;
+			}
+		}, { deep: true });
 
 		this.beats = opts.beats || 0;
 		this.experience = opts.experience || 0;
@@ -767,12 +773,14 @@ export interface Form extends FormMods {
 
 function _getForm(character: WerewolfCharacter, key: string) {
 	const forms = SPLATS[EnumSplat.WEREWOLF].forms as { [key: string]: Form };
-	const form  = forms[key];
+	const form = forms[key];
 
-	const def = (attr: string) => 
-		({ [attr]: { get: () => form[attr+"Mod"] + character.meritTraitMods[key+attr+"mod"]} });
+	const def = (attr: string) =>
+		({ [attr + "Mod"]: { get: () => form[attr + "Mod"] + character.meritTraitMods[key + attr + "mod"] } });
 
-	return Object.defineProperties({...form} as Form, {
+	// console.log(character.meritTraitMods);
+
+	return Object.defineProperties({ ...form } as Form, {
 		...def("intelligence"),
 		...def("wits"),
 		...def("resolve"),
@@ -807,7 +815,7 @@ export class WerewolfCharacter extends SupernaturalCharacter implements IWerewol
 	}
 
 	get forms(): { [key: string]: Form } {
-		const forms: {[key: string]: Form} = {};
+		const forms: { [key: string]: Form } = {};
 		Object.keys(SPLATS[EnumSplat.WEREWOLF].forms || {})
 			.forEach(key => forms[key] = _getForm(this, key));
 		return forms;

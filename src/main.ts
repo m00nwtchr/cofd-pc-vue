@@ -297,13 +297,14 @@ const characters: { [index: string]: Character | any } = {
 			"trained_observer": { "name": "Trained Observer", "level": 1 },
 			"defensive_combat_(brawl)": { "name": "Defensive Combat (Brawl)", "level": 1, "skill": "brawl", "use": true },
 			"favored_form_(gauru)": { 
-				"name": "Favored Form (Gauru)", 
-				"level": 2, 
-				"form": "gauru", 
-				"physicalSkill": "brawl", 
-				"attribute": "strength", 
-				"penaltyChoice1": ["urhan", "stamina"], 
-				"penaltyChoice2": ["dalu", "stamina"] 
+				"name": "Favored Form (Gauru)",
+				"level": 2,
+				"form": "gauru",
+				"physicalSkill": "brawl",
+				"attribute": "strength",
+
+				"penaltyChoice1": ["urhan", "stamina"],
+				"penaltyChoice2": ["dalu", "stamina"]
 			},
 			"efficient_killer": { "name": "Efficient Killer", "level": 2 },
 			"relentless_assault": { "name": "Relentless Assault", "level": 2 },

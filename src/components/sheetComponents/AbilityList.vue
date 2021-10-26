@@ -20,9 +20,8 @@
 								<select v-if="option.list" v-model="ability[option.name]">
 									<option v-for="(val, key) in option.list" :key="key" :value="typeof key === 'number' ? val : key">{{ val }}</option>
 								</select>
-								<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" :v-model="ability[option.name][i]">
-									<!-- dada -->
-									<option 
+								<select v-else-if="option.lists" v-for="(list, i) in option.lists" :key="i" v-model="ability[option.name][i]">
+									<option
 										v-for="(val, key) in list" 
 										:key="key" 
 										:value="val"
