@@ -703,7 +703,7 @@ export default defineComponent({
 					this.store.commit({
 						type: "SELECT_TRAIT",
 						name,
-						value: () => typeof obj[name].level === "number" ? obj[name].level : obj[name]
+						value: () => obj[name] && typeof obj[name].level === "number" ? obj[name].level : obj[name]
 					});
 				}
 			}

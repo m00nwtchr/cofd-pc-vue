@@ -385,13 +385,6 @@ interface IMortalCharacter extends ICharacter {
 	experience: number;
 }
 
-
-const MERIT_CACHE: {
-	[key: string]: {
-		[index: string]: Merit
-	}
-} = {};
-
 // eslint-disable-next-line @typescript-eslint/ban-types
 function proxy<T extends object>(obj: T, bonusHandler?: ProxyHandler<T>, def?: any) {
 	return new Proxy(obj, Object.assign({
@@ -414,24 +407,17 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 	get merits(): { [key: string]: Ability } {
 		const data = this.data.get("merits") as { [key: string]: Ability };
 
-		const obj = _.clone(data);
-
-		if (!MERIT_CACHE[this.id]) MERIT_CACHE[this.id] = {};
-
 		Object.entries(data).forEach(([key, value]) => {
 			const meritKey = key.includes("(") ? key.substr(0, key.indexOf("(") - 1) : key;
 
 			const m = MERITS[meritKey];
 
-			if (!MERIT_CACHE[this.id][key] && m) {
-				MERIT_CACHE[this.id][key] = new m(this, value);
+			if (m && !(data[key] instanceof m)) {
+				data[key] = new m(this, value);
 			}
-
-			obj[key] = MERIT_CACHE[this.id][key] || value;
 		});
 
-		// obj = reactive(obj);
-		return obj;
+		return data;
 	}
 
 	set merits(val: { [key: string]: Ability }) {
@@ -470,20 +456,8 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 	constructor(opts: IMortalCharacter) {
 		super(opts);
 		this.id = (opts as any).id || "";
-		this.data.set("merits", opts.merits || {});
-
-		let flag = true;
-		watch(() => this.merits, (val) => {
-			if (flag) {
-				flag = false;
-				console.log("MERIT UPDATE");
-
-				this.data.set("merits", val);
-			} else {
-				flag = true;
-			}
-		}, { deep: true });
-
+		this.merits = opts.merits || {};
+		
 		this.beats = opts.beats || 0;
 		this.experience = opts.experience || 0;
 
