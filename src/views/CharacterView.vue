@@ -692,7 +692,7 @@ export default defineComponent({
 			name: string,
 			obj: any
 		) {
-			if (typeof (obj[name].level || obj[name]) === "number") {
+			if (obj[name] !== undefined && typeof (obj[name].level || obj[name]) === "number") {
 				if (this.store.state.selectedTraits[name] !== undefined) {
 					this.store.commit("UNSELECT_TRAIT", name);
 				} else if (name) {
@@ -803,7 +803,7 @@ export default defineComponent({
 			deep: true,
 			handler(val) {
 				if (this.$route.query.data) return;
-
+				console.log("UPDATE");
 				// if (this.flag) {
 				// this.flag = false;
 				this.store.commit("UPDATE_CHARACTER", { id: this.id, val: val.getData() });
