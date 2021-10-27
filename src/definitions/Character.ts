@@ -431,8 +431,7 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 		});
 
 		// obj = reactive(obj);
-
-		return reactive(obj);
+		return obj;
 	}
 
 	set merits(val: { [key: string]: Ability }) {
@@ -477,6 +476,8 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 		watch(() => this.merits, (val) => {
 			if (flag) {
 				flag = false;
+				console.log("MERIT UPDATE");
+
 				this.data.set("merits", val);
 			} else {
 				flag = true;
@@ -571,7 +572,7 @@ export class SupernaturalCharacter extends MortalCharacter implements ISupernatu
 			this.abilities = reactive(ablTemp);
 		}
 
-		this.abilities = proxy(this.abilities, {}, { level: 0 });
+		// this.abilities = proxy(this.abilities, {}, { level: 0 });
 	}
 
 	// protected _getAbility(key: string): Ability {

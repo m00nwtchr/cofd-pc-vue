@@ -14,5 +14,5 @@ export default defineConfig({
 		})
 	],
 	base: "./",
-	define: { "process.env": process.env }
+	// define: { "process.env": process.env }
 });
