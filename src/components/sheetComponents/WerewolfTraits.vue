@@ -306,5 +306,7 @@ export default defineComponent({
 	background-origin: content-box;
 	background-size: contain;
 	background-position: center;
+
+	font-size: 11pt;
 }
 </style>
