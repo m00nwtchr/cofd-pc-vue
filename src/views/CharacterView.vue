@@ -213,26 +213,33 @@
 								abilityName="Merits"
 								id="merits"
 								class="block"
+								:min="10"
 							/>
-
-							<!-- <div id="werewolf-conditions"> </div> -->
-							<item-list
-								v-if="(character instanceof WerewolfCharacter)"
-								class="col-12"
-								name="Conditions"
-								:items="character.conditions"
-								:mutable="true"
-							/>
-							<br />
 
 							<span v-if="(character instanceof WerewolfCharacter)">
-								<h3 class="separator col-sm-12">Hunter's Aspect</h3>
-								<input class="line w-100" type="text" v-model="character.huntersAspect" />
+								<item-list
+									class="col-12"
+									name="Aspirations"
+									:items="character.aspirations"
+									:mutable="true"
+									:min="4"
+								/>
+		
+								<span>
+									<h3 class="separator col-sm-12">Hunter's Aspect</h3>
+									<input class="line w-100" type="text" v-model="character.huntersAspect" />
+								</span>
+								<item-list
+									class="col-12"
+									name="Conditions"
+									:items="character.conditions"
+									:mutable="true"
+									:min="3"
+								/>
 							</span>
 
 							<div id="minorTraits" class="block col col-12">
-								<br v-if="(character instanceof WerewolfCharacter)" />
-								<span v-else>
+								<span v-if="!(character instanceof WerewolfCharacter)">
 									{{ $t("character.trait.size") }}:
 									<input v-model.number="character.size" type="number" />
 									<br />
@@ -457,22 +464,24 @@
 
 							<!-- <br> -->
 
-							<item-list
-								class="col-12"
-								name="Conditions"
-								:items="character.conditions"
-								:mutable="true"
-								:min="6"
-							/>
-							<!-- <br> -->
+							<span v-if="!(character instanceof WerewolfCharacter)">
+								<item-list
+									class="col-12"
+									name="Conditions"
+									:items="character.conditions"
+									:mutable="true"
+									:min="6"
+								/>
+								<!-- <br> -->
 
-							<item-list
-								class="col-12"
-								name="Aspirations"
-								:items="character.aspirations"
-								:mutable="true"
-								:min="6"
-							/>
+								<item-list
+									class="col-12"
+									name="Aspirations"
+									:items="character.aspirations"
+									:mutable="true"
+									:min="6"
+								/>
+							</span>
 
 							<!-- <br v-if="character.splat.enum === EnumSplat.MAGE"> -->
 
