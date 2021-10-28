@@ -26,7 +26,7 @@
 
 	}
 
-	.block, #werewolf-forms {
+	.block {
 		font-family: 'ArnovaITC TT';
 		font-size: 12pt;
 	}
@@ -55,6 +55,18 @@
 
 	#werewolf-forms {
 		// color: black;
+		font-family: 'ArnovaITC TT';
+
+		.subtitle {
+			font-family: 'Goudy Old Style';
+			font-size: 10pt;
+		}
+
+		> .col-sm {
+			> .subtitle {
+				font-size: 9pt;
+			}
+		}
 
 		> div {
 			// border-right: 1px solid $color-werewolf;
