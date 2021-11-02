@@ -4325,6 +4325,7 @@ __metadata:
     sass-loader: ^12.1.0
     three: ^0.129.0
     three-dom-elements: ^1.2.1
+    ts-mixer: ^6.0.0
     typescript: ^4.3.4
     uuid: ^8.3.2
     vite: ^2.3.7
@@ -12554,6 +12555,13 @@ fsevents@^1.2.7:
   peerDependencies:
     typescript: "*"
   checksum: 3abd8579b630b90398829d8d092684e3d9276e784e63309f035634cd12603fb3bd223414b69264730f1d0e4fe7d4317d6b464064e3777953ba124777cb0d7a23
+  languageName: node
+  linkType: hard
+
+"ts-mixer@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "ts-mixer@npm:6.0.0"
+  checksum: c9e0d5e1191cecce8e54c3897d6ebf8724ba31d5e882c7e2fc9c629e961adedd7b626ff176fd2ce610ddb92be8d3020b7b0a1bad229896f41fb22b6400d83917
   languageName: node
   linkType: hard
 
