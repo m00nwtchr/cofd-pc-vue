@@ -220,8 +220,8 @@ import { defineComponent, PropType } from "vue";
 
 import { useStore } from "../../store";
 
-import AbilityList from "./AbilityList.vue";
-import ItemList from "./ItemList.vue";
+import AbilityList from "../sheetComponents/AbilityList.vue";
+import ItemList from "../sheetComponents/ItemList.vue";
 
 export default defineComponent({
 	name: "WerewolfTraits",

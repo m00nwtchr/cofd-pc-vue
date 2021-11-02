@@ -1,28 +1,38 @@
 <template>
-	<health-component style="margin-bottom: 15px" v-if="integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.integrityTrait" :healthTrack="character.integrityTrack" :name="character.splat.integrityTraitName" />
-	<div style="margin-bottom: 15px" v-else>
-		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-			<h3 class="separator col-sm-12">{{ character.splat.integrityTrackType.names[0] }} Touchstone</h3>
+	<health-component
+		v-if="integrityTrackType === 'healthTrack'"
+		:maxMarkValue="2"
+		:maxHealth="character.integrityTrait"
+		:healthTrack="character.integrityTrack"
+		:name="character.splat.integrityTraitName"
+	/>
+	<div style="text-align:center;" v-else>
+		<div class="touchstone" style="margin-bottom: 15px;" v-if="integrityTrackType === 'dualTouchstone'">
+			<h3 class="separator">{{ character.splat.integrityTrackType.names[0] }} Touchstone</h3>
 			<!-- eslint-disable-next-line vue/no-mutating-props -->
-			<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name">
-			</div>
-		<h3 class="separator col-sm-12">{{ $t(character.splat.integrityTraitName) }}</h3>
+			<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name" />
+		</div>
+		<h3 class="separator">{{ $t(character.splat.integrityTraitName) }}</h3>
 		<div class="sheet-dots" style="margin-top:-10px;">
-			<span v-for="n in items" :key="n" >
-				<button class="sheet-dot" @click="$parent.setTrait('integrityTrait', n)" :class="{'sheet-dot-full': character.integrityTrait >= n}"></button>
+			<span v-for="n in items" :key="n">
+				<button
+					class="sheet-dot"
+					@click="$parent.setTrait('integrityTrait', n)"
+					:class="{ 'sheet-dot-full': character.integrityTrait >= n }"
+				></button>
 				<span v-if="integrityTrackType === 'verticalTouchstoneTrack'">
 					<!-- <input class="line" @input="doInput(n)" v-if="character.touchstones[n-1]" v-model="character.touchstones[n-1].name"> -->
 					<!-- <input class="line" @input="doInput(n)" v-else> -->
 					<!-- eslint-disable-next-line vue/no-mutating-props -->
-					<input class="line" @input="doInput(n)" v-model="touchstonesTemp[n-1].name">
-					<br>
+					<input class="line" @input="doInput(n)" v-model="touchstonesTemp[n - 1].name" />
+					<br />
 				</span>
 			</span>
 		</div>
-		<div class="touchstone" v-if="integrityTrackType === 'dualTouchstone'">
-			<h3 class="separator col-sm-12">{{ character.splat.integrityTrackType.names[1] }} Touchstone</h3>
+		<div class="touchstone" style="margin-top: 15px;" v-if="integrityTrackType === 'dualTouchstone'">
+			<h3 class="separator">{{ character.splat.integrityTrackType.names[1] }} Touchstone</h3>
 			<!-- eslint-disable-next-line vue/no-mutating-props -->
-			<input class="line" @input="doInput(2)" v-model="touchstonesTemp[1].name">
+			<input class="line" @input="doInput(2)" v-model="touchstonesTemp[1].name" />
 		</div>
 	</div>
 </template>
@@ -34,17 +44,20 @@
 // import { EnumSplat } from "@/definitions/Splat";
 
 import HealthComponent from "./HealthComponent.vue";
+import SheetDots from "./SheetDots.vue";
 
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
+import { Character } from "../../definitions";
 export default defineComponent({
 	name: "IntegrityComponent",
 	components: {
-		"HealthComponent": HealthComponent
+		HealthComponent,
+		SheetDots
 	},
 	props: {
 		"character": {
 			required: true,
-			type: Object
+			type: Object as PropType<Character>
 		}
 	},
 	data() {
@@ -54,29 +67,31 @@ export default defineComponent({
 	},
 	methods: {
 		doInput(n: number) {
-			if (this.character.touchstones[n-1] != this.touchstonesTemp[n-1]){
-				this.character.touchstones[n-1] = this.touchstonesTemp[n-1];
-			}
+			if ('touchstones' in this.character) {
+				if (this.character.touchstones[n - 1] != this.touchstonesTemp[n - 1]) {
+					this.character.touchstones[n - 1] = this.touchstonesTemp[n - 1];
+				}
 
-			if (!this.character.touchstones[n-1]) {
-				///
-			} else if (this.character.touchstones[n-1].name === "") {
-				// console.log("e");
-				delete this.character.touchstones[n-1];
-				// this.character.touchstones.splice(n-1, 1);
+				if (!this.character.touchstones[n - 1]) {
+					///
+				} else if (this.character.touchstones[n - 1].name === "") {
+					// console.log("e");
+					delete this.character.touchstones[n - 1];
+					// this.character.touchstones.splice(n-1, 1);
+				}
 			}
 		}
 	},
 	computed: {
 		items(): number[] {
-			const list = [1,2,3,4,5,6,7,8,9,10];
+			const list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 			return this.integrityTrackType === "verticalTouchstoneTrack" ? list.reverse() : list;
 		},
 		touchstonesTemp() {
-			const arr: string[]=[];
+			const arr: string[] = [];
 
-			(this.integrityTrackType !== "dualTouchstone" ? this.items : [1,2]).forEach((el,i) => {
-				arr[i] = this.character.touchstones[i] || {name:""};
+			(this.integrityTrackType !== "dualTouchstone" ? this.items : [1, 2]).forEach((el, i) => {
+				arr[i] = this.character.touchstones[i] || { name: "" };
 			});
 
 			return arr;
@@ -107,8 +122,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .touchstone {
-	margin-bottom: 10px !important;
-	margin-top:10px;
+
 }
 
 input {

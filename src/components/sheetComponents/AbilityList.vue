@@ -57,19 +57,8 @@
 				</span>
 
 				<div class="col-5 row" style="flex-wrap:nowrap">
-					<div class="sheet-dots">
-						<button
-							class="sheet-dot"
-							:class="{
-								'sheet-dot-full': ability.level >= n,
-								'missing-dot': dotRanges[key] && n <= dotRanges[key].min,
-								'dot-limit': dotRanges[key] && n > dotRanges[key].max,
-							}"
-							@click="setDots(ability, n)"
-							v-for="n in 5"
-							:key="n"
-						></button>
-					</div>
+					<sheet-dots v-model="ability.level" />
+					
 					<div
 						class="options-toggle"
 						v-if="(ability instanceof Merit) && ability.getOptions().length > 0"
@@ -99,8 +88,13 @@ import { defineComponent, unref, isRef, PropType, watch } from "vue";
 import { uniqByKeepLast } from "../../Util";
 import { useStore } from "../../store";
 
+import SheetDots from "./SheetDots.vue";
+
 export default defineComponent({
 	name: "AbilityList",
+	components: {
+		SheetDots
+	},
 	props: {
 		"character": {
 			required: true,
@@ -146,7 +140,7 @@ export default defineComponent({
 		meritOptionDropSelect: "",
 		store: useStore(),
 
-		keys: {},
+		flag: true,
 
 		EnumSplat,
 		Merit
@@ -171,7 +165,8 @@ export default defineComponent({
 			// }
 		},
 		doInput(ability: Ability, key: string) {
-			if (this.optionsMutable && ability) {
+			if (this.optionsMutable && ability && this.flag) {
+				this.flag = false;
 				delete this.abilities[key];
 
 				// eslint-disable-next-line vue/no-mutating-props
@@ -179,6 +174,8 @@ export default defineComponent({
 				if (key !== "") {
 					this.abilities[nameToKey(ability.name)] = ability;
 				}
+			} else {
+				this.flag = true;
 			}
 		},
 		meritOptionDropDown(name: string) {
@@ -235,6 +232,7 @@ export default defineComponent({
 	white-space: nowrap;
 	width: fit-content;
 }
+
 .dot-limit {
 	background-color: grey;
 }
