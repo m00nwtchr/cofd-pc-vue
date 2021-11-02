@@ -17,7 +17,7 @@
 <script lang="ts">
 /* eslint-disable vue/no-mutating-props */
 
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 export default defineComponent({
 	name: "HealthComponent",
 	emits: ["update:healthTrack"],
@@ -28,7 +28,7 @@ export default defineComponent({
 		},
 		"healthTrack": {
 			required: true,
-			type: Array
+			type: Array as PropType<number[]>
 		},
 		"woundPenalty": {
 			required: false,
@@ -46,27 +46,20 @@ export default defineComponent({
 		},	
 	},
 	methods: {
-		pokeHealth(n: number, remAgg = true) {
-			const healthTrack = this.healthTrack as number[];
-			const c: number =  healthTrack[n];
+		pokeHealth(n: number, remove = true) {
+			const healthTrack = this.healthTrack;
+			const c = healthTrack[n];
 
-
-			const n2 = c === this.maxMarkValue ? 
+			n = c === this.maxMarkValue ? 
 				healthTrack.lastIndexOf(c) :
 				healthTrack.indexOf(c);
 
-			if (n !== n2) {
-				n = n2;
-			}
-
-			// healthTrack[n] = c !== this.maxMarkValue ? c+1 : c;
-
 			healthTrack[n]++;
 
-			if (remAgg && healthTrack[n] > this.maxMarkValue) {
-				healthTrack[n] = 0;
+			if (healthTrack[n] > this.maxMarkValue) {
+				healthTrack[n] = this.maxMarkValue;
 			
-				if (this.healthTrack[n+1] !== 0) {
+				if (remove && this.healthTrack[n+1] !== 0) {
 					this.healthTrack.splice(n,1);
 					this.healthTrack.push(0);
 				}

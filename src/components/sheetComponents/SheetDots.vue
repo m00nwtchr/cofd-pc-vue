@@ -8,6 +8,7 @@
 					'sheet-dot-full': value >= n,
 				}"
 			></button>
+			<br v-if="breakI && n % breakI === 0" />
 			<!-- 'sheet-dot-small': maxValue > 5 -->
 		</span>
 	</div>
@@ -20,12 +21,16 @@ const props = withDefaults(defineProps<{
 	modelValue: number;
 	maxValue?: number;
 	boxes?: boolean;
+	breakI?: number;
+	// setVal?: boolean;
 }>(), {
 	maxValue: 5,
-	boxes: false
+	boxes: false,
+	breakI: 0,
+	// setVal: true,
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "handle"]);
 
 const value = computed({
 	get() {
