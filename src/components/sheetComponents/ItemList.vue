@@ -1,14 +1,14 @@
 <template>
 	<!-- <teleport :to="teleport" :disabled="!teleport"> -->
-		<div class="conditions" :class="{'row': cols > 1}">
-			<h3 v-if="name" class="separator col-sm-12">{{ name }}</h3>
+		<div :class="{'row': cols > 1}">
+			<h3 v-if="name" class="separator">{{ name }}</h3>
 			<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
 			<div v-for="n in cols" :key="n" :class="{
 				['col-sm-'+Math.floor(12/cols)]: cols > 1
 			}">
-				<div style="margin:0" v-for="(item, i) in visibleArr" :key="i" class="col-sm-12">
+				<div style="margin:0" v-for="(item, i) in visibleArr" :key="i">
 					<!-- eslint-disable-next-line vue/no-mutating-props -->
-					<input @input="doInput(item, calc(i,n))" v-model="items[calc(i,n)]" class="line col-12">
+					<input @input="doInput(item, calc(i,n))" v-model="items[calc(i,n)]" class="line w-100">
 				</div>
 			</div>
 		</div>
@@ -133,7 +133,4 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-	.conditions {
-		margin-bottom: 10px;
-	}
 </style>

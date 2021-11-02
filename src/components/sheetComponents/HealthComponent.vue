@@ -8,7 +8,7 @@
 		<!-- <div class="sheet-dots" style="margin-top:-10px;"> -->
 			<!-- <button v-for="n in maxHealth" :key="n" class="sheet-dot" :class="{'sheet-dot-full': true}"></button> -->
 		<!-- </div> -->
-		<div class="sheet-boxes" style="margin-top:-7px;">
+		<div class="sheet-boxes" style="text-align:center;">
 			<button v-for="n in maxHealth" :key="n" @click="pokeHealth(n-1)" class="sheet-box" :data-healthbox="healthTrack[n-1]"></button>
 		</div>
 	</div>
@@ -20,6 +20,7 @@
 import { defineComponent } from "vue";
 export default defineComponent({
 	name: "HealthComponent",
+	emits: ["update:healthTrack"],
 	props: {
 		"maxHealth": {
 			required: true,
@@ -71,7 +72,7 @@ export default defineComponent({
 				}
 			}
 
-			this.$emit("update", healthTrack);
+			this.$emit("update:healthTrack", healthTrack);
 		}
 	},
 	computed: {

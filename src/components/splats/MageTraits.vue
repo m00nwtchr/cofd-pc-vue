@@ -84,8 +84,8 @@
 import { MageCharacter, Rote } from "../../definitions";
 import { defineComponent, PropType } from "vue";
 
-import ItemList from "./ItemList.vue";
-import ObjectList from "./ObjectList.vue";
+import ItemList from "../sheetComponents/ItemList.vue";
+import ObjectList from "../sheetComponents/ObjectList.vue";
 
 export default defineComponent({
 	name: "MageTraits",

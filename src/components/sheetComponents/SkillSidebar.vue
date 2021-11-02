@@ -8,18 +8,17 @@
 					$t(`character.cat.${Object.keys(skillCats)[i]}`)
 				}}
 			</h3>
-			<i class="col-12 subtitle">({{ Object.values(skillCats)[i] }} Unskilled)</i>
+			<i class="col-12 subtitle">({{ Object.values(skillCats)[i] }} unskilled)</i>
 
 			<div
-				style="font-style: italic; font-size: 10px; line-height: 10px"
+				style="font-style: italic; font-size: 10px; line-height: 10px;"
 				v-if="character.splat === EnumSplat.MAGE"
 			>
 				Rote<br>
 				Skill
 			</div>
 
-			<span style="text-transform: capitalize" v-for="skill in cat" :key="skill">
-				<!-- <button v-if="character.splat === EnumSplat.MAGE" @click="toggleRoteSkill(skill)" class="sheet-box" :class="{'sheet-dot-full': character.roteSkills.includes(skill)}"></button> -->
+			<div style="text-transform: capitalize" v-for="skill in cat" :key="skill">
 				<button
 					v-if="character instanceof MageCharacter"
 					class="sheet-box"
@@ -33,6 +32,7 @@
 						character.roteSkills.push(skill)
 					"
 				></button>
+
 				<span
 					:class="{
 						selected: store.state.selectedTraits[skill] !== undefined,
@@ -50,20 +50,7 @@
 					<font-awesome-icon icon="caret-right" v-else />
 				</button>
 
-				<div class="sheet-dots">
-					<button
-						@click="setSkill(skill, n)"
-						v-for="n in dotAttrMax"
-						:key="n"
-						class="sheet-dot"
-						:class="{
-							'sheet-dot-full':
-								character.skills[skill] >= n,
-							'sheet-dot-small': dotAttrMax > 5
-						}"
-					></button>
-				</div>
-				<br>
+				<sheet-dots v-model="character.skills[skill]" :maxValue="dotAttrMax" />
 
 				<item-list
 					v-if="specialtyDropSelect === skill"
@@ -71,7 +58,7 @@
 					:items="character.specialties[skill]"
 					:mutable="true"
 				/>
-			</span>
+			</div>
 		</div>
 		<br>
 	</div>
@@ -84,11 +71,13 @@ import { Character, MageCharacter, EnumSplat, ATTRIBUTES, SKILLS } from "../../d
 import { useStore } from "../../store";
 
 import ItemList from "./ItemList.vue";
+import SheetDots from "./SheetDots.vue";
 
 export default defineComponent({
 	name: "SkillSidebar",
 	components: {
-		ItemList
+		ItemList,
+		SheetDots
 	},
 	props: {
 		"character": {

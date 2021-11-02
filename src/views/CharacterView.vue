@@ -170,19 +170,7 @@
 								style="width: 35px"
 								class="attr-input"
 							/>
-							<div class="sheet-dots">
-								<button
-									@click="setAttr(attr, n)"
-									v-for="n in dotAttrMax"
-									:key="n"
-									:class="{
-										'sheet-dot': true,
-										'sheet-dot-full':
-											baseAttributes[attr] >= n,
-										'sheet-dot-small': dotAttrMax > 5
-									}"
-								></button>
-							</div>
+							<sheet-dots v-model="baseAttributes[attr]" :maxValue="dotAttrMax" />
 							<br />
 						</span>
 					</div>
@@ -218,19 +206,20 @@
 
 							<span v-if="(character instanceof WerewolfCharacter)">
 								<item-list
-									class="col-12"
+									class="col-12 block"
 									name="Aspirations"
 									:items="character.aspirations"
 									:mutable="true"
 									:min="4"
 								/>
 		
-								<span>
+								<div class="block">
 									<h3 class="separator col-sm-12">Hunter's Aspect</h3>
 									<input class="line w-100" type="text" v-model="character.huntersAspect" />
-								</span>
+								</div>
+
 								<item-list
-									class="col-12"
+									class="col-12 block"
 									name="Conditions"
 									:items="character.conditions"
 									:mutable="true"
@@ -265,7 +254,7 @@
 								</span>
 								<span style="float: left; margin-right: 5px">{{ $t("character.trait.beats") }}:</span>
 								<div style="float: left; margin-right: 10px">
-									<span v-for="n in 5" :key="n">
+									<!-- <span v-for="n in 5" :key="n">
 										<button
 											class="sheet-box"
 											@click="setTrait('beats', n)"
@@ -274,7 +263,8 @@
 													character.beats >= n
 											}"
 										></button>
-									</span>
+									</span> -->
+									<sheet-dots v-model.number="character.beats" :boxes="true" @update:modelValue="character.beats === 5 ? character.beats = 0 && character.experience+=1 : 0" />
 								</div>
 								<span style="clear: both"></span>
 								<br />
@@ -331,62 +321,27 @@
 						<div class="col col-sm-5" style="padding-right: 30px">
 							<health-component
 								id="health"
-								class="col-12"
-								style="margin-bottom: 15px"
+								class="col-12 block"
+								:name="$t('character.trait.health')"
+								v-model:healthTrack="character.healthTrack"
 								:maxHealth="character.maxHealth"
 								:woundPenalty="character.woundPenalty"
-								:healthTrack="character.healthTrack"
-								:name="$t('character.trait.health')"
-								@update="(track) => character.healthTrack = track"
 							>
 								<!-- <i class="subtitle" style="margin-bottom: 5px" v-if="character.splat === EnumSplat.WEREWOLF">(EEE)</i> -->
 							</health-component>
 
-							<div id="willpower" class="col-12" style="margin-bottom: 15px">
-								<h3 class="separator col-sm-12">{{ $t("character.trait.willpower") }}</h3>
-								<div class="sheet-dots" style="margin-top: -10px">
-									<button
-										v-for="n in character.maxWillpower + character.spentWillpowerDots"
-										:key="n"
-										@click="
-										setTrait(
-											'spentWillpowerDots',
-											character.maxWillpower + character.spentWillpowerDots - n,
-											{
-												off: -1
-											}
-										)
-										"
-										class="sheet-dot"
-										:class="{
-											'sheet-dot-full':
-												character.maxWillpower >=
-												n
-										}"
-									></button>
-								</div>
-								<div
-									class="sheet-boxes"
-									:style="{ marginLeft: (character.spentWillpowerDots * -15) + 'px' }"
-									style="margin-top: -7px"
-								>
-									<button
-										v-for="n in character.maxWillpower"
-										:key="n"
-										class="sheet-box"
-										@click="setTrait('willpower', n)"
-										:class="{
-											'sheet-dot-full':
-												character.willpower >= n
-										}"
-									></button>
-								</div>
-							</div>
+
+							<willpower-component id="willpower" :character="character" class="col-12 block" />
+							<!-- </willpower-component> -->
+							<!-- <div id="willpower" class="col-12 block">
+
+							</div> -->
+
 							<div
-								v-if="character instanceof SupernaturalCharacter"
-								class="col-12"
+								v-if="(character instanceof SupernaturalCharacter)"
+								class="col-12 block"
 								id="powerTrait"
-								style="margin-bottom: 15px"
+								style="text-align: center;"
 							>
 								<h3
 									:class="{
@@ -412,9 +367,8 @@
 							</div>
 							<div
 								v-if="(character instanceof SupernaturalCharacter)"
-								class="col-12"
+								class="col-12 block"
 								id="fuelTrait"
-								style="margin-bottom: 15px"
 							>
 								<h3 class="separator col-sm-12">{{ $t(character.splat.fuelTraitName) }}</h3>
 								<div class="sheet-boxes" style="margin-top: -10px">
@@ -433,15 +387,12 @@
 								</div>
 							</div>
 
-							<!-- <span class="col-12" v-if="splat && splat.integrityTraitName"> -->
-							<!-- <health-component    v-if="splat.integrityTrackType === 'healthTrack'" :maxMarkValue="2" :maxHealth="character.maxClarity" :healthTrack="character.clarityTrack" :name="splat.integrityTraitName" class="col-12" id="integrityTrait" /> -->
 							<integrity-component
 								v-if="character.splat.integrityTraitName"
 								:character="character"
-								class="col-12"
+								class="col-12 block"
 								id="integrityTrait"
 							/>
-							<!-- </span> -->
 
 							<div
 								class="col-12"
@@ -466,7 +417,7 @@
 
 							<span v-if="!(character instanceof WerewolfCharacter)">
 								<item-list
-									class="col-12"
+									class="col-12 block"
 									name="Conditions"
 									:items="character.conditions"
 									:mutable="true"
@@ -475,7 +426,7 @@
 								<!-- <br> -->
 
 								<item-list
-									class="col-12"
+									class="col-12 block"
 									name="Aspirations"
 									:items="character.aspirations"
 									:mutable="true"
@@ -542,13 +493,16 @@ import {
 import AbilityList from "../components/sheetComponents/AbilityList.vue";
 import HealthComponent from "../components/sheetComponents/HealthComponent.vue";
 import IntegrityComponent from "../components/sheetComponents/IntegrityComponent.vue";
+import WillpowerComponent from "../components/sheetComponents/WillpowerComponent.vue";
+import SheetDots from "../components/sheetComponents/SheetDots.vue";
+
 import ItemList from "../components/sheetComponents/ItemList.vue";
 import ObjectList from "../components/sheetComponents/ObjectList.vue";
 import DiceRollerComponent from "../components/sheetComponents/diceRoller/DiceRoller.vue";
 
 import SkillSidebar from "../components/sheetComponents/SkillSidebar.vue";
-import WerewolfTraits from "../components/sheetComponents/WerewolfTraits.vue";
-import MageTraits from "../components/sheetComponents/MageTraits.vue";
+import WerewolfTraits from "../components/splats/WerewolfTraits.vue";
+import MageTraits from "../components/splats/MageTraits.vue";
 
 import ModalComponent from "../components/ModalComponent.vue";
 import FloatingActionMenu from "../components/FloatingActionMenu.vue";
@@ -568,7 +522,9 @@ export default defineComponent({
 		AbilityList,
 		HealthComponent,
 		IntegrityComponent,
+		WillpowerComponent,
 		ItemList,
+		SheetDots,
 		// ObjectList,
 		DiceRoller: DiceRollerComponent,
 		// ModalComponent,
@@ -752,6 +708,15 @@ export default defineComponent({
 				}
 			}
 		},
+		updateBeats(alt?: boolean) {
+
+			if (!alt && this.character.beats) {
+				if (this.character.beats === 5) {
+					this.character.beats = 0;
+					this.characater
+				}
+			}
+		},
 		exportCharacter() {
 			if (navigator.clipboard) {
 				const txt = encodeURI(JSON.stringify(this.character.getData()));
@@ -905,40 +870,17 @@ input:focus {
 	text-transform: uppercase;
 	text-align: center;
 
-	margin-top: 20px;
-	margin-bottom: 0.3rem;
+	// margin-top: 10px;
+	margin-bottom: 0px;
 	// margin-bottom: 0px;
 
 	// margin-bottom: 15px;
 }
 
-.block .sheet-dots {
-	float: right;
-}
-
-button.sheet-dot {
-	-moz-border-radius: 50%;
-	-webkit-border-radius: 50%;
-	border-radius: 50%;
-}
-
-button.sheet-dot-full {
-	background: $accent !important;
-}
-
-.sheet-dot,
-.sheet-box {
-	$radius: 15px;
-
-	width: $radius;
-	height: $radius;
-
-	padding: 0;
-	border: solid 1px #000000;
-	line-height: 11px;
-	background-color: #efefef;
-
-	margin-right: 1px;
+.attr-proper, #skills {
+	.sheet-dots {
+		float: right;
+	}
 }
 
 #skills .sheet-dot {
@@ -1001,12 +943,12 @@ button.sheet-dot-full {
 	}
 }
 
-button.sheet-dot-small {
-	$radius: 12px;
+// button.sheet-dot-small {
+// 	$radius: 12px;
 
-	width: $radius;
-	height: $radius;
-}
+// 	width: $radius;
+// 	height: $radius;
+// }
 
 #minorTraits {
 	font-size: 14.2pt;
@@ -1014,13 +956,14 @@ button.sheet-dot-small {
 }
 
 .subtitle {
-	margin-top: -13px;
-	// margin-bottom:-10px;
+	line-height: 5px;
+	// margin-top: -13px;
+	// margin-bottom: 5px;
 	display: block;
 	text-align: center;
 
-	font-size: 8pt;
-	font-family: "Goudy";
+	font-size: 10pt;
+	font-family: "Goudy Old style";
 
 	color: black;
 }
@@ -1073,5 +1016,9 @@ button.sheet-dot-small {
 	// stroke: red;
 	// stroke-width: 3;
 	// text-shadow: 2px 0 0 $color, -2px 0 0 $color, 0 2px 0 $color, 0 -2px 0 $color, 1px 1px $color, -1px -1px 0 $color, 1px -1px 0 $color, -1px 1px 0 $color;
+}
+
+#fuelTrait {
+	text-align: center;
 }
 </style>
