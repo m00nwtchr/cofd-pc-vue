@@ -264,7 +264,7 @@
 											}"
 										></button>
 									</span> -->
-									<sheet-dots v-model.number="character.beats" :boxes="true" @update:modelValue="character.beats === 5 ? character.beats = 0 && character.experience+=1 : 0" />
+									<sheet-dots v-model.number="character.beats" :boxes="true" @update:modelValue="updateBeats()" />
 								</div>
 								<span style="clear: both"></span>
 								<br />
@@ -673,14 +673,6 @@ export default defineComponent({
 				}
 			}
 		},
-		setAttr(attr: string, val: number) {
-			const character = this.character;
-
-			// if (!character.attributes)
-			// 	(character.attributes as any) = {};
-
-			character.attributes[attr] = character.attributes[attr] === val && val !== 1 ? val - 1 : val;
-		},
 		setTrait(
 			trait: string,
 			val: number,
@@ -697,23 +689,17 @@ export default defineComponent({
 
 			// console.log(character[trait], min);
 			character[trait] = Math.max(min || 0, character[trait]);
-
-			if (trait === "beats" || trait === "alternateBeats") {
-				if (character[trait] === 5) {
-					character[trait] = 0;
-
-					trait === "beats"
-						? character["experience"]++
-						: character["alternateExperience"]++;
-				}
-			}
 		},
-		updateBeats(alt?: boolean) {
-
+		updateBeats(alt = false) {
 			if (!alt && this.character.beats) {
 				if (this.character.beats === 5) {
 					this.character.beats = 0;
-					this.characater
+					this.character.experience++;
+				}
+			} else if (this.character.alternativeBeats) {
+				if (this.character.alternativeBeats === 5) {
+					this.character.alternativeBeats = 0;
+					this.character.alternativeExperience++;
 				}
 			}
 		},
