@@ -350,20 +350,8 @@
 									@click="selectTrait('power', character)"
 									class="separator col-sm-12"
 								>{{ $t(character.splat.powerTraitName) }}</h3>
-								<div class="sheet-dots" style="margin-top: -10px">
-									<button
-										v-for="n in 10"
-										:key="n"
-										class="sheet-dot"
-										@click="
-										setTrait('power', n, { min: 1 })
-										"
-										:class="{
-											'sheet-dot-full':
-												character.power >= n
-										}"
-									></button>
-								</div>
+								<sheet-dots v-model.number="character.power" :maxValue="10" />
+
 							</div>
 							<div
 								v-if="(character instanceof SupernaturalCharacter)"
@@ -371,20 +359,12 @@
 								id="fuelTrait"
 							>
 								<h3 class="separator col-sm-12">{{ $t(character.splat.fuelTraitName) }}</h3>
-								<div class="sheet-boxes" style="margin-top: -10px">
-									<!-- {{character.maxFuel}} -->
-									<span v-for="n in character.maxFuel" :key="n">
-										<button
-											class="sheet-box"
-											@click="setTrait('fuel', n)"
-											:class="{
-												'sheet-dot-full':
-													character.fuel >= n
-											}"
-										></button>
-										<br v-if="n % 10 === 0" />
-									</span>
-								</div>
+								<sheet-dots 
+									v-model="character.fuel"
+									:maxValue="character.maxFuel"
+									:boxes="true"
+									:breakI="10"
+								/>
 							</div>
 
 							<integrity-component
@@ -610,7 +590,6 @@ export default defineComponent({
 		}
 	},
 	methods: {
-		// nameToKey,
 		async rollTest() {
 			const results = [] as string[][];
 
@@ -680,15 +659,13 @@ export default defineComponent({
 		) {
 			const character: any = this.character;
 
-			// eslint-disable-next-line prefer-const
 			let { off, min } = opts || {};
 
 			off = off || 1;
+			min = min || 0;
 
 			character[trait] = character[trait] === val ? val - off : val;
-
-			// console.log(character[trait], min);
-			character[trait] = Math.max(min || 0, character[trait]);
+			character[trait] = Math.max(min, character[trait]);
 		},
 		updateBeats(alt = false) {
 			if (!alt && this.character.beats) {
