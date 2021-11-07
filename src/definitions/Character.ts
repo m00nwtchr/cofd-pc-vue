@@ -1,7 +1,19 @@
 import _ from "lodash";
-import { watch } from "vue";
 import { reactive } from "vue";
-import { Splat, SPLATS, EnumSplat, Organization, SubType, MERITS, Merit, Modifier } from ".";
+import {
+	Attributes,
+	Ability,
+	Splat,
+	SPLATS,
+	EnumSplat,
+	Organization,
+	SubType,
+	MERITS,
+	Merit,
+	SKILLS,
+	Skills,
+	Armor,
+} from ".";
 
 export function nameToKey(name: string) {
 	return name.trim().toLowerCase().replaceAll(" ", "_").replaceAll("-", "_");//.replaceAll("(", "_").replaceAll(")", "_");
@@ -11,75 +23,6 @@ export function keyToName(key: string) {
 	return key.replaceAll("_", " ");
 }
 
-
-export const ATTRIBUTES = [
-	["intelligence", "wits", "resolve"],
-	["strength", "dexterity", "stamina"],
-	["presence", "manipulation", "composure"],
-];
-
-export const SKILLS = [
-	[
-		"academics",
-		"computer",
-		"crafts",
-		"investigation",
-		"medicine",
-		"occult",
-		"politics",
-		"science",
-	],
-	[
-		"athletics",
-		"brawl",
-		"drive",
-		"firearms",
-		"larceny",
-		"stealth",
-		"survival",
-		"weaponry",
-	],
-	[
-		"animal_ken",
-		"empathy",
-		"expression",
-		"intimidation",
-		"persuasion",
-		"socialize",
-		"streetwise",
-		"subterfuge",
-	],
-];
-export interface Ability {
-	key?: string;
-	name?: string;
-	level: number;
-}
-
-export interface Attributes {
-	[index: string]: number;
-	intelligence: number;
-	wits: number;
-	resolve: number;
-
-	strength: number;
-	dexterity: number;
-	stamina: number;
-
-	presence: number;
-	manipulation: number;
-	composure: number;
-}
-
-interface Skills {
-	[index: string]: number;
-}
-
-interface Armor {
-	[key: string]: number;
-	general: number;
-	ballistic: number;
-}
 
 interface ICharacter {
 	splat: Splat;
@@ -457,7 +400,7 @@ export class MortalCharacter extends Character implements IMortalCharacter {
 		super(opts);
 		this.id = (opts as any).id || "";
 		this.merits = opts.merits || {};
-		
+
 		this.beats = opts.beats || 0;
 		this.experience = opts.experience || 0;
 
