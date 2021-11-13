@@ -27,6 +27,7 @@ const vuexPersist = new VuexPersistence<State>({
 // export type Characters = { [key: string]: Character };
 
 export interface State {
+	debug: boolean;
 	flag: boolean;
 	characters: { [key: string]: Character };
 	selectedTraits: { [index: string]: () => number };
@@ -48,9 +49,13 @@ export const store = createStore<State>({
 	state: {
 		flag: true,
 		characters: {},
-		selectedTraits: {}
+		selectedTraits: {},
+		debug: false
 	},
 	mutations: {
+		UPDATE_ENV(state, val) {
+			state.debug = val;
+		},
 		UPDATE_CHARACTERS(state, val) {
 			state.characters = val;
 		},

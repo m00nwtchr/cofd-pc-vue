@@ -66,12 +66,14 @@ class RandomOrgClient {
 		this.endpoint = this.endpoint || RANDOM_ORG_URL(4);
 	}
 
+	private req_id = 0;
+
 	protected async _request<T extends Result>(method: string, params: { [key: string]: any }): Promise<T> {
 		const data = {
 			jsonrpc: "2.0", method, params: {
 				apiKey: this.apiKey,
 				...params
-			}, id: Math.floor(Math.random() * 1000)
+			}, id: this.req_id++
 		};
 
 		const resp = (await axios.post(this.endpoint, data));

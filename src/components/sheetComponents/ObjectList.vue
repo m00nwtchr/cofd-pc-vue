@@ -12,10 +12,16 @@
 			>
 				<i v-if="i === 0" class="subtitle" style="text-transform: capitalize;">{{ camelPad(attr) }}</i>
 				<!-- eslint-disable-next-line vue/no-mutating-props -->
-				<input
+				<input v-if="(typeof (defaultItem || item)[attr]) === 'number'"
 					@input="doInput(item, attr, i);"
-					:type="(typeof item[attr])"
+					type="number"
 					v-model.number="item[attr]"
+					class="line w-100"
+					style="max-width: 370px"
+				/>
+				<input v-else
+					@input="doInput(item, attr, i);"
+					v-model="item[attr]"
 					class="line w-100"
 					style="max-width: 370px"
 				/>
@@ -70,6 +76,9 @@ export default defineComponent({
 			default: () => Number.MAX_VALUE
 		}
 	},
+	data() { return {
+		defaultItem: this.itemFactory ? new (this.itemFactory as any)() : {}
+	};},
 	methods: {
 		doInput(item: any, attr: string, i: number) {
 			if (!this.items.includes(item)) {

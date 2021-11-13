@@ -11,7 +11,7 @@
 		@close="addModalOpen = false; newChar();"
 		ref="modal"
 	>
-		<new-character ref="newchar"/>
+		<new-character ref="newchar" />
 	</modal-component>
 
 	<floating-action-menu
@@ -29,12 +29,12 @@
 					<span class="name">{{ el.name }}</span>
 					<br />
 					<span style="text-transform: capitalize;" class="desc">
-						<span v-if="el.concept">
-							{{ el.concept }}
-							<br />
-						</span>
+						<!-- <span v-if="el.concept"> -->
+						<!-- {{ el.concept }} -->
+						<!-- <br /> -->
+						<!-- </span> -->
 						{{ el.splat.name && $t(el.splat.name) }}
-						{{ el.legacy || "" }} {{ el.subType.name && $t(el.subType.name) }} {{ el.organization.name && $t(el.organization.name) }}
+						<!-- {{ el.legacy || "" }} {{ el.subType.name && $t(el.subType.name) }} {{ el.organization.name && $t(el.organization.name) }} -->
 						<br />
 						<span
 							v-if="el.splat.name === ''"
@@ -48,60 +48,52 @@
 	</ul>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-
-import { EnumSplat, createCharacter, Character } from "../definitions";
-import { useStore } from "../store";
-
+<script lang="ts" setup>
+import { computed, ref, onMounted } from "vue";
+import { fromJSON } from "../definitions";
 import FloatingActionMenu from "../components/FloatingActionMenu.vue";
 import ModalComponent from "../components/ModalComponent.vue";
-
 import NewCharacter from "./NewCharacter.vue";
-
 import { v4 as uuidv4 } from "uuid";
 
+import { useStore } from "../store";
+import { MortalCharacter } from "../definitions";
+import * as all from "../definitions";
 
-export default defineComponent({
-	name: "CharacterList",
-	components: {
-		FloatingActionMenu,
-		ModalComponent,
-		NewCharacter
-	},
-	data: () => ({
-		store: useStore(),
+const store = useStore();
 
-		addModalOpen: false
-	}),
-	computed: {
-		characters(): { [key: string]: Character } {
-			return Object.entries(this.store.state.characters)
-				.map(el => [el[0], createCharacter(el[1])])
-				.map(el => ({
-					[el[0]]: el[1]
-				})).reduce((prev, val) => Object.assign(prev, val), {});
-		}
-	},
-	methods: {
-		newChar() {
-			const char = createCharacter({
-				id: uuidv4(),
-				splat: this.$refs.newchar.splat,
+const newchar = ref<any>(null);
+const modal = ref<any>(null);
 
-				name: "Unnamed",
-				
-			} as any);
+let addModalOpen = ref(false);
+onMounted(() => {
+	Object.assign(window, all);
+})
 
-			this.store.commit("UPDATE_CHARACTERS", {
-				...this.store.state.characters,
-				[char.id]: char.getData()
-			});
-		}
-	},	beforeMount() {
-		(window as any).vue = this;
-	},
-});
+const characters = computed(() => Object.entries(store.state.characters)
+	.map(el => [el[0], fromJSON(el[1])])
+	.map(el => ({
+		[el[0]]: el[1]
+	}))
+	.reduce((prev, val) => Object.assign(prev, val), {})
+);
+
+function newChar() {
+	const id = uuidv4();
+	console.log(newchar.value.splat);
+	const char = fromJSON({
+		splat: newchar.value.splat,
+
+		name: "Unnamed",
+	});
+	console.log(char);
+	// console.log(char.toJSON());
+
+	store.commit("UPDATE_CHARACTERS", {
+		...store.state.characters,
+		[id]: char.toJSON()
+	});
+}
 </script>
 
 <style lang="scss" scoped>

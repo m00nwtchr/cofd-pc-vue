@@ -1,8 +1,9 @@
 import { Mixin } from 'ts-mixer';
 import {
 	IsSupernatural,
-	HasFuel
-} from "./index";
+	HasFuel,
+	JSONMixin
+} from ".";
 
 export class SupernaturalWithFuel extends Mixin(IsSupernatural, HasFuel) {
 	get maxFuel(): number {

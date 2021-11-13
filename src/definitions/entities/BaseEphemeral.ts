@@ -8,7 +8,7 @@ import { EphemeralAttributes, IEphemeralAttributes } from "..";
 
 export class BaseEphemeral extends Mixin(Character, IsSupernatural) { 
 	
-	protected _attributes = {} as EphemeralAttributes;
+	_attributes = {} as EphemeralAttributes;
 
 	get attributes(): EphemeralAttributes {
 		const _defProp = (val: string) => ({

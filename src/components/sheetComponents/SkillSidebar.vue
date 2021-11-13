@@ -12,7 +12,7 @@
 
 			<div
 				style="font-style: italic; font-size: 10px; line-height: 10px;"
-				v-if="character.splat === EnumSplat.MAGE"
+				v-if="(character instanceof MageCharacter)"
 			>
 				Rote<br>
 				Skill
@@ -20,7 +20,7 @@
 
 			<div style="text-transform: capitalize" v-for="skill in cat" :key="skill">
 				<button
-					v-if="character instanceof MageCharacter"
+					v-if="(character instanceof MageCharacter)"
 					class="sheet-box"
 					:class="{
 						'sheet-dot-full': character.roteSkills.includes(
@@ -79,6 +79,7 @@ export default defineComponent({
 		ItemList,
 		SheetDots
 	},
+	emits: ["selectSkill"],
 	props: {
 		"character": {
 			required: true,

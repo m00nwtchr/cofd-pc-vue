@@ -1,14 +1,40 @@
 import { Mixin, hasMixin } from 'ts-mixer';
 import {
-	BaseCharacter, HasIntegrity,
+	BaseCharacter, 
+	EarnsAlternativeBeats, 
+	HasIntegrity, 
+	HasLegacy, 
+	HasOrganization,
+	HasVirtueViceAnchors,
 } from ".";
-import { EnumSplat } from "..";
+import { EnumSplat, Rote } from "..";
 
-import {SupernaturalWithFuel} from "./SupernaturalWithFuel";
+import { SupernaturalWithFuel } from "./SupernaturalWithFuel";
 
-export class MageCharacter extends Mixin(BaseCharacter, SupernaturalWithFuel, HasIntegrity) { 
+export class MageCharacter extends Mixin(BaseCharacter, SupernaturalWithFuel, HasVirtueViceAnchors, HasIntegrity, HasOrganization, HasLegacy, EarnsAlternativeBeats) {
+
+	activeSpells: string[] = [];
+	yantras: string[]      = [];
+	magicalTools: string[] = [];
+	praxes: string[]       = [];
+	inuredSpells: string[] = [];
+	nimbus: string[]       = [];
+	obsessions: string[]   = [];
+
+	attainments: string[]       = [];
+	legacyAttainments: string[] = [];
+
+	rotes: Rote[] = [];
+
+	_roteSklls?: string[];
+	get roteSkills(): string[] {
+		return this.organization.skills || this._roteSklls || [];
+	}
+	set roteSkills(val: string[]) {
+		this._roteSklls = val;
+	}
+
 	constructor() {
-		super();
-		this._splat = EnumSplat.MAGE;
+		super(EnumSplat.MAGE);
 	}
 }
