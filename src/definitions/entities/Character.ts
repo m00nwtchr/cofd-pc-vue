@@ -1,9 +1,14 @@
+import _ from "lodash";
 import { hasMixin } from "ts-mixer";
 import { JSONMixin } from ".";
-import { Attributes, EnumSplat, Splat, SPLATS } from "..";
+import { Armor, Attributes, EnumSplat, Splat, SPLATS } from "..";
 
-interface ICharacter {
+export interface ICharacter {
 	name: string;
+
+	splat: Splat;
+
+	// concept: string;
 
 	attributes: Attributes;
 
@@ -20,7 +25,7 @@ interface ICharacter {
 	size: number;
 	speed: number;
 	defense: number;
-	// armor: Armor;
+	armor: Armor;
 	initative: number;
 	perception: number;
 }
@@ -40,7 +45,7 @@ export class Character implements ICharacter {
 
 	name: string;
 
-	protected _attributes!: Attributes;
+	_attributes!: Attributes;
 	set attributes(val: Attributes) {
 		this._attributes = val;
 	}
@@ -66,8 +71,26 @@ export class Character implements ICharacter {
 		});
 	}
 
+	private _healthTrack: number[] = [];
+
 	get maxHealth() { return this.size + this.attributes.stamina; }
-	healthTrack: number[];
+	get healthTrack(): number[] {
+		const ogTrack = this._healthTrack || [];
+		const track = Object.assign(new Array(this.maxHealth || 0).fill(0), ogTrack);
+
+		if (this.maxHealth < track.length) {
+			const deleted = track.splice(this.maxHealth - 1, track.length - this.maxHealth);
+		}
+
+		if (JSON.stringify(track) !== JSON.stringify(ogTrack)) {
+			this._healthTrack = track;
+		}
+
+		return track;
+	}
+	set healthTrack(track: number[]) {
+		this._healthTrack = track;
+	}
 
 	get maxWillpower() { return this.attributes.resolve + this.attributes.composure; }
 	willpower: number;
@@ -76,15 +99,25 @@ export class Character implements ICharacter {
 	conditions: string[];
 	aspirations: string[];
 
-	size: number;
+	_size!: number;
+	get size(): number {
+		return this._size;
+	}
+	set size(val: number) {
+		this._size = val;
+	}
+
 	get speed() { return this.attributes.strength + this.attributes.dexterity + 5 }
 	get defense() { return Math.min(this.attributes.dexterity, this.attributes.wits) }
-	// armor: Armor;
+	armor: Armor = {
+		ballistic: 0,
+		general: 0
+	};
 	get initative() { return this.attributes.dexterity + this.attributes.composure }
 	get perception() { return this.attributes.wits + this.attributes.composure }
 
-	constructor() {
-		this.splat = EnumSplat.MORTAL;
+	constructor(splat?: EnumSplat | Splat) {
+		this.splat = splat || EnumSplat.MORTAL;
 		this.name = "";
 		this.attributes = {
 			intelligence: 1,
@@ -108,17 +141,28 @@ export class Character implements ICharacter {
 		this.size = 5;
 	}
 
-	protected init() {
+	protected init(splat?: EnumSplat | Splat) {
+		this.splat = splat || EnumSplat.MORTAL;
+
 		if (hasMixin(this, JSONMixin)) {
-			const funcs = (this as JSONMixin).toJSONFuncs;
+			const funcs = this.toJSONFuncs;
+
 			function f(this: any) {
-				if (this._splat) {
+				if (typeof this._splat === "number") {
 					this.splat = this._splat;
 					delete this._splat;
+				}
+				if (typeof this._size === "number") {
+					this.size = this._size;
+					delete this._size;
 				}
 				if (this._attributes) {
 					this.attributes = this._attributes;
 					delete this._attributes;
+				}
+				if (this._healthTrack) {
+					this.healthTrack = this._healthTrack;
+					delete this._healthTrack;
 				}
 
 				return this;
@@ -127,3 +171,36 @@ export class Character implements ICharacter {
 		}
 	}
 }
+
+type Constructor<T> = new (...args: any[]) => T;
+
+export function fromJSON<T extends Character>(data: any, type?: Constructor<T>): T {
+	data = {...data};
+	if (data) {
+		const splat: EnumSplat = data.splat || data._splat || EnumSplat.MORTAL;
+
+		if (!type) {
+			type = SPLATS[splat].characterFactory as Constructor<T>;
+		}
+
+		if (data.attributes) {
+			data._attributes = data.attributes;
+			delete data.attributes;
+		}
+
+		if (data.skills) {
+			data._skills = data.skills;
+			delete data.skills;
+		}
+
+		// let obj = Object.assign(new (type || Character))
+		// let obj = _.merge(new (type || Character)(data.splat), data);
+
+	// /	return obj;
+		return _.merge(new (type || Character)(data.splat), data);
+	}
+}
+
+// export function createCharacter() {
+// 	return 
+// }

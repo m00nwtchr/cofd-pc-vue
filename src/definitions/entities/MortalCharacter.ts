@@ -1,11 +1,9 @@
 import { Mixin, hasMixin } from 'ts-mixer';
 import {
-	BaseCharacter, HasIntegrity,
+	BaseCharacter,
+	HasIntegrity,
+	HasVirtueViceAnchors,
 } from ".";
-import { EnumSplat } from "..";
+import { HasOrganization } from './mixins';
 
-export class MortalCharacter extends Mixin(BaseCharacter, HasIntegrity) { 
-	constructor() {
-		super();
-	}
-}
+export class MortalCharacter extends Mixin(BaseCharacter, HasIntegrity, HasVirtueViceAnchors, HasOrganization) {}

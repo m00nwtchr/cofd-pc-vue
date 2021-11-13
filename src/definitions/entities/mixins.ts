@@ -3,9 +3,9 @@ import { Mixin, settings, hasMixin } from 'ts-mixer';
 import { reactive } from 'vue';
 settings.initFunction = "init";
 
-import { Ability, SKILLS, Skills } from "..";
+import { Ability, Merit, Organization, SKILLS, Skills, SubType } from "..";
 
-import { Character } from ".";
+import { Character, ICharacter } from ".";
 
 type Function<T = void> = () => T;
 
@@ -32,7 +32,10 @@ export class EarnsBeats {
 		this.experience = 0;
 	}
 }
-
+export class EarnsAlternativeBeats {
+	alternateBeats: number = 0;
+	alternateExperience: number = 0;
+}
 export class HasSkills {
 	private _skills: Skills;
 	specialties: { [index: string]: string[] };
@@ -82,15 +85,56 @@ export class HasIntegrity {
 	}
 }
 
-export class HasMerits {
-	merits: { [key: string]: Ability };
+export class HasTouchstones {
+	touchstones: string[] = [];
+}
 
-	constructor() {
-		this.merits = {};
+export class HasIntegrityHealth {
+	integrityTrack: number[] = [];
+}
+
+export interface HasMerits extends Character {}
+export class HasMerits {
+	merits: { [key: string]: Ability } = {};
+
+	get meritTraitMods(): { [key: string]: number } {
+		const obj = Object.values(this.merits)
+			.filter(m => m instanceof Merit)
+			.flatMap((el) => (el as Merit).getTraitMods(this))
+			.map(el => {
+				return {
+					mod: typeof el.mod === "function" ? el.mod() : el.mod,
+					trait: el.trait
+				};
+			}).reduce((acc, val) => {
+				acc[val.trait] = val.mod + (acc[val.trait] || 0);
+
+				return acc;
+			}, {} as { [key: string]: number });
+
+		return proxy(obj);
+	}
+
+	get size(): number {
+		return this._size + (this.meritTraitMods.size || 0);
+	}
+
+	set size(val: number) {
+		this._size = val - (this.meritTraitMods.size || 0);
 	}
 }
 
+export interface IsSupernatural extends Character {}
 export class IsSupernatural {
+
+	_subType: string = "";
+	get subType(): SubType {
+		return this.splat.subTypes[this._subType] || {};
+	}
+	set subType(val: string | SubType) {
+		this._subType = typeof val === "string" ? val : val.name;
+	}
+
 	power: number;
 	abilities: { [index: string]: Ability };
 
@@ -126,6 +170,18 @@ export class IsSupernatural {
 				.forEach(key => ablTemp[key] = custom[key]);
 			this.abilities = reactive(ablTemp);
 		}
+
+		if (hasMixin(this, JSONMixin)) {
+			function f(this: any) {
+				if (this._subType) {
+					this.subType = this._subType;
+					delete this._subType;
+				}
+
+				return this;
+			}
+			this.toJSONFuncs["IsSupernatural"] = f;
+		}
 	}
 }
 
@@ -141,10 +197,68 @@ export class HasFuel {
 	}
 }
 
-type Constructor<T> = new (...args: any[]) => T;
+export class HasVirtueViceAnchors {
+	virtueAnchor: string = "";
+	viceAnchor: string = "";
+}
 
-export function fromJSON<T extends Character>(data: any, type: Constructor<T>): T {
-	return Object.assign(new type(), data);
+interface IHasHealth {
+	healthTrack: number[];
+	maxHealth: number;
+}
+
+export interface HasWoundPenalties extends IHasHealth {}
+export class HasWoundPenalties {
+	get woundPenalty(): number {
+		return Math.min((this.healthTrack[this.maxHealth - 1] !== 0 ?
+			-3 : this.healthTrack[this.maxHealth - 2] !== 0 ?
+				-2 : this.healthTrack[this.maxHealth - 3] !== 0 ?
+					-1 : 0), 0);
+	}
+}
+
+export interface HasOrganization extends ICharacter {}
+export class HasOrganization {
+	_organization: string = "";
+
+	get organization(): Organization {
+		return this.splat.organizations[this._organization] || Object.defineProperties({}, {
+			name: {
+				get: () => this._organization,
+				set: (val: string) => this._organization = val
+			}
+		});
+	}
+	set organization(val: Organization | string) {
+		this._organization = typeof val === "object" ? val.name : val;
+	}
+
+	protected init() {
+		if (hasMixin(this, JSONMixin)) {
+			function f(this: any) {
+				if (this._organization) {
+					this.organization = this._organization;
+					delete this._organization;
+				}
+				return this;
+			}
+			this.toJSONFuncs["HasOrganization"] = f;
+		}
+	}
+}
+
+export class HasLegacy {
+	legacy: string = "";
+}
+
+export function proxy<T extends object>(obj: T, bonusHandler?: ProxyHandler<T>, def?: any) {
+	return new Proxy(obj, Object.assign({
+		get(target: any, property: any) {
+			if (typeof property === "string") {
+				return target[property] || def || 0;
+			}
+		},
+	}, bonusHandler || {}));
 }
 
 // fromJSON<MortalCharacter>({});

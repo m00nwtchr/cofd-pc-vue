@@ -334,6 +334,10 @@ if (import.meta.env.MODE === "development" && Object.keys(store.state.characters
 	console.log(store.state);
 // debugger;
 }
+if (import.meta.env.MODE === "development") {
+	// store.state.debug = true;
+	store.commit("UPDATE_ENV", true);
+}
 
 // (window as any).export = (): void => {
 // 	const chara = {} as Characters;

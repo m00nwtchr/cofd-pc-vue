@@ -3,7 +3,7 @@
 		<div>{{ character.name }}</div>
 	</header>
 
-	<dice-roller></dice-roller>
+	<!-- <dice-roller></dice-roller> -->
 
 	<floating-action-menu
 		:items="[
@@ -41,12 +41,12 @@
 		}"
 	>
 		<!-- <fab /> -->
-		{
-		<span
-			:key="val[0]"
-			v-for="val in Object.entries(store.state.selectedTraits)"
-		>{{ val[0] }}: {{ val[1]() }},</span>
-		}
+		<span v-if="store.state.debug">
+			{<span 
+				:key="val[0]"
+				v-for="val in Object.entries(store.state.selectedTraits)"
+			>{{ val[0] }}: {{ val[1]() }},</span>}
+		</span>
 		<!-- {{  }} -->
 		<div id="page-1">
 			<div id="infoBar" class="bar row">
@@ -72,55 +72,66 @@
 					</span>
 				</div>
 				<div class="block col-sm-4">
-					<label for="virtueAnchor">{{ $t(character.splat.virtueAnchorName) }}:</label>
-					<input v-model="virtueAnchor" list="virtueAnchors" id="virtueAnchor" />
-					<br />
-					<label for="viceAnchor">{{ $t(character.splat.viceAnchorName) }}:</label>
-					<input v-model="viceAnchor" list="viceAnchors" id="viceAnchor" />
+						<label>
+							{{ $t(character.splat.virtueAnchorName) }}:
+							<input v-model="virtueAnchor" list="virtueAnchors"/>
+						</label>
+						<br />
+						<label>
+							{{ $t(character.splat.viceAnchorName) }}:
+							<input v-model="viceAnchor" list="viceAnchors"/>
+						</label>
 					<br />
 					<label for="concept">{{ $t("character.concept") }}:</label>
 					<input v-model="character.concept" id="concept" />
 				</div>
 				<div class="block col-sm-4">
 					<span v-if="character.splat.enum === EnumSplat.MORTAL">
-						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
-						<input v-model="character.chronicle" id="chronicle" />
+						<label>
+							{{ $t("character.chronicle") }}:
+							<input v-model="character.chronicle" />
+						</label>
 						<br />
-						<label for="faction">{{ $t(character.splat.legacyName) }}:</label>
-						<input v-model="character.faction" id="faction" />
+						<label>
+							{{ $t(character.splat.legacyName) }}:
+							<input v-model="character.faction" />
+						</label>
 						<br />
-						<label for="group-name">{{ $t(character.splat.orgName) }}:</label>
-						<input v-model="character.organization.name" id="group-name" />
+						<label v-if="hasMixin(character, HasOrganization)">
+							{{ $t(character.splat.orgName) }}:
+							<input v-model="character._organization" />
+						</label>
 						<br />
 					</span>
 					<span v-else>
-						<label for="subType">{{ $t(character.splat.subTypeName) }}:</label>
-						<!-- <input
-							v-model="character.subType"
-							list="subTypes"
-						/><br>-->
-						<select v-model="subType" id="subType">
-							<option
-								v-for="(el, key) in character.splat.subTypes"
-								:key="key"
-								:value="key"
-							>{{ $t(el.name) }}</option>
-							<option></option>
-						</select>
-						<br />
-						<label for="legacy">{{ $t(character.splat.legacyName) }}:</label>
-						<input v-model="character.legacy" id="legacy" />
-						<br />
-
-						<label for="organization">{{ $t(character.splat.orgName) }}:</label>
-						<select v-model="organization" id="organization">
-							<option
-								v-for="(el, key) in character.splat.organizations"
-								:key="key"
-								:value="key"
-							>{{ $t(el.name) }}</option>
-							<option></option>
-						</select>
+						<label v-if="hasMixin(character, IsSupernatural)">
+							{{ $t(character.splat.subTypeName) }}:
+							<select v-model="character._subType">
+								<option
+									v-for="(el, key) in character.splat.subTypes"
+									:key="key"
+									:value="key"
+								>{{ $t(el.name) }}</option>
+								<option></option>
+							</select>
+						</label>
+						<br>
+						<label v-if="hasMixin(character, HasLegacy)">
+							{{ $t(character.splat.legacyName) }}:
+							<input v-model="character.legacy"/>
+						</label>
+						<br>
+						<label v-if="hasMixin(character, HasOrganization)">
+							{{ $t(character.splat.orgName) }}:
+							<select v-model="character._organization">
+								<option
+									v-for="(el, key) in character.splat.organizations"
+									:key="key"
+									:value="key"
+								>{{ $t(el.name) }}</option>
+								<option></option>
+							</select>
+						</label>
 					</span>
 				</div>
 
@@ -184,7 +195,7 @@
 					<div class="row">
 						<div class="col col-sm-7">
 							<ability-list
-								v-if="(character instanceof SupernaturalCharacter)"
+								v-if="hasMixin(character, IsSupernatural)"
 								:character="character"
 								:abilities="character.abilities"
 								:optionsMutable="!character.splat.finiteAbilities"
@@ -192,16 +203,18 @@
 								:datalist="character.splat.abilities"
 								id="ability"
 								class="block"
+								@select="selectTrait"
 							/>
 
 							<ability-list
-								v-if="(character instanceof MortalCharacter)"
+								v-if="hasMixin(character, HasMerits)"
 								:character="character"
 								:abilities="character.merits"
 								abilityName="Merits"
 								id="merits"
 								class="block"
 								:min="10"
+								@select="selectTrait"
 							/>
 
 							<span v-if="(character instanceof WerewolfCharacter)">
@@ -212,7 +225,7 @@
 									:mutable="true"
 									:min="4"
 								/>
-		
+
 								<div class="block">
 									<h3 class="separator col-sm-12">Hunter's Aspect</h3>
 									<input class="line w-100" type="text" v-model="character.huntersAspect" />
@@ -253,29 +266,25 @@
 									<br />
 								</span>
 								<span style="float: left; margin-right: 5px">{{ $t("character.trait.beats") }}:</span>
-								<div style="float: left; margin-right: 10px">
-									<!-- <span v-for="n in 5" :key="n">
-										<button
-											class="sheet-box"
-											@click="setTrait('beats', n)"
-											:class="{
-												'sheet-dot-full':
-													character.beats >= n
-											}"
-										></button>
-									</span> -->
-									<sheet-dots v-model.number="character.beats" :boxes="true" @update:modelValue="updateBeats()" />
-								</div>
-								<span style="clear: both"></span>
-								<br />
-								{{ $t("character.trait.experience") }}:
-								<input
-									v-model.number="character.experience"
-									type="number"
-								/>
+								<span v-if="hasMixin(character, EarnsBeats)">
+									<div style="float: left; margin-right: 10px">
+										<sheet-dots
+											v-model.number="character.beats"
+											:boxes="true"
+											@update:modelValue="updateBeats()"
+										/>
+									</div>
+									<!-- <span style="clear: both"></span> -->
+									<br />
+									{{ $t("character.trait.experience") }}:
+									<input
+										v-model.number="character.experience"
+										type="number"
+									/>
+								</span>
 								<br />
 								<div
-									v-if="
+									v-if="hasMixin(character, EarnsAlternativeBeats) &&
 										character.splat.alternateBeatName &&
 										character.splat.alternateBeatDefault
 									"
@@ -286,59 +295,42 @@
 										}}:
 									</span>
 									<div style="float: left">
-										<span v-for="n in 5" :key="n">
-											<button
-												class="sheet-box"
-												@click="
-												setTrait(
-													'alternateBeats',
-													n
-												)
-												"
-												:class="{
-													'sheet-dot-full':
-														character.alternateBeats >=
-														n
-												}"
-											></button>
-										</span>
+										<sheet-dots
+											v-model.number="character.alternateBeats"
+											:boxes="true"
+											@update:modelValue="updateBeats(true)"
+										/>
 									</div>
 									<span style="clear: both"></span>
 									<br />
 									{{
 										$t(character.splat.alternateBeatName, { x: $t("character.trait.experience") })
 									}}:
-									<input
-										v-model.number="
-											character.alternateExperience
-										"
-										type="number"
-									/>
+									<input v-model.number="character.alternateExperience" type="number"/>
 									<br />
 								</div>
 							</div>
 						</div>
-						<div class="col col-sm-5" style="padding-right: 30px">
+						<div class="col col-sm-5" >
 							<health-component
 								id="health"
 								class="col-12 block"
 								:name="$t('character.trait.health')"
 								v-model:healthTrack="character.healthTrack"
 								:maxHealth="character.maxHealth"
-								:woundPenalty="character.woundPenalty"
+								:woundPenalty="hasMixin(character, HasWoundPenalties) ? character.woundPenalty : 0"
 							>
 								<!-- <i class="subtitle" style="margin-bottom: 5px" v-if="character.splat === EnumSplat.WEREWOLF">(EEE)</i> -->
 							</health-component>
-
 
 							<willpower-component id="willpower" :character="character" class="col-12 block" />
 							<!-- </willpower-component> -->
 							<!-- <div id="willpower" class="col-12 block">
 
-							</div> -->
+							</div>-->
 
 							<div
-								v-if="(character instanceof SupernaturalCharacter)"
+								v-if="hasMixin(character, IsSupernatural)"
 								class="col-12 block"
 								id="powerTrait"
 								style="text-align: center;"
@@ -349,17 +341,13 @@
 									}"
 									@click="selectTrait('power', character)"
 									class="separator col-sm-12"
+									style="white-space: nowrap"
 								>{{ $t(character.splat.powerTraitName) }}</h3>
 								<sheet-dots v-model.number="character.power" :maxValue="10" />
-
 							</div>
-							<div
-								v-if="(character instanceof SupernaturalCharacter)"
-								class="col-12 block"
-								id="fuelTrait"
-							>
+							<div v-if="hasMixin(character, HasFuel)" class="col-12 block" id="fuelTrait">
 								<h3 class="separator col-sm-12">{{ $t(character.splat.fuelTraitName) }}</h3>
-								<sheet-dots 
+								<sheet-dots
 									v-model="character.fuel"
 									:maxValue="character.maxFuel"
 									:boxes="true"
@@ -372,6 +360,7 @@
 								:character="character"
 								class="col-12 block"
 								id="integrityTrait"
+								@select="selectTrait"
 							/>
 
 							<div
@@ -445,29 +434,39 @@
 	</div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, readonly } from "vue";
+<script lang="ts" setup>
+import { computed, defineComponent, onBeforeMount, reactive, readonly, Ref, unref, watch } from "vue";
 import { encode, decode } from "base2048";
 import { Buffer } from "buffer";
 
-import { useStore } from "../store";
+import { key, useStore } from "../store";
+import { useRouter, useRoute } from 'vue-router'
+
+import { hasMixin } from "ts-mixer";
 
 import {
-	Character,
-	MortalCharacter,
-	SupernaturalCharacter,
-	VampireCharacter,
-	WerewolfCharacter,
-	Ability,
 	ATTRIBUTES,
 	Attributes,
 	MageCharacter,
 	SKILLS,
-	SPLATS,
-	Splat,
 	EnumSplat,
-	createCharacter,
-	Form,
+	fromJSON,
+
+	Character,
+
+	MortalCharacter,
+	VampireCharacter,
+	WerewolfCharacter,
+
+	HasWoundPenalties,
+	HasVirtueViceAnchors,
+	IsSupernatural,
+	HasFuel,
+	EarnsBeats,
+	EarnsAlternativeBeats,
+	HasOrganization,
+	HasLegacy,
+	HasMerits
 } from "../definitions";
 
 import AbilityList from "../components/sheetComponents/AbilityList.vue";
@@ -491,267 +490,193 @@ import SpellCalculator from "../components/sheetComponents/SpellCalculator.vue";
 
 import { DiceRoller } from "../DiceRoller";
 import { v4 as uuidv4 } from "uuid";
+// import { SupernaturalCharacter } from "@/definitions/Character";
+// import { get, set } from "lodash";
+// import g from "../i18n";
+// const { te } = g.global;
+import { useI18n } from "vue-i18n";
 
+const { t, te } = useI18n();
 
-import g from "../i18n";
-const { te } = g.global;
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
 
-export default defineComponent({
-	name: "CharacterView",
-	components: {
-		AbilityList,
-		HealthComponent,
-		IntegrityComponent,
-		WillpowerComponent,
-		ItemList,
-		SheetDots,
-		// ObjectList,
-		DiceRoller: DiceRollerComponent,
-		// ModalComponent,
-		// SpellCalculator,
-		FloatingActionMenu,
+const roller = new DiceRoller();
 
-		SkillSidebar,
+const characters = computed(() => store.state.characters);
 
-		WerewolfTraits,
-		MageTraits
-		// "fab": fab
-	},
-	computed: {
-		id(): string {
-			return this.$route.params.id as string;
-		},
-		characters(): { [key: string]: Character } {
-			return this.store.state.characters;
-		},
-		baseAttributes: {
-			get(): Attributes {
-				return this.character.data.get("attributes") as Attributes;
-			},
-			set(val: Attributes) {
-				this.character.data.set("attributes", val);
-			}
-		},
-		subType: {
-			get(): string {
-				return this.character.data.get("subType") as string;
-			},
-			set(val: string) {
-				this.character.data.set("subType", val);
-			}
-		},
-		organization: {
-			get(): string {
-				return this.character.data.get("organization") as string;
-			},
-			set(val: string) {
-				this.character.data.set("organization", val);
-			}
-		},
-		virtueAnchor: {
-			get(): string {
-				const x = (this.character.splat.virtueAnchor || (() => ""))(this.character.virtueAnchor);
-				return te(x) ? this.$t(x) : this.character.virtueAnchor;
-			},
-			set(val: string) {
-				// const x = (this.character.splat.virtueAnchor || (() => ""))(val);
+const id = computed(() => route.params.id as string);
 
-				this.character.virtueAnchor = val;
-			}
-		},
-		viceAnchor: {
-			get(): string {
-				const x = (this.character.splat.viceAnchor || (() => ""))(this.character.viceAnchor);
-				return te(x) ? this.$t(x) : this.character.viceAnchor;
-			},
-			set(val: string) {
-				// const x = (this.character.splat.viceAnchor || (() => ""))(val);
+const CACHE: {
+	[key: string]: Character
+} = {};
 
-				this.character.viceAnchor = val;
-			}
-		},
+const character = computed(() => {
+	let data = characters.value[id.value];
 
-		dotAttrMax() {
-			return Math.min(
-				this.attrMax,
-				this.dotsOverFive ? 10 : 5
-			);
-		},
-		attrMax() {
-			if (this.character instanceof SupernaturalCharacter) {
-				return this.character.power > 5
-					? this.character.power
-					: 5;
-			}
-			return 5;
-		},
-		dotsOverFive() {
-			return false;
+	if (CACHE[id.value]) {
+		return CACHE[id.value];
+	}
+
+	if (!data && route.query.data) {
+		let routeData = route.query.data as string;
+
+		data = JSON.parse(decodeURI(routeData));
+	}
+
+	const obj = reactive(fromJSON(data));
+	
+	if (!route.query.data)
+		CACHE[id.value] = obj as any;
+
+	return obj;
+});
+
+let flag = true;
+watch(() => character.value, (val) => {
+	if (route.query.data) return;
+	console.log("UPDATE");
+	if (flag) {
+		flag = false;
+		if (id.value)
+			store.commit("UPDATE_CHARACTER", { id: id.value, val });
+	} else {
+		flag = true;
+	}
+}, { deep: true });
+
+onBeforeMount(() => {
+	Object.assign(window, {
+		character, roller
+	});
+});
+
+const virtueAnchor = computed({
+	get(): string {
+		if (hasMixin(character.value, HasVirtueViceAnchors)) {
+			const x = (character.value.splat.virtueAnchor || (() => ""))(character.value.virtueAnchor);
+			return te(x) ? t(x) : character.value.virtueAnchor;
 		}
+		return "";
 	},
-	methods: {
-		async rollTest() {
-			const results = [] as string[][];
+	set(val: string) {
+		if (hasMixin(character.value, HasVirtueViceAnchors)) {
+			const x = (character.value.splat.virtueAnchor || (() => ""))(val.toLowerCase());
 
-			const maxTarget = 12;
-			const maxDice = 15;
-
-			const rollIterations = 5;
-
-			for (let dice = 1; dice <= maxDice; dice++) {
-				for (let target = 1; target <= maxTarget; target++) {
-					// const succArr = [];
-					// for (let i = 0; i < 10; i++) {
-					let succs = 0;
-					for (let j = 0; j < rollIterations; j++) {
-						const suc = await this.roller.roll(dice, {} as any);
-
-						if (suc >= target) {
-							succs++;
-						}
-					}
-					// succArr.push(succs/target);
-					// }
-					if (!results[dice - 1]) results[dice - 1] = [];
-					// results[dice-1][target-1] = succArr.reduce((prev, val) => prev+val) / 10;
-					results[dice - 1][target - 1] = (
-						(succs / rollIterations / target) *
-						100
-					).toFixed(2);
-				}
-			}
-			return results;
-		},
-		async rollSelected(opts: any) {
-			const vals = Object.values(this.store.state.selectedTraits).map(el => el());
-			if (vals.length === 0) return 0;
-
-			const dice = vals.reduce((prev, val) => prev + val);
-
-			const result = await this.roller.roll(dice, opts);
-
-			alert(`Rolled ${dice} dice, got ${result} successes`);
-		},
-		selectTrait(
-			name: string,
-			obj: any
-		) {
-			if (obj[name] !== undefined && typeof (obj[name].level || obj[name]) === "number") {
-				if (this.store.state.selectedTraits[name] !== undefined) {
-					this.store.commit("UNSELECT_TRAIT", name);
-				} else if (name) {
-					if (Object.keys(this.store.state.selectedTraits).length === 3) {
-						this.store.commit("UPDATE_SELECTED", {});
-					}
-
-					this.store.commit({
-						type: "SELECT_TRAIT",
-						name,
-						value: () => obj[name] && typeof obj[name].level === "number" ? obj[name].level : obj[name]
-					});
-				}
-			}
-		},
-		setTrait(
-			trait: string,
-			val: number,
-			opts?: { off?: number; min?: number }
-		) {
-			const character: any = this.character;
-
-			let { off, min } = opts || {};
-
-			off = off || 1;
-			min = min || 0;
-
-			character[trait] = character[trait] === val ? val - off : val;
-			character[trait] = Math.max(min, character[trait]);
-		},
-		updateBeats(alt = false) {
-			if (!alt && this.character.beats) {
-				if (this.character.beats === 5) {
-					this.character.beats = 0;
-					this.character.experience++;
-				}
-			} else if (this.character.alternativeBeats) {
-				if (this.character.alternativeBeats === 5) {
-					this.character.alternativeBeats = 0;
-					this.character.alternativeExperience++;
-				}
-			}
-		},
-		exportCharacter() {
-			if (navigator.clipboard) {
-				const txt = encodeURI(JSON.stringify(this.character.getData()));
-
-				navigator.clipboard.writeText(`${document.location.origin+document.location.pathname}#/character/?data=${txt}`);
-			}
-		},
-		importCharacter() {
-			const data = JSON.parse(decodeURI(this.$route.query.data));
-
-			data.id = uuidv4();
-
-			this.store.commit("UPDATE_CHARACTER", {
-				id: data.id,
-				val: data
-			});
-
-			this.$router.push({name:"character", params: {id: data.id}});
-		}
-	},
-	data: () => ({
-		store: useStore(),
-
-		character: undefined as unknown as Character,
-
-		// random: new Random(),
-		roller: new DiceRoller(),
-
-		skillCats: { mental: -3, physical: -1, social: -1 } as {
-			[index: string]: number;
-		},
-		flag: true,
-
-		EnumSplat,
-		ATTRIBUTES,
-		skills: SKILLS,
-		MortalCharacter,
-		MageCharacter,
-		VampireCharacter,
-		SupernaturalCharacter,
-		WerewolfCharacter
-	}),
-	beforeMount() {
-		(window as any).vue = this;
-
-		let data = this.characters[this.id];
-
-		if (!data && this.$route.query.data) {
-			let routeData = this.$route.query.data as string;
-
-			data = JSON.parse(decodeURI(routeData));
-		}
-
-		this.character = createCharacter(data);
-	},
-	watch: {
-		character: {
-			deep: true,
-			handler(val) {
-				if (this.$route.query.data) return;
-				console.log("UPDATE");
-				// if (this.flag) {
-				// this.flag = false;
-				this.store.commit("UPDATE_CHARACTER", { id: this.id, val: val.getData() });
-				// } else {
-				// this.flag = true;
-				// }
+			if (character.value.splat.virtueAnchors.includes(x)) {
+				character.value.virtueAnchor = val.toLowerCase();
+			} else {
+				character.value.virtueAnchor = val;
 			}
 		}
 	}
-
 });
+
+const viceAnchor = computed({
+	get(): string {
+		if (hasMixin(character.value, HasVirtueViceAnchors)) {
+			const x = (character.value.splat.viceAnchor || (() => ""))(character.value.viceAnchor);
+			return te(x) ? t(x) : character.value.viceAnchor;
+		}
+		return "";
+	},
+	set(val: string) {
+		if (hasMixin(character.value, HasVirtueViceAnchors)) {
+			const x = (character.value.splat.viceAnchor || (() => ""))(val.toLowerCase());
+
+			if (character.value.splat.viceAnchors.includes(x)) {
+				character.value.viceAnchor = val.toLowerCase();
+			} else {
+				character.value.viceAnchor = val;
+			}
+		}
+	}
+});
+
+const baseAttributes = computed({
+	get(): Attributes {
+		return character.value._attributes;
+	},
+	set(val: Attributes) {
+		character.value._attributes = val;
+	}
+})
+
+const dotsOverFive = computed(() => false);
+
+const dotAttrMax = computed(() => Math.min(
+	attrMax.value,
+	dotsOverFive.value ? 10 : 5
+));
+
+const attrMax = computed(() => hasMixin(character.value, IsSupernatural) ?
+	character.value.power > 5 ?
+		character.value.power : 5
+	: 5
+);
+
+async function rollSelected(opts: any) {
+	const vals = Object.values(store.state.selectedTraits).map(el => el());
+	if (vals.length === 0) return 0;
+
+	const dice = vals.reduce((prev, val) => prev + val);
+	const result = await roller.roll(dice, opts);
+
+	alert(`Rolled ${dice} dice, got ${result} successes`);
+}
+
+function selectTrait(name: string, obj: any) {
+	if (obj[name] !== undefined && typeof (obj[name].level || obj[name]) === "number") {
+		if (store.state.selectedTraits[name] !== undefined) {
+			store.commit("UNSELECT_TRAIT", name);
+		} else if (name) {
+			if (Object.keys(store.state.selectedTraits).length === 3) {
+				store.commit("UPDATE_SELECTED", {});
+			}
+
+			store.commit({
+				type: "SELECT_TRAIT",
+				name,
+				value: () => obj[name] && typeof obj[name].level === "number" ? obj[name].level : obj[name]
+			});
+		}
+	}
+}
+
+function updateBeats(alt = false) {
+	if (!alt && hasMixin(character.value, EarnsBeats)) {
+		if (character.value.beats === 5) {
+			character.value.beats = 0;
+			character.value.experience++;
+		}
+	} else if (hasMixin(character.value, EarnsAlternativeBeats)) {
+		if (character.value.alternateBeats === 5) {
+			character.value.alternateBeats = 0;
+			character.value.alternateExperience++;
+		}
+	}
+}
+
+function exportCharacter() {
+	if (navigator.clipboard) {
+		const txt = encodeURI(JSON.stringify(character));
+
+		navigator.clipboard.writeText(`${document.location.origin + document.location.pathname}#/character/?data=${txt}`);
+	}
+}
+function importCharacter() {
+	const data = JSON.parse(decodeURI(route.query.data as string));
+
+	data.id = uuidv4();
+
+	store.commit("UPDATE_CHARACTER", {
+		id: data.id,
+		val: data
+	});
+
+	router.push({ name: "character", params: { id: data.id } });
+}
 </script>
 
 <style lang="scss">
@@ -840,7 +765,8 @@ input:focus {
 	// margin-bottom: 15px;
 }
 
-.attr-proper, #skills {
+.attr-proper,
+#skills {
 	.sheet-dots {
 		float: right;
 	}

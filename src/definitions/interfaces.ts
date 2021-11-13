@@ -36,3 +36,35 @@ export interface Armor {
 	general: number;
 	ballistic: number;
 }
+
+export interface FormMods {
+	intelligenceMod: number;
+	witsMod: number;
+	resolveMod: number;
+
+	strengthMod: number;
+	dexterityMod: number;
+	staminaMod: number;
+
+	presenceMod: number;
+	manipulationMod: number;
+	composureMod: number;
+
+	sizeMod: number;
+	speedMod: number;
+
+	perceptionMod: number;
+
+	defenseCalcMax?: boolean;
+	defenseMod?: number;
+
+	armorMod: Armor;
+}
+
+export interface Form extends FormMods {
+	name: string;
+	desc: string;
+	traits: string[];
+
+	[index: string]: any;
+}

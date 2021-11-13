@@ -1,14 +1,18 @@
 import { Mixin, hasMixin } from 'ts-mixer';
 import {
-	BaseCharacter, HasIntegrity,
+	BaseCharacter,
+	HasIntegrity,
+	HasLegacy,
+	HasOrganization,
+	HasTouchstones,
+	HasVirtueViceAnchors,
 } from ".";
-import { EnumSplat } from "..";
+import { EnumSplat, Splat } from "..";
 
 import {SupernaturalWithFuel} from "./SupernaturalWithFuel";
 
-export class VampireCharacter extends Mixin(BaseCharacter, SupernaturalWithFuel, HasIntegrity) { 
+export class VampireCharacter extends Mixin(BaseCharacter, SupernaturalWithFuel, HasIntegrity, HasVirtueViceAnchors, HasOrganization, HasLegacy, HasTouchstones) { 
 	constructor() {
-		super();
-		this._splat = EnumSplat.VAMPIRE;
+		super(EnumSplat.VAMPIRE);
 	}
 }

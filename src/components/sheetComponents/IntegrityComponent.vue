@@ -1,6 +1,6 @@
 <template>
 	<health-component
-		v-if="integrityTrackType === 'healthTrack'"
+		v-if="hasMixin(character, HasIntegrityHealth)"
 		:maxMarkValue="2"
 		:maxHealth="character.integrityTrait"
 		:healthTrack="character.integrityTrack"
@@ -12,13 +12,16 @@
 			<!-- eslint-disable-next-line vue/no-mutating-props -->
 			<input class="line" @input="doInput(1)" v-model="touchstonesTemp[0].name" />
 		</div>
-		<h3 class="separator">{{ $t(character.splat.integrityTraitName) }}</h3>
-		<div class="sheet-dots" style="margin-top:-10px;">
+		<h3 class="separator" 
+			:class="{ 'selected': store.state.selectedTraits['integrityTrait'] }"
+			@click="$emit('select', 'integrityTrait', character)"
+		>{{ $t(character.splat.integrityTraitName) }}</h3>
+		<div class="sheet-dots">
 			<span v-for="n in items" :key="n">
 				<button
 					class="sheet-dot"
-					@click="$parent.setTrait('integrityTrait', n)"
-					:class="{ 'sheet-dot-full': character.integrityTrait >= n }"
+					@click="integrity = n"
+					:class="{ 'sheet-dot-full': integrity >= n }"
 				></button>
 				<span v-if="integrityTrackType === 'verticalTouchstoneTrack'">
 					<!-- <input class="line" @input="doInput(n)" v-if="character.touchstones[n-1]" v-model="character.touchstones[n-1].name"> -->
@@ -46,8 +49,11 @@
 import HealthComponent from "./HealthComponent.vue";
 import SheetDots from "./SheetDots.vue";
 
+import { useStore } from "../../store";
+
 import { defineComponent, PropType } from "vue";
-import { Character } from "../../definitions";
+import { Character, HasIntegrity, HasTouchstones, HasIntegrityHealth } from "../../definitions";
+import { hasMixin } from "ts-mixer";
 export default defineComponent({
 	name: "IntegrityComponent",
 	components: {
@@ -57,17 +63,19 @@ export default defineComponent({
 	props: {
 		"character": {
 			required: true,
-			type: Object as PropType<Character>
+			type: Object as PropType<Character & HasIntegrity>
 		}
 	},
 	data() {
 		return {
-			// tmpVals: []
+			store: useStore(),
+			HasIntegrityHealth
 		};
 	},
 	methods: {
+		hasMixin,
 		doInput(n: number) {
-			if ('touchstones' in this.character) {
+			if (hasMixin(this.character, HasTouchstones)) {
 				if (this.character.touchstones[n - 1] != this.touchstonesTemp[n - 1]) {
 					this.character.touchstones[n - 1] = this.touchstonesTemp[n - 1];
 				}
@@ -90,9 +98,13 @@ export default defineComponent({
 		touchstonesTemp() {
 			const arr: string[] = [];
 
-			(this.integrityTrackType !== "dualTouchstone" ? this.items : [1, 2]).forEach((el, i) => {
-				arr[i] = this.character.touchstones[i] || { name: "" };
-			});
+			const items = this.integrityTrackType !== "dualTouchstone" ? this.items : [1, 2];
+
+			if (hasMixin(this.character, HasTouchstones)) {
+				items.forEach((el, i) => {
+					arr[i] = this.character.touchstones[i] || { name: "" };
+				});
+			}
 
 			return arr;
 		},
@@ -100,6 +112,14 @@ export default defineComponent({
 			return typeof this.character.splat.integrityTrackType === "string" ?
 				this.character.splat.integrityTrackType :
 				this.character.splat.integrityTrackType.type;
+		},
+		integrity: {
+			get(): number {
+				return this.character.integrityTrait;
+			},
+			set(val: number) {
+				this.character.integrityTrait = this.integrity === val ? val-1 : val;
+			}
 		}
 	},
 	watch: {

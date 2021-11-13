@@ -7,10 +7,8 @@
 			class="col-sm"
 		>
 			<h4
-				@click="character.data.set('currentForm', key)"
-				:class="{
-					'form-active': character.data.get('currentForm') === key
-				}"
+				@click="(character._currentForm = key)"
+				:class="character._currentForm === key ? 'form-active' : ''"
 				class="separator col-sm-12"
 			>{{ form.name }}</h4>
 			<i class="subtitle">({{ $t(form.desc) }})</i>
@@ -245,8 +243,6 @@ export default defineComponent({
 			return num !== 0 ? `(${num > 0 ? "+" : ""}${num})` : "";
 		},
 		formDefense(form: Form) {
-			if (!(this.character instanceof WerewolfCharacter)) return 0;
-
 			return (
 				(form.defenseCalcMax ? Math.max : Math.min)(
 					this.character.attributes.dexterity -
@@ -256,16 +252,14 @@ export default defineComponent({
 					this.character.currentForm.witsMod +
 					form.witsMod
 				) +
-				(this.character.skills.athletics || 0) +
-				(this.character.mod("defense") -
-					(this.character.currentForm.defenseMod || 0) +
-					(form.defenseMod || 0))
+				(this.character.skills.athletics || 0) + (form.defenseMod || 0)
+				// (//this.character.mod("defense")
+					// (this.character.currentForm.defenseMod || 0) +
+					// (form.defenseMod || 0))
 			);
 			// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
 		},
 		formDefenseMod(form: Form) {
-			if (!(this.character instanceof WerewolfCharacter)) return 0;
-
 			const hishu = this.character.forms["hishu"];
 			let sub = 0;
 

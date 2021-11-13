@@ -87,6 +87,7 @@ export default defineComponent({
 	},
 	watch: {
 		maxHealth() {
+			console.log("UPD maxHealth")
 			if (this.healthTrack.length < this.maxHealth) {
 				for (let iii = this.healthTrack.length; iii < this.maxHealth; iii++) {
 					this.healthTrack.push(0);

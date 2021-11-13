@@ -12,7 +12,7 @@ export enum EnumSplat {
 
 export interface Splat {
 	enum: EnumSplat;
-	characterFactory: new (opts: any) => Character;
+	characterFactory: new (...opts: any) => Character;
 
 	name: string;
 

@@ -17,7 +17,7 @@
 				<span
 					class="line col-7"
 					:class="{ 'selected': store.state.selectedTraits[key] }"
-					@click="$parent.selectTrait(key, abilities)"
+					@click="$emit('select', key, abilities)"
 				>
 					<input
 						v-if="optionsMutable && ability.name || key === 'NEW'"
@@ -95,6 +95,7 @@ export default defineComponent({
 	components: {
 		SheetDots
 	},
+	emits: ["select"],
 	props: {
 		"character": {
 			required: true,
