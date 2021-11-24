@@ -136,6 +136,10 @@ export class WerewolfCharacter extends Mixin(BaseCharacter, WerewolfInit, Supern
 			this.abilities.purity.level : 0);
 	}
 
+	get woundPenalty(): number {
+		return this._currentForm === "gauru" ? 0 : super.woundPenalty;
+	}
+
 	kuruthTriggers: { passive: string; common: string; specific: string; } = {
 		passive: "",
 		common: "",
