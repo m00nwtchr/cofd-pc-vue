@@ -3,7 +3,7 @@ import { Mixin, settings, hasMixin } from 'ts-mixer';
 import { reactive } from 'vue';
 settings.initFunction = "init";
 
-import { Ability, Merit, Organization, SKILLS, Skills, SubType } from "..";
+import { Ability, Merit, MERITS, Organization, SKILLS, Skills, SubType } from "..";
 
 import { Character, ICharacter } from ".";
 
@@ -93,9 +93,25 @@ export class HasIntegrityHealth {
 	integrityTrack: number[] = [];
 }
 
-export interface HasMerits extends Character {}
+export interface HasMerits extends Character { }
 export class HasMerits {
-	merits: { [key: string]: Ability } = {};
+
+	_merits: { [key: string]: Ability | Merit } = {};
+	get merits(): { [key: string]: Ability | Merit } {
+		Object.entries(this._merits).forEach(([key, value]) => {
+			const meritKey = key.includes("(") ? key.substr(0, key.indexOf("(") - 1) : key;
+
+			const m = MERITS[meritKey];
+
+			if (m && !(this._merits[key] instanceof m)) {
+				this._merits[key] = new m(this, value);
+			}
+		});
+
+		return this._merits;
+	}
+
+	// merits: { [key: string]: Ability } = {};
 
 	get meritTraitMods(): { [key: string]: number } {
 		const obj = Object.values(this.merits)
@@ -122,9 +138,24 @@ export class HasMerits {
 	set size(val: number) {
 		this._size = val - (this.meritTraitMods.size || 0);
 	}
+
+	protected init() {
+		if (hasMixin(this, JSONMixin)) {
+			const funcs = (this as JSONMixin).toJSONFuncs;
+			function f(this: any) {
+				if (this._merits) {
+					this.merits = this._merits;
+					delete this._merits;
+				}
+				return this;
+			}
+
+			funcs["HasMerits"] = f;
+		}
+	}
 }
 
-export interface IsSupernatural extends Character {}
+export interface IsSupernatural extends Character { }
 export class IsSupernatural {
 
 	_subType: string = "";
@@ -207,7 +238,7 @@ interface IHasHealth {
 	maxHealth: number;
 }
 
-export interface HasWoundPenalties extends IHasHealth {}
+export interface HasWoundPenalties extends IHasHealth { }
 export class HasWoundPenalties {
 	get woundPenalty(): number {
 		return Math.min((this.healthTrack[this.maxHealth - 1] !== 0 ?
@@ -217,7 +248,7 @@ export class HasWoundPenalties {
 	}
 }
 
-export interface HasOrganization extends ICharacter {}
+export interface HasOrganization extends ICharacter { }
 export class HasOrganization {
 	_organization: string = "";
 

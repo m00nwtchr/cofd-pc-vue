@@ -36,10 +36,10 @@
 								form[attr + "Mod"]
 						}}
 					</span>
-					<br>
+					<br />
 				</span>
 
-				<br>
+				<br />
 				{{
 					$t("character.trait.size")
 				}}
@@ -56,7 +56,7 @@
 						character.size - character.currentForm.sizeMod + form.sizeMod
 					}}
 				</span>
-				<br>
+				<br />
 				{{
 					$t("character.trait.defense")
 				}}
@@ -64,7 +64,7 @@
 				-->
 				{{ formatNum(formDefenseMod(form)) }}:
 				<span class="default-font">{{ formDefense(form) }}</span>
-				<br>
+				<br />
 				{{
 					$t("character.trait.initative")
 				}}
@@ -89,7 +89,7 @@
 							form.composureMod
 					}}
 				</span>
-				<br>
+				<br />
 
 				<!-- Armor: <input v-model="character.armor" /><br> -->
 				{{
@@ -111,7 +111,7 @@
 							form.speedMod
 					}}
 				</span>
-				<br>
+				<br />
 				{{ $t("character.trait.armor") }}:
 				<span class="default-font">
 					{{
@@ -123,7 +123,7 @@
 							form.armorMod.ballistic}`
 					}}
 				</span>
-				<br>
+				<br />
 				{{
 					$t("character.trait.perception")
 				}}
@@ -139,7 +139,7 @@
 							form.perceptionMod
 					}}
 				</span>
-				<br>
+				<br />
 
 				<span v-if="form.name === 'Gauru'">
 					Kuruth Limit:
@@ -151,11 +151,11 @@
 						}}
 					</span>
 				</span>
-				<br>
+				<br />
 
 				<div style="line-height: 15px" class="form-traits">
 					<span v-for="(trait, i) in form.traits" :key="i">
-						<br>
+						<br />
 						<i class="subtitle">{{ trait }}</i>
 					</span>
 				</div>
@@ -170,44 +170,39 @@
 		<div class="col-sm-8">
 			<h2 class="separator col-sm-12" style="margin-bottom: 20px;">Gifts and Rites</h2>
 
-			<div class="row" style="margin-bottom: 10px">
-				<ability-list
-					class="col-12"
-					:character="character"
-					:abilities="character.moonGifts"
-					abilityName="Moon Gifts"
-					translationKey="splat.werewolf.gift.moon."
-					:optionsMutable="true"
-					:length="2"
-					:horizontal="true"
+			<ability-list
+				class="col-12 block"
+				:character="character"
+				:abilities="character.moonGifts"
+				abilityName="Moon Gifts"
+				translationKey="splat.werewolf.gift.moon."
+				:optionsMutable="true"
+				:length="2"
+				:horizontal="true"
+			/>
+			<div class="row col-sm-12 block">
+				<item-list
+					class="col-sm-6"
+					name="Shadow Gifts"
+					:items="character.shadowGifts"
+					:mutable="true"
+					:min="Math.max(character.shadowGifts.length, character.wolfGifts.length) + 1"
+				/>
+				<item-list
+					class="col-sm-6"
+					name="Wolf Gifts"
+					:items="character.wolfGifts"
+					:mutable="true"
+					:min="Math.max(character.shadowGifts.length, character.wolfGifts.length) + 1"
 				/>
 			</div>
-			<div class="row col-sm-12">
-				<div class="col-sm-6">
-					<h4 class="separator">Shadow Gifts</h4>
-					<item-list 
-						class="col-12" 
-						:items="character.shadowGifts" 
-						:mutable="true"
-
-						:min="Math.max(character.shadowGifts.length, character.wolfGifts.length)+1"
-					/>
-				</div>
-				<div class="col-sm-6">
-					<h4 class="separator">Wolf Gifts</h4>
-					<item-list 
-						class="col-12" 
-						:items="character.wolfGifts" 
-						:mutable="true" 
-					
-						:min="Math.max(character.shadowGifts.length, character.wolfGifts.length)+1"
-					/>
-				</div>
-			</div>
-			<div class="row col-sm-12">
-				<h4 class="separator">Rites</h4>
-				<item-list class="col-12" :items="character.rites" :mutable="true" :cols="2" />
-			</div>
+			<item-list 
+				class="col-12" 
+				name="Rites"
+				:items="character.rites" 
+				:mutable="true" 
+				:cols="2" 
+			/>
 		</div>
 	</div>
 </template>
@@ -254,8 +249,8 @@ export default defineComponent({
 				) +
 				(this.character.skills.athletics || 0) + (form.defenseMod || 0)
 				// (//this.character.mod("defense")
-					// (this.character.currentForm.defenseMod || 0) +
-					// (form.defenseMod || 0))
+				// (this.character.currentForm.defenseMod || 0) +
+				// (form.defenseMod || 0))
 			);
 			// return (this as any).character.defense - (this as any).currentForm.dexterityMod + form.dexterityMod;
 		},

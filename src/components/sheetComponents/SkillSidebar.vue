@@ -8,14 +8,16 @@
 					$t(`character.cat.${Object.keys(skillCats)[i]}`)
 				}}
 			</h3>
-			<i class="col-12 subtitle">({{ Object.values(skillCats)[i] }} unskilled)</i>
 
-			<div
-				style="font-style: italic; font-size: 10px; line-height: 10px;"
-				v-if="(character instanceof MageCharacter)"
-			>
-				Rote<br>
-				Skill
+			<div class="cat-subheader">
+				<span style="font-size:8pt;line-height:8pt;text-align:left;width:33.33333%;">
+					<span v-if="(character instanceof MageCharacter)">
+					Rote<br>
+					Skill
+					</span>
+				</span>
+				<span style="font-size:10pt;text-align:center;width:33.33333%;">({{ Object.values(skillCats)[i] }} unskilled)</span>
+				<span style="width:33.33333%;"></span>
 			</div>
 
 			<div style="text-transform: capitalize" v-for="skill in cat" :key="skill">
@@ -45,8 +47,6 @@
 
 				<button class="dropdown-toggle material-icons" @click="specialtyDropDown(skill)">
 					<font-awesome-icon icon="caret-down" v-if="specialtyDropSelect === skill"/>
-					<!-- arrow_drop_down</span> -->
-					<!-- <span v-else>arrow_right</span> -->
 					<font-awesome-icon icon="caret-right" v-else />
 				</button>
 
@@ -65,8 +65,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { Character, MageCharacter, EnumSplat, ATTRIBUTES, SKILLS } from "../../definitions";
+import { defineComponent, PropType } from "vue";
+import { Character, MageCharacter, EnumSplat, ATTRIBUTES, SKILLS, HasSkills } from "../../definitions";
 
 import { useStore } from "../../store";
 
@@ -83,7 +83,7 @@ export default defineComponent({
 	props: {
 		"character": {
 			required: true,
-			type: Object
+			type: Object as PropType<Character & HasSkills>
 		}
 	},
 	data: () => ({
@@ -91,7 +91,7 @@ export default defineComponent({
 
 		SKILLS, ATTRIBUTES, EnumSplat,
 		skillCats: { mental: -3, physical: -1, social: -1 } as {
-			[index: string]: number;
+			[key: string]: number;
 		},
 		specialtyDropSelect: null as string | null,
 		MageCharacter
@@ -117,14 +117,12 @@ export default defineComponent({
 			}
 		},
 		setSkill(attr: string, val: number) {
-			const character = this.character as Character;
-
-			if (!character.skills) character.skills = {};
+			if (!this.character.skills) this.character.skills = {};
 
 			// console.log(character.skills);
 
-			character.skills[attr] =
-				character.skills[attr] === val ? val - 1 : val;
+			this.character.skills[attr] =
+				this.character.skills[attr] === val ? val - 1 : val;
 			// console.log(character.skills);
 		},
 	},
@@ -137,6 +135,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.cat-subheader {
+	display: flex;
+	flex-flow: row wrap;
+	font-style: italic;
+	font-weight: normal;
+}
 .dropdown-toggle svg {
 	width: 7px;
 	margin-top: 3px;

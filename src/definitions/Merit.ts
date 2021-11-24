@@ -101,8 +101,6 @@ class FavoredFormMerit extends Merit {
 		this.form = ability.form || "";
 		this.physicalSkill = ability.physicalSkill || "";
 
-		console.log(ability.attribute);
-
 		if (ability.attribute)
 			this.attribute = ability.attribute;
 
@@ -442,7 +440,7 @@ function createTraitMerit(trait: string, maxLevel = 3, minLevel = 1, bonusMax?: 
 }
 
 
-export const MERITS: { [index: string]: new <T extends Merit>(character: Character, ability: T) => Merit } = {
+export const MERITS: { [index: string]: new (character: Character, ability: Ability) => Merit } = {
 	giant: GiantMerit,
 	small_framed: SmallFramedMerit,
 	defensive_combat: DefensiveCombatMerit,

@@ -68,7 +68,7 @@ const modal = ref<any>(null);
 let addModalOpen = ref(false);
 onMounted(() => {
 	Object.assign(window, all);
-})
+});
 
 const characters = computed(() => Object.entries(store.state.characters)
 	.map(el => [el[0], fromJSON(el[1])])
@@ -127,6 +127,11 @@ header {
 	list-style-type: none;
 
 	line-height: 16px;
+
+	$pad: 35px;
+
+	padding-left: $pad;
+	padding-right: $pad;
 
 	li {
 		display: block;

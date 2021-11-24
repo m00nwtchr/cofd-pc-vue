@@ -10,7 +10,7 @@ export interface ICharacter {
 
 	// concept: string;
 
-	attributes: Attributes;
+	readonly attributes: Attributes;
 
 	maxHealth: number;
 	healthTrack: number[];
@@ -43,7 +43,7 @@ export class Character implements ICharacter {
 		this._splat = typeof val === "number" ? val : val.enum;
 	}
 
-	name: string;
+	name: string = "";
 
 	_attributes!: Attributes;
 	set attributes(val: Attributes) {
@@ -72,14 +72,18 @@ export class Character implements ICharacter {
 	}
 
 	private _healthTrack: number[] = [];
-
 	get maxHealth() { return this.size + this.attributes.stamina; }
 	get healthTrack(): number[] {
 		const ogTrack = this._healthTrack || [];
 		const track = Object.assign(new Array(this.maxHealth || 0).fill(0), ogTrack);
 
 		if (this.maxHealth < track.length) {
-			const deleted = track.splice(this.maxHealth - 1, track.length - this.maxHealth);
+			const deleted = track.splice(this.maxHealth, track.length - this.maxHealth);
+			const leastI = track.indexOf(Math.min(...track));
+			deleted.forEach((el, i) => {
+				if (track[leastI+i] < 3)
+					track[leastI+i]++;
+			});
 		}
 
 		if (JSON.stringify(track) !== JSON.stringify(ogTrack)) {
@@ -93,13 +97,13 @@ export class Character implements ICharacter {
 	}
 
 	get maxWillpower() { return this.attributes.resolve + this.attributes.composure; }
-	willpower: number;
-	spentWillpowerDots: number;
+	willpower: number = 0;
+	spentWillpowerDots: number = 0;
 
-	conditions: string[];
-	aspirations: string[];
+	conditions: string[] = [];
+	aspirations: string[] = [];
 
-	_size!: number;
+	_size: number = 5;
 	get size(): number {
 		return this._size;
 	}
@@ -118,7 +122,6 @@ export class Character implements ICharacter {
 
 	constructor(splat?: EnumSplat | Splat) {
 		this.splat = splat || EnumSplat.MORTAL;
-		this.name = "";
 		this.attributes = {
 			intelligence: 1,
 			wits: 1,
@@ -130,15 +133,6 @@ export class Character implements ICharacter {
 			manipulation: 1,
 			composure: 1,
 		};
-
-		this.healthTrack = [];
-		this.willpower = 0;
-		this.spentWillpowerDots = 0;
-
-		this.conditions = [];
-		this.aspirations = [];
-
-		this.size = 5;
 	}
 
 	protected init(splat?: EnumSplat | Splat) {
@@ -196,7 +190,7 @@ export function fromJSON<T extends Character>(data: any, type?: Constructor<T>):
 		// let obj = Object.assign(new (type || Character))
 		// let obj = _.merge(new (type || Character)(data.splat), data);
 
-	// /	return obj;
+		// return obj;
 		return _.merge(new (type || Character)(data.splat), data);
 	}
 }
