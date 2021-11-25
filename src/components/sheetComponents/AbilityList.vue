@@ -21,7 +21,7 @@
 				>
 					<input
 						v-if="optionsMutable && ability.name || key === 'NEW'"
-						@input="doInput(ability, key, i)"
+						@change="doInput(ability, key, i)"
 						v-model="ability.name"
 						:list="datalistFilter ? abilityName + 'List' : ''"
 					/>
@@ -137,14 +137,15 @@ const props = defineProps({
 	}
 });
 
-const map = ref([] as [string, Ability | Merit][]);
 const meritOptionDropSelect = ref("");
 
-onMounted(() => {
-	Object.entries(props.abilities).forEach(el => {
-		// if (el[1].name)
-		map.value.push(el);
-	});
+const map = computed({
+	get() {
+		return Object.entries(props.abilities);
+	},
+	set(val: [string, Ability][]) {
+		emit("update:abilities", Object.fromEntries(val));
+	}
 });
 
 const visible = computed(() => {
@@ -172,18 +173,10 @@ const visible = computed(() => {
 	return arr;
 });
 
-const datalistFilter = computed(() => 
+const datalistFilter = computed(() =>
 	Object.keys(props.datalist || {})
 		.filter((el) => !props.abilities[el])
 		.map(el => props.datalist[el]));
-
-watch(map, (arr, prev) => {
-	arr.forEach((entry, i) => {
-		if (prev[i] !== entry) {
-			console.log("A");
-		}
-	});
-}, { deep: true });
 
 function setDots(ability: Ability, n: number) {
 	ability.level = (ability.level === n ? n - 1 : n);
@@ -192,11 +185,19 @@ function setDots(ability: Ability, n: number) {
 function doInput(ability: Ability, key: string, i: number) {
 	if (props.optionsMutable && ability) {
 		if (typeof ability.name === "string") {
-			map.value[i][0] = nameToKey(ability.name);
+			if (!map.value[i]) {
+				console.log("ADD");
+				map.value = [...map.value, [nameToKey(ability.name), ability]]
+				// map.value.push([nameToKey(ability.name), ability]);
+			} else {
+				map.value[i][0] = nameToKey(ability.name);
+				map.value = [...map.value];
+			}
 		}
 
 		if (!ability.name) {
 			map.value.splice(i, 1);
+			map.value = [...map.value];
 		}
 	}
 }

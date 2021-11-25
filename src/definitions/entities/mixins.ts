@@ -110,7 +110,9 @@ export class HasMerits {
 
 		return this._merits;
 	}
-
+	set merits(val: { [key: string]: Ability | Merit }) {
+		this._merits = val;
+	}
 	// merits: { [key: string]: Ability } = {};
 
 	get meritTraitMods(): { [key: string]: number } {
