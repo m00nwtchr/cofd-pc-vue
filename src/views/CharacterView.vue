@@ -197,7 +197,7 @@
 							<ability-list
 								v-if="hasMixin(character, IsSupernatural)"
 								:character="character"
-								:abilities="character.abilities"
+								v-model:abilities="character.abilities"
 								:optionsMutable="!character.splat.finiteAbilities"
 								:abilityName="$t(character.splat.abilityName)"
 								:datalist="character.splat.abilities"
@@ -209,7 +209,7 @@
 							<ability-list
 								v-if="hasMixin(character, HasMerits)"
 								:character="character"
-								:abilities="character.merits"
+								v-model:abilities="character.merits"
 								abilityName="Merits"
 								id="merits"
 								class="block"
@@ -534,7 +534,7 @@ const character = computed(() => {
 });
 
 let flag = true;
-watch(() => character.value, (val) => {
+watch(character, (val) => {
 	if (route.query.data) return;
 	console.log("UPDATE");
 	if (flag) {
