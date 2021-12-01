@@ -31,6 +31,7 @@ export interface State {
 	flag: boolean;
 	characters: { [key: string]: Character };
 	selectedTraits: { [index: string]: () => number };
+	creationMode: boolean;
 }
 
 abstract class AsyncStore<T> extends Store<T> {
@@ -50,7 +51,8 @@ export const store = createStore<State>({
 		flag: true,
 		characters: {},
 		selectedTraits: {},
-		debug: false
+		debug: false,
+		creationMode: false,
 	},
 	mutations: {
 		UPDATE_ENV(state, val) {
@@ -76,6 +78,15 @@ export const store = createStore<State>({
 			// Vue.set(state.selectedTraits, name, undefined);
 			delete state.selectedTraits[name];
 		},
+
+		CREATION_MODE(state, val) {
+			if (typeof val !== "undefined") {
+				state.creationMode = val;
+			} else {
+				state.creationMode = !state.creationMode;
+			}
+		},
+
 
 		// RESTORE_MUTATION: vuexPersist.RESTORE_MUTATION
 		RESTORE_MUTATION(state, savedState) {
