@@ -420,13 +420,26 @@
 		</div>
 
 		<div id="page-2">
+			<div class="block col-12">
+				<!-- <item-list 
+					class="col-12" 
+					name="Rites"
+					:items="[]" 
+					:mutable="true" 
+					:cols="3"
+				/> -->
+			</div>
+
+			<werewolf-traits 
+				v-if="(character instanceof WerewolfCharacter)" 
+				:character="character"
+			></werewolf-traits>
+
 			<mage-traits
 				v-if="(character instanceof MageCharacter)"
 				:character="character"
 				class="row col-12"
 			></mage-traits>
-
-			<werewolf-traits v-if="(character instanceof WerewolfCharacter)" :character="character"></werewolf-traits>
 
 			<div id="vampire-traits" v-if="(character instanceof VampireCharacter)" class="row col-12"></div>
 		</div>

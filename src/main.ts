@@ -59,7 +59,7 @@ app.use(store, key)
 
 const characters: { [index: string]: Character | any } = {
 	"488669fb-7e01-4ed7-b368-fbba0d37379a": {
-		"splat": 2,
+		"splat": EnumSplat.VAMPIRE,
 
 		"name": "Darren Webb",
 		"player": "m00n",
@@ -119,14 +119,14 @@ const characters: { [index: string]: Character | any } = {
 			"cacophony_savvy": { "name": "Cacophony Savvy", "level": 3 },
 			"fast-talking": { "name": "Fast-Talking", "level": 1 },
 			"professional_training": { "name": "Professional Training", "level": 2 },
+			"contacts": { "name": "Contacts", "level": 2 },
+			"safe_place": { "name": "Safe Place", "level": 3 },
+			"resources": { "name": "Resources", "level": 3 },
+			"nest_guardian": { "name": "Nest Guardian", "level": 3 },
 			"feeding_grounds": { "name": "Feeding Grounds", "level": 0 },
 			"sleight_of_hand": { "name": "Sleight of Hand", "level": 0 },
 			"striking_looks": { "name": "Striking Looks", "level": 0 },
 			"honey_trap": { "name": "Honey Trap", "level": 0 },
-			"safe_place": { "name": "Safe Place", "level": 3 },
-			"contacts": { "name": "Contacts", "level": 2 },
-			"resources": { "name": "Resources", "level": 3 },
-			"nest_guardian": { "name": "Nest Guardian", "level": 3 }
 		},
 
 		"spentWillpowerDots": 0,
@@ -136,7 +136,7 @@ const characters: { [index: string]: Character | any } = {
 		"experience": 1,
 	},
 	"88f0cd49-41d6-42cb-9c66-07214cc910f1": {
-		"splat": 0,
+		"splat": EnumSplat.MORTAL,
 
 		"name": "Guy",
 		"age": 40,
@@ -196,7 +196,7 @@ const characters: { [index: string]: Character | any } = {
 		"experience": 0,
 	},
 	"86d23c4e-d887-46d2-ba5e-d472d87f1533": {
-		"splat": 1,
+		"splat": EnumSplat.MAGE,
 
 		"name": "Moonwatcher",
 		"player": "m00n",
@@ -277,7 +277,7 @@ const characters: { [index: string]: Character | any } = {
 		"willpower": 5
 	},
 	"b153b71d-57b0-488e-8a14-165f0ebc5b20": {
-		"splat": 3,
+		"splat": EnumSplat.WEREWOLF,
 		"name": "Amos Gray",
 		"player": "m00n",
 

@@ -1,136 +1,69 @@
 <template>
-	<!-- <teleport :to="teleport" :disabled="!teleport"> -->
-		<div :class="{'row': cols > 1}">
-			<h3 v-if="name" class="separator">{{ name }}</h3>
-			<!-- eslint-disable-next-line vue/no-use-v-if-with-v-for -->
-			<div v-for="n in cols" :key="n" :class="{
-				['col-sm-'+Math.floor(12/cols)]: cols > 1
-			}">
-				<div style="margin:0" v-for="(item, i) in visibleArr" :key="i">
-					<!-- eslint-disable-next-line vue/no-mutating-props -->
-					<input @input="doInput(item, calc(i,n))" v-model="items[calc(i,n)]" class="line w-100">
-				</div>
+	<div :class="{ 'row': cols > 1 }">
+		<h3 v-if="name" class="separator">{{ name }}</h3>
+		<div v-for="n in cols" :key="n" :class="{
+			['col-sm-' + Math.floor(12 / cols)]: cols > 1
+		}">
+			<div style="margin:0" v-for="(i) in rows" :key="calc(i - 1, n)">
+				<input @input="doInput(calc(i - 1, n))" v-model="items[calc(i - 1, n)]" class="line w-100" />
 			</div>
 		</div>
-	<!-- </teleport> -->
+	</div>
 </template>
 
-<script lang="ts">
-/* eslint-disable vue/no-mutating-props */
+<script lang="ts" setup>
+import { computed } from "vue";
 
-import { defineComponent, PropType } from "vue";
-export default defineComponent({
-	name: "ItemList",
-	props: {
-		"items": {
-			required: true,
-			type: Array as PropType<string[]>
-		},
-		"name": {
-			required: false,
-			type: String
-		},
-		"cols": {
-			required: false,
-			type: Number,
-			default: () => 1
-		},
-		"mutable": {
-			required: false,
-			default: true,
-			type: Boolean
-		},
-		"teleport": {
-			required: false,
-			type: String,
-		},
-		"min": {
-			required: false,
-			type: Number,
-			default: () => 1
-		},
-		"max": {
-			required: false,
-			type: Number,
-			default: () => Number.MAX_VALUE
-		}
-	},
-	methods: {
-		doInput(ability: string, i: number) {
-			if (this.mutable && ability === "") {
-				// eslint-disable-next-line vue/no-mutating-props
-				this.items.splice(i, 1);
-			}
-		},
-		calc(i: number, n: number) {
-			return this.cols * i + n - 1;
-		}
-	},
-	computed: {
-		visibleArr(): string[] {
-			const arr = [...this.items];
-
-			if (this.mutable) {
-				do {
-					if (arr.length == this.max) {
-						break;
-					}
-
-					arr.push("");
-				} while(arr.length < this.min);
-			}
-
-			return arr;
-		}
-	},
-	watch: {
-		// abilityArr: {handler(newVal, oldVal) {
-		// 	// (this as any).abilities = {};
-
-		// 	newVal.forEach((el: string) => {
-		// 		this.items[el.name.toLowerCase()] = el;
-		// 	});
-		// }, deep:true}
-		// abilities: {handler(newVal, oldVal) {
-
-		// 	// console.log(newVal, oldVal);
-
-		// 	const newW = Object.keys(newVal).filter(el => Object.keys(oldVal).includes(el))[0];
-		// 	const old  = Object.keys(oldVal).filter(el => Object.keys(newVal).includes(el))[0];
-
-
-		// 	this.abilities[newW] = this.abilities[old];
-		// 	delete this.abilities[old];
-		// }, deep: true}
-		// abilityArr: {
-		// 	handler(newArr, oldArr) {
-		// 		newArr.forEach(el => {
-		// 			if ((ability as any).false) {
-		// 				delete (ability as any).false;
-				
-		// 				// eslint-disable-next-line vue/no-mutating-props
-		// 				this.abilityArr.push(ability);
-		// 			}
-		// 		});
-		// 	},
-		// 	deep: true
-		// }
-	}
+const props = withDefaults(defineProps<{
+	items: string[];
+	name: string;
+	cols?: number;
+	mutable?: boolean;
+	min?: number;
+	max?: number;
+}>(), {
+	cols: 1,
+	mutable: false,
+	min: 1,
+	max: Number.MAX_VALUE
 });
 
-// <div id="merits" class="block">
-// 	<h3 class="separator col-sm-12">Merits</h3>
-// 	<div style="margin:0" v-for="(merit, i) in character.merits" :key="i" class="block row col-sm-12">
-// 		<!-- <span style="text-transform: capitalize" v-for="j in attributes[i-1].length" :key="j"> -->
-// 		<input v-model="merit.name" class="line col-7">
-// 		<div class="sheet-dots col-5">
-// 			<button @click="merit.dots = (merit.dots === n ? n-1 : n)" v-for="n in 5" :key="n" :class="{'sheet-dot':true,'sheet-dot-full':merit.dots>=n}"></button>
-// 		</div>
-// 		<!-- <br> -->
-// 		<!-- </span> -->
-// 	</div>
-// </div> -->
-</script>
+const visibleArr = computed(() => {
+	const arr = [...props.items];
 
+	let ii = arr.length-1;
+	for (const [i, el] of arr.reverse().entries()) {
+		if (el) {
+			arr.splice(ii);
+			break;
+		}
+
+		ii = arr.length-i-1;
+	}
+
+	return arr;
+});
+
+const rows = computed(() =>
+	Math.min(Math.ceil(
+			Math.max(visibleArr.value.length, props.min) 
+			/ props.cols
+		) + 
+		(props.mutable ? 1 : 0),
+		props.max
+	)
+);
+
+function doInput(i: number) {
+	// if (!props.items[i]) props.items[i] = "";
+	if (props.mutable && !props.items[i]) {
+		props.items.splice(i, 1);
+	}
+}
+
+function calc(i: number, n: number) {
+	return props.cols * i + n - 1;
+}
+</script>
 <style lang="scss" scoped>
 </style>
