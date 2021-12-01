@@ -49,149 +49,21 @@
 		</span>
 		<!-- {{  }} -->
 		<div id="page-1">
-			<div id="infoBar" class="bar row">
-				<!-- <datalist> </datalist> -->
+			
+			<info-bar-component :character="character"></info-bar-component>
 
-				<div class="block col-sm-4">
-					{{ $t(character.splat.nameName) }}:
-					<input v-model="character.name" />
-					<br />
-					<span v-if="character.splat.enum === EnumSplat.MORTAL">
-						<label for="age">{{ $t("character.age") }}:</label>
-						<input v-model.number="character.age" type="number" id="age" />
-						<br />
-						<label for="player">{{ $t("character.player") }}:</label>
-						<input v-model="character.player" id="player" />
-					</span>
-					<span v-else>
-						<label for="player">{{ $t("character.player") }}:</label>
-						<input v-model="character.player" id="player" />
-						<br />
-						<label for="chronicle">{{ $t("character.chronicle") }}:</label>
-						<input v-model="character.chronicle" id="chronicle" />
-					</span>
-				</div>
-				<div class="block col-sm-4">
-						<label>
-							{{ $t(character.splat.virtueAnchorName) }}:
-							<input v-model="virtueAnchor" list="virtueAnchors"/>
-						</label>
-						<br />
-						<label>
-							{{ $t(character.splat.viceAnchorName) }}:
-							<input v-model="viceAnchor" list="viceAnchors"/>
-						</label>
-					<br />
-					<label for="concept">{{ $t("character.concept") }}:</label>
-					<input v-model="character.concept" id="concept" />
-				</div>
-				<div class="block col-sm-4">
-					<span v-if="character.splat.enum === EnumSplat.MORTAL">
-						<label>
-							{{ $t("character.chronicle") }}:
-							<input v-model="character.chronicle" />
-						</label>
-						<br />
-						<label>
-							{{ $t(character.splat.legacyName) }}:
-							<input v-model="character.faction" />
-						</label>
-						<br />
-						<label v-if="hasMixin(character, HasOrganization)">
-							{{ $t(character.splat.orgName) }}:
-							<input v-model="character._organization" />
-						</label>
-						<br />
-					</span>
-					<span v-else>
-						<label v-if="hasMixin(character, IsSupernatural)">
-							{{ $t(character.splat.subTypeName) }}:
-							<select v-model="character._subType">
-								<option
-									v-for="(el, key) in character.splat.subTypes"
-									:key="key"
-									:value="key"
-								>{{ $t(el.name) }}</option>
-								<option></option>
-							</select>
-						</label>
-						<br>
-						<label v-if="hasMixin(character, HasLegacy)">
-							{{ $t(character.splat.legacyName) }}:
-							<input v-model="character.legacy"/>
-						</label>
-						<br>
-						<label v-if="hasMixin(character, HasOrganization)">
-							{{ $t(character.splat.orgName) }}:
-							<select v-model="character._organization">
-								<option
-									v-for="(el, key) in character.splat.organizations"
-									:key="key"
-									:value="key"
-								>{{ $t(el.name) }}</option>
-								<option></option>
-							</select>
-						</label>
-					</span>
-				</div>
+			<attribute-component :character="character"></attribute-component>
 
-				<datalist id="organizations">
-					<option
-						v-for="(el, key) in character.splat.organizations"
-						:key="key"
-						:value="key"
-					>{{ $t(el.name) }}</option>
-				</datalist>
-
-				<datalist id="subTypes">
-					<option v-for="(el, key) in character.splat.subTypes" :key="key" :value="key">{{ $t(el.name) }}</option>
-				</datalist>
-
-				<datalist id="virtueAnchors">
-					<option v-for="el in character.splat.virtueAnchors" :key="el" :value="$t(el)"></option>
-				</datalist>
-
-				<datalist id="viceAnchors">
-					<option v-for="el in character.splat.viceAnchors" :key="el" :value="$t(el)"></option>
-				</datalist>
-			</div>
-			<div class="separator col-12">
-				<h2>{{ $t("character.attributes") }}</h2>
-			</div>
-			<div id="attrBar" class="bar row">
-				<div id="attr-cats" style="text-align: right" class="block col-sm-2">
-					{{ $t("character.attribute.power") }}
-					<br />
-					{{ $t("character.attribute.finesse") }}
-					<br />
-					{{ $t("character.attribute.resistance") }}
-					<br />
-				</div>
-				<div class="attr-proper row col-sm-10">
-					<div v-for="(attrCat,i) in ATTRIBUTES" :key="i" class="block col-sm-4">
-						<span style="text-transform: capitalize" v-for="attr in attrCat" :key="attr">
-							<span
-								:class="{ selected: store.state.selectedTraits[attr] }"
-								@click="selectTrait(attr, character.attributes)"
-							>{{ $t(`character.attribute.${attr}`) }}</span>
-							<input
-								v-if="!dotsOverFive && attrMax > 5"
-								v-model.number="baseAttributes[attr]"
-								type="number"
-								style="width: 35px"
-								class="attr-input"
-							/>
-							<sheet-dots v-model="baseAttributes[attr]" :maxValue="dotAttrMax" />
-							<br />
-						</span>
-					</div>
-				</div>
-			</div>
 			<div class="row" style="margin-top:15px">
-				<skill-sidebar @selectSkill="selectTrait" :character="character" class="col col-sm-4"></skill-sidebar>
+				<skill-sidebar
+					v-if="hasMixin(character, HasSkills)"
+					@selectSkill="selectTrait" 
+					:character="character" 
+					class="col col-sm-4">
+				</skill-sidebar>
 
 				<div id="traits" class="col-sm-8">
-					<h2 class="separator col-sm-12" style="margin-bottom: 20px">{{ $t("character.other_traits") }}</h2>
+					<h2 class="separator col-sm-12" style="margin-bottom: 20px">{{ t("character.other_traits") }}</h2>
 					<div class="row">
 						<div class="col col-sm-7">
 							<ability-list
@@ -199,7 +71,7 @@
 								:character="character"
 								v-model:abilities="character.abilities"
 								:optionsMutable="!character.splat.finiteAbilities"
-								:abilityName="$t(character.splat.abilityName)"
+								:abilityName="t(character.splat.abilityName)"
 								:datalist="character.splat.abilities"
 								id="ability"
 								class="block"
@@ -242,17 +114,17 @@
 
 							<div id="minorTraits" class="block col col-12">
 								<span v-if="!(character instanceof WerewolfCharacter)">
-									{{ $t("character.trait.size") }}:
+									{{ t("character.trait.size") }}:
 									<input v-model.number="character.size" type="number" />
 									<br />
-									{{ $t("character.trait.speed") }}:
+									{{ t("character.trait.speed") }}:
 									{{ character.speed }}
 									<br />
-									{{ $t("character.trait.defense") }}:
+									{{ t("character.trait.defense") }}:
 									{{ character.defense }}
 									<br />
-									<!-- {{ $t("character.trait.armor") }}: <input v-model="character.armor" /><br> -->
-									{{ $t("character.trait.armor") }}:
+									<!-- {{ t("character.trait.armor") }}: <input v-model="character.armor" /><br> -->
+									{{ t("character.trait.armor") }}:
 									{{
 										character.armor
 											? character.armor.general +
@@ -261,11 +133,11 @@
 											: ""
 									}}
 									<br />
-									{{ $t("character.trait.initative") }}:
+									{{ t("character.trait.initative") }}:
 									{{ character.initative }}
 									<br />
 								</span>
-								<span style="float: left; margin-right: 5px">{{ $t("character.trait.beats") }}:</span>
+								<span style="float: left; margin-right: 5px">{{ t("character.trait.beats") }}:</span>
 								<span v-if="hasMixin(character, EarnsBeats)">
 									<div style="float: left; margin-right: 10px">
 										<sheet-dots
@@ -276,7 +148,7 @@
 									</div>
 									<!-- <span style="clear: both"></span> -->
 									<br />
-									{{ $t("character.trait.experience") }}:
+									{{ t("character.trait.experience") }}:
 									<input
 										v-model.number="character.experience"
 										type="number"
@@ -291,7 +163,7 @@
 								>
 									<span style="float: left; margin-right: 5px">
 										{{
-											$t(character.splat.alternateBeatName, { x: $t("character.trait.beats") })
+											t(character.splat.alternateBeatName, { x: t("character.trait.beats") })
 										}}:
 									</span>
 									<div style="float: left">
@@ -304,7 +176,7 @@
 									<span style="clear: both"></span>
 									<br />
 									{{
-										$t(character.splat.alternateBeatName, { x: $t("character.trait.experience") })
+										t(character.splat.alternateBeatName, { x: t("character.trait.experience") })
 									}}:
 									<input v-model.number="character.alternateExperience" type="number"/>
 									<br />
@@ -315,7 +187,7 @@
 							<health-component
 								id="health"
 								class="col-12 block"
-								:name="$t('character.trait.health')"
+								:name="t('character.trait.health')"
 								v-model:healthTrack="character.healthTrack"
 								:maxHealth="character.maxHealth"
 								:woundPenalty="hasMixin(character, HasWoundPenalties) ? character.woundPenalty : 0"
@@ -342,11 +214,11 @@
 									@click="selectTrait('power', character)"
 									class="separator col-sm-12"
 									style="white-space: nowrap"
-								>{{ $t(character.splat.powerTraitName) }}</h3>
+								>{{ t(character.splat.powerTraitName) }}</h3>
 								<sheet-dots v-model.number="character.power" :maxValue="10" />
 							</div>
 							<div v-if="hasMixin(character, HasFuel)" class="col-12 block" id="fuelTrait">
-								<h3 class="separator col-sm-12">{{ $t(character.splat.fuelTraitName) }}</h3>
+								<h3 class="separator col-sm-12">{{ t(character.splat.fuelTraitName) }}</h3>
 								<sheet-dots
 									v-model="character.fuel"
 									:maxValue="character.maxFuel"
@@ -435,7 +307,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineComponent, onBeforeMount, reactive, readonly, Ref, unref, watch } from "vue";
+import { computed, defineComponent, onBeforeMount, reactive, readonly, ref, watch } from "vue";
 import { encode, decode } from "base2048";
 import { Buffer } from "buffer";
 
@@ -446,7 +318,6 @@ import { hasMixin } from "ts-mixer";
 
 import {
 	ATTRIBUTES,
-	Attributes,
 	MageCharacter,
 	SKILLS,
 	EnumSplat,
@@ -466,7 +337,8 @@ import {
 	EarnsAlternativeBeats,
 	HasOrganization,
 	HasLegacy,
-	HasMerits
+	HasMerits,
+	HasSkills
 } from "../definitions";
 
 import AbilityList from "../components/sheetComponents/AbilityList.vue";
@@ -479,7 +351,10 @@ import ItemList from "../components/sheetComponents/ItemList.vue";
 import ObjectList from "../components/sheetComponents/ObjectList.vue";
 import DiceRollerComponent from "../components/sheetComponents/diceRoller/DiceRoller.vue";
 
+import InfoBarComponent from "../components/sheetComponents/InfoBarComponent.vue";
+import AttributeComponent from "../components/sheetComponents/AttributeComponent.vue";
 import SkillSidebar from "../components/sheetComponents/SkillSidebar.vue";
+
 import WerewolfTraits from "../components/splats/WerewolfTraits.vue";
 import MageTraits from "../components/splats/MageTraits.vue";
 
@@ -505,7 +380,6 @@ const store = useStore();
 const roller = new DiceRoller();
 
 const characters = computed(() => store.state.characters);
-
 const id = computed(() => route.params.id as string);
 
 const CACHE: {
@@ -530,7 +404,7 @@ const character = computed(() => {
 	if (!route.query.data)
 		CACHE[id.value] = obj as any;
 
-	return obj;
+	return obj as Character;
 });
 
 let flag = true;
@@ -548,73 +422,9 @@ watch(character, (val) => {
 
 onBeforeMount(() => {
 	Object.assign(window, {
-		character, roller
+		character, roller, store
 	});
 });
-
-const virtueAnchor = computed({
-	get(): string {
-		if (hasMixin(character.value, HasVirtueViceAnchors)) {
-			const x = (character.value.splat.virtueAnchor || (() => ""))(character.value.virtueAnchor);
-			return te(x) ? t(x) : character.value.virtueAnchor;
-		}
-		return "";
-	},
-	set(val: string) {
-		if (hasMixin(character.value, HasVirtueViceAnchors)) {
-			const x = (character.value.splat.virtueAnchor || (() => ""))(val.toLowerCase());
-
-			if (character.value.splat.virtueAnchors.includes(x)) {
-				character.value.virtueAnchor = val.toLowerCase();
-			} else {
-				character.value.virtueAnchor = val;
-			}
-		}
-	}
-});
-
-const viceAnchor = computed({
-	get(): string {
-		if (hasMixin(character.value, HasVirtueViceAnchors)) {
-			const x = (character.value.splat.viceAnchor || (() => ""))(character.value.viceAnchor);
-			return te(x) ? t(x) : character.value.viceAnchor;
-		}
-		return "";
-	},
-	set(val: string) {
-		if (hasMixin(character.value, HasVirtueViceAnchors)) {
-			const x = (character.value.splat.viceAnchor || (() => ""))(val.toLowerCase());
-
-			if (character.value.splat.viceAnchors.includes(x)) {
-				character.value.viceAnchor = val.toLowerCase();
-			} else {
-				character.value.viceAnchor = val;
-			}
-		}
-	}
-});
-
-const baseAttributes = computed({
-	get(): Attributes {
-		return character.value._attributes;
-	},
-	set(val: Attributes) {
-		character.value._attributes = val;
-	}
-})
-
-const dotsOverFive = computed(() => false);
-
-const dotAttrMax = computed(() => Math.min(
-	attrMax.value,
-	dotsOverFive.value ? 10 : 5
-));
-
-const attrMax = computed(() => hasMixin(character.value, IsSupernatural) ?
-	character.value.power > 5 ?
-		character.value.power : 5
-	: 5
-);
 
 async function rollSelected(opts: any) {
 	const vals = Object.values(store.state.selectedTraits).map(el => el());
@@ -665,6 +475,7 @@ function exportCharacter() {
 		navigator.clipboard.writeText(`${document.location.origin + document.location.pathname}#/character/?data=${txt}`);
 	}
 }
+
 function importCharacter() {
 	const data = JSON.parse(decodeURI(route.query.data as string));
 
